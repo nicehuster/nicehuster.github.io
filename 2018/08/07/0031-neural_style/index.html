@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc" />
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9" />
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="deep learning,Neural-style," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="风格迁移，是一个非常有意思的任务，使用这种方法，可以将一张图片的风格“迁移”到另外一张图片上。如下图：从上面的图看一看出，风格迁移就是输入一张图片，在持本身内容大致不变的情况下，结合一张艺术图片，然后生成出带有艺术效果的图片。风格迁移自2015年Gatys第一次提出开始，其热度一直不断攀升，期间还出现了一个非常火爆的“风格迁移”滤镜App——Prisma，App官网上面的风格迁移图片做的非常好看，">
+<meta name="keywords" content="deep learning,Neural-style">
+<meta property="og:type" content="article">
+<meta property="og:title" content="风格迁移（一）：原始风格迁移">
+<meta property="og:url" content="https://nicehuster.github.io/2018/08/07/0031-neural_style/index.html">
+<meta property="og:site_name" content="nicehuster&#39;s blog">
+<meta property="og:description" content="风格迁移，是一个非常有意思的任务，使用这种方法，可以将一张图片的风格“迁移”到另外一张图片上。如下图：从上面的图看一看出，风格迁移就是输入一张图片，在持本身内容大致不变的情况下，结合一张艺术图片，然后生成出带有艺术效果的图片。风格迁移自2015年Gatys第一次提出开始，其热度一直不断攀升，期间还出现了一个非常火爆的“风格迁移”滤镜App——Prisma，App官网上面的风格迁移图片做的非常好看，">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.github.io/img/neural_style.jpg">
+<meta property="og:image" content="https://nicehuster.github.io/img/neural_style1.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/neural_style2.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/VGG16.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/style.png">
+<meta property="og:updated_time" content="2020-09-13T06:54:12.031Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="风格迁移（一）：原始风格迁移">
+<meta name="twitter:description" content="风格迁移，是一个非常有意思的任务，使用这种方法，可以将一张图片的风格“迁移”到另外一张图片上。如下图：从上面的图看一看出，风格迁移就是输入一张图片，在持本身内容大致不变的情况下，结合一张艺术图片，然后生成出带有艺术效果的图片。风格迁移自2015年Gatys第一次提出开始，其热度一直不断攀升，期间还出现了一个非常火爆的“风格迁移”滤镜App——Prisma，App官网上面的风格迁移图片做的非常好看，">
+<meta name="twitter:image" content="https://nicehuster.github.io/img/neural_style.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.github.io/2018/08/07/0031-neural_style/"/>
+
+
+
+
+
+  <title>风格迁移（一）：原始风格迁移 | nicehuster's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nicehuster's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">不积跬步，无以至千里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2018/08/07/0031-neural_style/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nicehuster's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">风格迁移（一）：原始风格迁移</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-07T19:13:39+08:00">
+                2018-08-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/PyTorch/" itemprop="url" rel="index">
+                    <span itemprop="name">PyTorch</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>风格迁移，是一个非常有意思的任务，使用这种方法，可以将一张图片的风格“迁移”到另外一张图片上。如下图：<br><img src="/img/neural_style.jpg" alt=""><br>从上面的图看一看出，风格迁移就是输入一张图片，在持本身内容大致不变的情况下，结合一张艺术图片，然后生成出带有艺术效果的图片。风格迁移自2015年Gatys第一次提出开始，其热度一直不断攀升，期间还出现了一个非常火爆的“风格迁移”滤镜App——<a href="https://prisma-ai.com/" target="_blank" rel="noopener">Prisma</a>，App官网上面的风格迁移图片做的非常好看，真是美如画，可以去看看一下。<br><a id="more"></a><br>风格迁移自2015年发展到现在，涌现出许多非常不错的算法，这些算法大致可以分为三种：</p>
+<blockquote>
+<ul>
+<li>原始风格迁移：固定风格固定内容；</li>
+<li>快速风格迁移：固定风格任意内容；</li>
+<li>极速风格迁移：任意风格任意内容；</li>
+</ul>
+</blockquote>
+<p>风格迁移的大致思路基本都是通过定义两种loss：Content loss和 Style loss。分别对应着输出图片与 Content Image 内容上的差异，以及与 Style Image 在风格上的差异。最终的 Loss 为两种 Loss 的加权和，通过迭代优化，不断减小loss,使得生成图片既包含content image的内容也具有style image的风格。</p>
+<p><img src="/img/neural_style1.png" alt="a图的style 和 p图的content 进行融合，得到第三幅图x"><br><img src="/img/neural_style2.png" alt="代价函数loss"><br>我们的目的是生成一张在内容上尽量与Content image 保持一致，在风格上尽量与Style image要保持一致的图片，现在输入输出，loss都知道了，那怎样具体去设计Content loss和Style loss呢。</p>
+<h3 id="原始风格迁移（style-transfer）"><a href="#原始风格迁移（style-transfer）" class="headerlink" title="原始风格迁移（style transfer）"></a>原始风格迁移（style transfer）</h3><p>原始风格迁移是在固定风格、固定内容的情况下做的风格迁移，这是最慢的方法，也是最经典的方法。原始风格迁移方法思路比较简单，将生成图片看做是一个训练的过程，训练变量就是图片，通过不断的迭代优化，生成与内容图片以及风格图片都尽量一致的图片，这种方法的缺点就是速度慢，效率低。这种方法可以参考这篇文章： A Neural Algorithm of Artistic Style。</p>
+<h3 id="网络结构"><a href="#网络结构" class="headerlink" title="网络结构"></a>网络结构</h3><p>在进行风格迁移任务时，需要使用一个预训练网络对图像提取特征，通过这些特征来衡量两个图像之间的内容差异和风格差异。在这里我选用了VGG16，提取其中几个比较重要的层的特征。<br><img src="/img/VGG16.png" alt=""><br><figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">VGG</span>(<span class="title">nn</span>.<span class="title">Module</span>):</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(<span class="keyword">self</span>, features)</span></span><span class="symbol">:</span></span><br><span class="line">        <span class="keyword">super</span>(VGG, <span class="keyword">self</span>).__init_<span class="number">_</span>()</span><br><span class="line">        <span class="keyword">self</span>.features = features</span><br><span class="line">        <span class="keyword">self</span>.layer_name_mapping = &#123;</span><br><span class="line">            <span class="string">'3'</span>: <span class="string">"relu1_2"</span>,  </span><br><span class="line">            <span class="string">'8'</span>: <span class="string">"relu2_2"</span>,</span><br><span class="line">            <span class="string">'15'</span>: <span class="string">"relu3_3"</span>,</span><br><span class="line">            <span class="string">'22'</span>: <span class="string">"relu4_3"</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> p <span class="keyword">in</span> <span class="keyword">self</span>.parameters()<span class="symbol">:</span></span><br><span class="line">            p.requires_grad = False</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(<span class="keyword">self</span>, x)</span></span><span class="symbol">:</span></span><br><span class="line">        outs = []</span><br><span class="line">        <span class="keyword">for</span> name, <span class="class"><span class="keyword">module</span> <span class="title">in</span> <span class="title">self</span>.<span class="title">features</span>.<span class="title">_modules</span>.<span class="title">items</span>():</span></span><br><span class="line">            x = <span class="class"><span class="keyword">module</span>(<span class="title">x</span>)</span></span><br><span class="line">            <span class="keyword">if</span> name <span class="keyword">in</span> <span class="keyword">self</span>.<span class="symbol">layer_name_mapping:</span></span><br><span class="line">                outs.append(x)</span><br><span class="line">        <span class="keyword">return</span> outs</span><br><span class="line"></span><br><span class="line">vgg16 = models.vgg16(pretrained=True)</span><br><span class="line">vgg16 = VGG(vgg16.features[<span class="symbol">:</span><span class="number">23</span>]).to(device).eval()</span><br></pre></td></tr></table></figure></p>
+<p>经过修改之后的VGG16可以提取relu1_2、relu2_2、relu3_3、relu4_3这几层的特征图。打印这几层特征图的大小，如下：<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">relu1_2 [<span class="number">1</span>, <span class="number">64</span>, <span class="number">512</span>, <span class="number">512</span>]</span><br><span class="line">relu2_2 [<span class="number">1</span>, <span class="number">128</span>, <span class="number">256</span>, <span class="number">256</span>]</span><br><span class="line">relu3_3 [<span class="number">1</span>, <span class="number">256</span>, <span class="number">128</span>, <span class="number">128</span>]</span><br><span class="line">relu4_3 [<span class="number">1</span>, <span class="number">512</span>, <span class="number">64</span>, <span class="number">64</span>]</span><br></pre></td></tr></table></figure></p>
+<h3 id="内容-Content-loss"><a href="#内容-Content-loss" class="headerlink" title="内容 Content loss"></a>内容 Content loss</h3><p>在进行风格迁移时，如何保证生成图像与内容图像的一致性，如何使用定量指标去衡量两张图片在内容上的差异呢。在上面的那张网络结构图上，采用的是relu3_3层特征去比较内容差异。注意，在这里，没有使用Image Transform Net。图片X,Y之间的内容差异可以如下表示：</p>
+<script type="math/tex; mode=display">D_C^L(X,Y) = \|F_{XL} - F_{YL}\|^2 = \sum_i (F_{XL}(i) - F_{YL}(i))^2</script><p>$F_{XL}$表示将第relu3层的feature map展开后的一维向量。我们可以简单的认为，输入图片X在网络的第relu3层的内容就是它。根据生成图像和内容图像在relu3层的输出的特征图的均方误差（MeanSquaredError）来优化生成的图像与内容图像之间的内容一致性。</p>
+<h3 id="风格-Style-loss"><a href="#风格-Style-loss" class="headerlink" title="风格 Style loss"></a>风格 Style loss</h3><p>在Gatys那边文章中引入Gram矩阵来表示图像的风格，通过Gram矩阵来计算图片风格之间的差异。假设预训练网络在第L层的特征图大小1<em>c</em>h<em>w,Gram矩阵的大小为c</em>c,每一个元素Gram(k,l)表示第k个通道的特征图和第l个通道的特征图相乘求和，则</p>
+<script type="math/tex; mode=display">G_{XL}(k,l) = \langle F_{XL}^k, F_{XL}^l\rangle = \sum_i F_{XL}^k(i) . F_{XL}^l(i)</script><p>上面知道了图片风格的定义，那么图片之间的风格差异就是两幅图的Gram矩阵的差异。具体代码实现如下：<br><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">def gram_matrix(y):</span><br><span class="line">    (b, ch, h, w) = y.size()</span><br><span class="line">    <span class="built_in">features</span> = y.<span class="built_in">view</span>(b, ch, w * h)</span><br><span class="line">    features_t = <span class="built_in">features</span>.<span class="built_in">transpose</span>(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line">    gram = <span class="built_in">features</span>.bmm(features_t) / (ch * h * w)</span><br><span class="line">    <span class="built_in">return</span> gram</span><br></pre></td></tr></table></figure></p>
+<p>图片X,Y之间的风格差异定义如下：</p>
+<script type="math/tex; mode=display">D_S^L(X,Y) = |G_{XL} - G_{YL}|^2 = \sum_{k,l} (G_{XL}(k,l) - G_{YL}(k,l))^2</script><p>在风格迁移中，我们需要最小化几层内容差异$D_C^L(X,Y)$和几层风格差异$D_S^L(X,Y)$，我们的目标函数就最小化这两者的和。</p>
+<script type="math/tex; mode=display">min( \sum_{L_C} w_{CL_C}.D_C^L(X,C) + \sum_{L_S} w_{SL_S}.D_S^L(X,S))</script><p>其中$L_C$表示内容上需要输出的几层，$L_S$表示风格需要输出的几层。w表示相应的权重。从上面的那个网络结构图可以看出，在内容上只比较了relu3_3层的差异，在风格上比较了relu1_2、relu2_2、relu3_3、relu4_3 四层的差异。</p>
+<h3 id="完整代码实现-code"><a href="#完整代码实现-code" class="headerlink" title="完整代码实现 code"></a>完整代码实现 code</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">@author: niceliu</span></span><br><span class="line"><span class="string">@contact: nicehuster@gmail.com</span></span><br><span class="line"><span class="string">@file: neural_style1.py</span></span><br><span class="line"><span class="string">@time: 8/7/18 10:39 PM</span></span><br><span class="line"><span class="string">@desc:</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">import</span> torch.nn.functional <span class="keyword">as</span> F</span><br><span class="line"><span class="keyword">import</span> torch.optim <span class="keyword">as</span> optim</span><br><span class="line"><span class="keyword">from</span> PIL <span class="keyword">import</span> Image</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">import</span> torchvision.transforms <span class="keyword">as</span> transforms</span><br><span class="line"><span class="keyword">import</span> torchvision.models <span class="keyword">as</span> models</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">cnn_normalization_mean = [<span class="number">0.485</span>, <span class="number">0.456</span>, <span class="number">0.406</span>]</span><br><span class="line">cnn_normalization_std = [<span class="number">0.229</span>, <span class="number">0.224</span>, <span class="number">0.225</span>]</span><br><span class="line">tensor_normalizer = transforms.Normalize(mean=cnn_normalization_mean, std=cnn_normalization_std)</span><br><span class="line"></span><br><span class="line">device = torch.device(<span class="string">"cuda:0"</span> <span class="keyword">if</span> torch.cuda.is_available() <span class="keyword">else</span> <span class="string">"cpu"</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">VGG</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, features)</span>:</span></span><br><span class="line">        super(VGG, self).__init__()</span><br><span class="line">        self.features = features</span><br><span class="line">        self.layer_name_mapping = &#123;</span><br><span class="line">            <span class="string">'3'</span>: <span class="string">"relu1_2"</span>,</span><br><span class="line">            <span class="string">'8'</span>: <span class="string">"relu2_2"</span>,</span><br><span class="line">            <span class="string">'15'</span>: <span class="string">"relu3_3"</span>,</span><br><span class="line">            <span class="string">'22'</span>: <span class="string">"relu4_3"</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> p <span class="keyword">in</span> self.parameters():</span><br><span class="line">            p.requires_grad = <span class="keyword">False</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        outs = []</span><br><span class="line">        <span class="keyword">for</span> name, module <span class="keyword">in</span> self.features._modules.items():</span><br><span class="line">            x = module(x)</span><br><span class="line">            <span class="keyword">if</span> name <span class="keyword">in</span> self.layer_name_mapping:</span><br><span class="line">                outs.append(x)</span><br><span class="line">        <span class="keyword">return</span> outs</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">gram_matrix</span><span class="params">(y)</span>:</span></span><br><span class="line">    (b, ch, h, w) = y.size()</span><br><span class="line">    features = y.view(b, ch, w * h)</span><br><span class="line">    features_t = features.transpose(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line">    gram = features.bmm(features_t) / (ch * h * w)</span><br><span class="line">    <span class="keyword">return</span> gram</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">preprocess_image</span><span class="params">(image, target_width=None)</span>:</span></span><br><span class="line">    <span class="string">"""输入 PIL.Image 对象，输出标准化后的四维 tensor"""</span></span><br><span class="line">    <span class="keyword">if</span> target_width:</span><br><span class="line">        t = transforms.Compose([</span><br><span class="line">            transforms.Resize(target_width),</span><br><span class="line">            transforms.CenterCrop(target_width),</span><br><span class="line">            transforms.ToTensor(),</span><br><span class="line">            tensor_normalizer,</span><br><span class="line">        ])</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        t = transforms.Compose([</span><br><span class="line">            transforms.ToTensor(),</span><br><span class="line">            tensor_normalizer,</span><br><span class="line">        ])</span><br><span class="line">    <span class="keyword">return</span> t(image).unsqueeze(<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">read_image</span><span class="params">(path, target_width=None)</span>:</span></span><br><span class="line">    <span class="string">"""输入图像路径，输出标准化后的四维 tensor"""</span></span><br><span class="line">    image = Image.open(path)</span><br><span class="line">    <span class="keyword">return</span> preprocess_image(image, target_width)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">recover_image</span><span class="params">(tensor)</span>:</span></span><br><span class="line">    <span class="string">"""输入 GPU 上的四维 tensor，输出 0~255 范围的三维 numpy 矩阵，RGB 顺序"""</span></span><br><span class="line">    image = tensor.detach().cpu().numpy()</span><br><span class="line">    image = image * np.array(cnn_normalization_std).reshape((<span class="number">1</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">1</span>)) + \</span><br><span class="line">    np.array(cnn_normalization_mean).reshape((<span class="number">1</span>, <span class="number">3</span>, <span class="number">1</span>, <span class="number">1</span>))</span><br><span class="line">    <span class="keyword">return</span> (image.transpose(<span class="number">0</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">1</span>) * <span class="number">255.</span>).clip(<span class="number">0</span>, <span class="number">255</span>).astype(np.uint8)[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">imshow</span><span class="params">(tensor, title=None)</span>:</span></span><br><span class="line">    <span class="string">"""输入 GPU 上的四维 tensor，然后绘制该图像"""</span></span><br><span class="line">    image = recover_image(tensor)</span><br><span class="line">    print(image.shape)</span><br><span class="line">    plt.imshow(image)</span><br><span class="line">    <span class="keyword">if</span> title <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">        plt.title(title)</span><br><span class="line"></span><br><span class="line">width = <span class="number">512</span></span><br><span class="line">style_img = read_image(<span class="string">'picasso.jpg'</span>, target_width=width).to(device)</span><br><span class="line">content_img = read_image(<span class="string">'dancing.jpg'</span>, target_width=width).to(device)</span><br><span class="line">vgg16 = models.vgg16(pretrained=<span class="keyword">True</span>)</span><br><span class="line">vgg16 = VGG(vgg16.features[:<span class="number">23</span>]).to(device).eval()</span><br><span class="line">style_features = vgg16(style_img)</span><br><span class="line">content_features = vgg16(content_img)</span><br><span class="line"></span><br><span class="line">style_grams = [gram_matrix(x) <span class="keyword">for</span> x <span class="keyword">in</span> style_features]</span><br><span class="line">[x.shape <span class="keyword">for</span> x <span class="keyword">in</span> style_grams]</span><br><span class="line">[x.shape <span class="keyword">for</span> x <span class="keyword">in</span> content_features]</span><br><span class="line"></span><br><span class="line">input_img = content_img.clone()</span><br><span class="line">optimizer = optim.LBFGS([input_img.requires_grad_()]) <span class="comment">#将input_img作为变量，不断迭代优化</span></span><br><span class="line">style_weight = <span class="number">1e6</span></span><br><span class="line">content_weight = <span class="number">1</span></span><br><span class="line"></span><br><span class="line">run = [<span class="number">0</span>]</span><br><span class="line"><span class="keyword">while</span> run[<span class="number">0</span>] &lt;= <span class="number">300</span>:</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">f</span><span class="params">()</span>:</span></span><br><span class="line">        optimizer.zero_grad()</span><br><span class="line">        features = vgg16(input_img) <span class="comment">#在这里，我们使用内容作为输入，不过也可以使用噪声图片输入</span></span><br><span class="line"></span><br><span class="line">        content_loss = F.mse_loss(features[<span class="number">2</span>], content_features[<span class="number">2</span>]) * content_weight</span><br><span class="line">        <span class="comment">#在这里 content feature 只提取了relu_3层的特征输出。</span></span><br><span class="line">        style_loss = <span class="number">0</span></span><br><span class="line">        grams = [gram_matrix(x) <span class="keyword">for</span> x <span class="keyword">in</span> features]</span><br><span class="line">        <span class="keyword">for</span> a, b <span class="keyword">in</span> zip(grams, style_grams):</span><br><span class="line">            style_loss += F.mse_loss(a, b) * style_weight</span><br><span class="line"></span><br><span class="line">        loss = style_loss + content_loss</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> run[<span class="number">0</span>] % <span class="number">50</span> == <span class="number">0</span>:</span><br><span class="line">            print(<span class="string">'Step &#123;&#125;: Style Loss: &#123;:4f&#125; Content Loss: &#123;:4f&#125;'</span>.format(</span><br><span class="line">                run[<span class="number">0</span>], style_loss.item(), content_loss.item()))</span><br><span class="line">        run[<span class="number">0</span>] += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">        loss.backward()</span><br><span class="line">        <span class="keyword">return</span> loss</span><br><span class="line">    optimizer.step(f)</span><br><span class="line"></span><br><span class="line">plt.figure(figsize=(<span class="number">18</span>, <span class="number">6</span>))</span><br><span class="line"></span><br><span class="line">plt.subplot(<span class="number">1</span>, <span class="number">3</span>, <span class="number">1</span>)</span><br><span class="line">imshow(style_img, title=<span class="string">'Style Image'</span>)</span><br><span class="line"></span><br><span class="line">plt.subplot(<span class="number">1</span>, <span class="number">3</span>, <span class="number">2</span>)</span><br><span class="line">imshow(content_img, title=<span class="string">'Content Image'</span>)</span><br><span class="line"></span><br><span class="line">plt.subplot(<span class="number">1</span>, <span class="number">3</span>, <span class="number">3</span>)</span><br><span class="line">imshow(input_img, title=<span class="string">'Output Image'</span>)</span><br><span class="line">plt.show()</span><br></pre></td></tr></table></figure>
+<p>这里说明一下，上面的完整代码主要参考<a href="https://github.com/CortexFoundation/StyleTransferTrilogy/blob/master/code/Situation1.ipynb" target="_blank" rel="noopener">这里</a>，还有<a href="https://github.com/pytorch/examples/blob/master/fast_neural_style/neural_style/utils.py" target="_blank" rel="noopener">这里</a>。<br>最终实验结果如下：<br><img src="/img/style.png" alt=""><br>从上面的实验结果可以看出，生成的图片即包含有content image的内容，也有style image的风格。上面生成一张512大小的图片，设置的是迭代300次，在tianX上用时10s左右，从速度上来讲还是挺慢的。下一篇博客会介绍一下在此基础上改进的快速风格迁移，以及基于meta network的极速风格迁移，尤其是CVPR2018的基于meta network的风格迁移方法，该方法可以直接在手机移动端运行，可以达到实时风格迁移的效果。  </p>
+<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>图像风格迁移这个领域，我也是刚开始看，如果对这个方向感兴趣的话，想深入了解的话，就得需要多看看论文。然后搜集查找相关论文是一个比较耗时的过程，还有已经有人整理了不少关于风格迁移相关的论文和代码，想深入了解的话，可以看这里：<a href="https://github.com/huihuangz/Neural-Style-Transfer-Papers-Code" target="_blank" rel="noopener">Neural-Style-Transfer-Papers-Code</a>。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+            <a href="/tags/Neural-style/" rel="tag"># Neural-style</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/03/0030-leetcode_dynamic2/" rel="next" title="LeetCode：动态规划（二）">
+                <i class="fa fa-chevron-left"></i> LeetCode：动态规划（二）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/08/0032-neural_style2/" rel="prev" title="风格迁移（二）：快速风格迁移">
+                风格迁移（二）：快速风格迁移 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/weichat.jpg"
+               alt="nicehuster" />
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">62</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#原始风格迁移（style-transfer）"><span class="nav-number">1.</span> <span class="nav-text">原始风格迁移（style transfer）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#网络结构"><span class="nav-number">2.</span> <span class="nav-text">网络结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内容-Content-loss"><span class="nav-number">3.</span> <span class="nav-text">内容 Content loss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#风格-Style-loss"><span class="nav-number">4.</span> <span class="nav-text">风格 Style loss</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#完整代码实现-code"><span class="nav-number">5.</span> <span class="nav-text">完整代码实现 code</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最后"><span class="nav-number">6.</span> <span class="nav-text">最后</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc" />
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9" />
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="caffe," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="这几天开始开始忙着找工作的事情，由于简历中写道熟悉深度学习框架caffe，为避免在面试的时候问及caffe框架相关的问题，就对caffe的框架进行重温一遍。 第三方依赖库caffe安装需要的依赖包比较多，下面介绍这些依赖包的用途：   protobuffer：用户建立统一的参数描述文件（proto）,然后利用protoc编译就能让协议（prototxt）等部分关键代码自动生成，节省大量开发，调试代">
+<meta name="keywords" content="caffe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="caffe框架结构介绍">
+<meta property="og:url" content="https://nicehuster.github.io/2018/07/08/0017-caffe/index.html">
+<meta property="og:site_name" content="nicehuster&#39;s blog">
+<meta property="og:description" content="这几天开始开始忙着找工作的事情，由于简历中写道熟悉深度学习框架caffe，为避免在面试的时候问及caffe框架相关的问题，就对caffe的框架进行重温一遍。 第三方依赖库caffe安装需要的依赖包比较多，下面介绍这些依赖包的用途：   protobuffer：用户建立统一的参数描述文件（proto）,然后利用protoc编译就能让协议（prototxt）等部分关键代码自动生成，节省大量开发，调试代">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-09-13T06:54:12.027Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="caffe框架结构介绍">
+<meta name="twitter:description" content="这几天开始开始忙着找工作的事情，由于简历中写道熟悉深度学习框架caffe，为避免在面试的时候问及caffe框架相关的问题，就对caffe的框架进行重温一遍。 第三方依赖库caffe安装需要的依赖包比较多，下面介绍这些依赖包的用途：   protobuffer：用户建立统一的参数描述文件（proto）,然后利用protoc编译就能让协议（prototxt）等部分关键代码自动生成，节省大量开发，调试代">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.github.io/2018/07/08/0017-caffe/"/>
+
+
+
+
+
+  <title>caffe框架结构介绍 | nicehuster's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nicehuster's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">不积跬步，无以至千里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2018/07/08/0017-caffe/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nicehuster's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">caffe框架结构介绍</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-08T10:13:39+08:00">
+                2018-07-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/project/" itemprop="url" rel="index">
+                    <span itemprop="name">project</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这几天开始开始忙着找工作的事情，由于简历中写道熟悉深度学习框架caffe，为避免在面试的时候问及caffe框架相关的问题，就对caffe的框架进行重温一遍。</p>
+<h3 id="第三方依赖库"><a href="#第三方依赖库" class="headerlink" title="第三方依赖库"></a>第三方依赖库</h3><p>caffe安装需要的依赖包比较多，下面介绍这些依赖包的用途：</p>
+<blockquote>
+<ul>
+<li>protobuffer：用户建立统一的参数描述文件（proto）,然后利用protoc编译就能让协议（prototxt）等部分关键代码自动生成，节省大量开发，调试代码时间。</li>
+<li>boost：caffe中使用了boost中的智能指针，其自带引用计数功能，可避免共享指针时造成的内存泄漏问题；</li>
+<li>gflags：命令行参数解析；</li>
+<li>glog：用于记录应用程序日志；</li>
+<li>openBLAS：负责caffe中CPU端的数值计算（如矩阵、向量的乘法运算），由于调用量相当大，该库的性能直接影响caffe的运行性能；</li>
+<li>hfd5：存储不同类型的图像和数码数据；</li>
+<li>OpenCV：计算机视觉库，包含大量图像处理函数，caffe使用这个完成图像存取和预处理功能；</li>
+<li>lmdb和leveldb：将各种原始数据（jpeg图片，二进制数据等）转化为key-value存储，便于caffe快速获取这些数据；</li>
+<li>snappy：压缩和解压缩；</li>
+</ul>
+</blockquote>
+<a id="more"></a>
+<h3 id="结构"><a href="#结构" class="headerlink" title="结构"></a>结构</h3><p> Caffe是一个深度学习框架，该框架主要包括四个组件组成：blobs，layers，nets、solver。因此可以从这四个层次进行理解：</p>
+<h4 id="Blob"><a href="#Blob" class="headerlink" title="Blob"></a>Blob</h4><p>Blob是一个四维连续数组(type = float32), 使用(n, c, h,w)表示的话，那么每一维的意思分别是：</p>
+<blockquote>
+<ul>
+<li>n: number. 输入数据量，比如进行sgd时候的mini-batch大小。</li>
+<li>c: channel. 如果是图像数据的话可以认为是通道数量。</li>
+<li>h,w: height, width. 如果是图像数据的话可以认为是图片(或feature map)的高度和宽度。</li>
+</ul>
+</blockquote>
+<p>Blob内部其实有两个字段data,diff.data表示流动数据(输出数据)，而diff则存储BP的梯度。data/diff可以存储于cpu, 也可以存储于gpu。如果某个layer不支持gpu的话，那么就需要将gpu数据copy到cpu上，造成性能开销。对于python/numpy用户来说，可以用reshape函数来转换为blob: </p>
+<script type="math/tex; mode=display">data = data.reshape((-1, c, h, w))</script><h4 id="Layer"><a href="#Layer" class="headerlink" title="Layer"></a>Layer</h4><p>caffe提供了许多内置layer，比如convolution layer, pool layer, dropout layer, nonlinearity layer等。这些层说明以及具体参数都可以在<a href="http://caffe.berkeleyvision.org/" target="_blank" rel="noopener">这里</a>查看。每个layer有输入一些’bottom’ blobs, 输出一些’top’ blobs. 输入层是”data”和”label” blobs。每个层的定义有四个关键的函数：</p>
+<blockquote>
+<ul>
+<li>LayerSetUp：初始化工作；</li>
+<li>Reshape：数据输入大小类型转化；</li>
+<li>Forward_cpu/Forward_gpu：前向传播；</li>
+<li>Backward_cpu/Backward_gpu：反向传播/计算梯度；</li>
+</ul>
+</blockquote>
+<p>另外，部分data layer还支持预处理操作。</p>
+<h4 id="Net"><a href="#Net" class="headerlink" title="Net"></a>Net</h4><p>Net是layers组成的DAG, 并且可以使用文本格式来描述（比如<a href="https://github.com/BVLC/caffe/blob/master/examples/mnist/lenet_train_test.prototxt" target="_blank" rel="noopener">lenet_train_test.prototxt</a>）。Net有个初始化函数Init()，它的作用有两个：1）创建blosb和layers; 2） 调用layers的SetUp函数来初始化layers。</p>
+<h4 id="Solver"><a href="#Solver" class="headerlink" title="Solver"></a>Solver</h4><p>负责深度网络的训练，主要目的就是协调模型的优化，solver优化一个模型的方法是：首先通过调用前向传播来获得输出和损失，然后通过调用反向传播产生模型的梯度，将梯度和权值更新后相结合来最小化损失。此外通过solver.prototxt（例如<a href="https://github.com/BVLC/caffe/blob/master/examples/mnist/lenet_solver.prototxt" target="_blank" rel="noopener">lenet_solver.prototxt</a>）文件指定优化方法，以及一些超参数，以及保存模型。</p>
+<p>上面只是简单地从理论层面上对caffe架构以及模型进行重温和介绍，更深入地理解必须结合caffe源码做进一步地分析，如果要深入理解的话，还是建议阅读以下源码。</p>
+<p>参考<br><a href="https://dirtysalt.github.io/html/caffe.html" target="_blank" rel="noopener">https://dirtysalt.github.io/html/caffe.html</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/caffe/" rel="tag"># caffe</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/05/15/0016-retrieval/" rel="next" title="论文阅读：Deep Learning of Binary Hash Codes for Fast Image Retrieval">
+                <i class="fa fa-chevron-left"></i> 论文阅读：Deep Learning of Binary Hash Codes for Fast Image Retrieval
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/09/0018-leetcode_listnode/" rel="prev" title="LeetCode：链表（1）">
+                LeetCode：链表（1） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/weichat.jpg"
+               alt="nicehuster" />
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">62</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#第三方依赖库"><span class="nav-number">1.</span> <span class="nav-text">第三方依赖库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结构"><span class="nav-number">2.</span> <span class="nav-text">结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Blob"><span class="nav-number">2.1.</span> <span class="nav-text">Blob</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Layer"><span class="nav-number">2.2.</span> <span class="nav-text">Layer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Net"><span class="nav-number">2.3.</span> <span class="nav-text">Net</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Solver"><span class="nav-number">2.4.</span> <span class="nav-text">Solver</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

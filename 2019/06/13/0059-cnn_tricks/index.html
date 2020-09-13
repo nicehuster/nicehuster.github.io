@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc" />
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9" />
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="deep learning," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="上午看了一下Bag of Tricks for Image Classification with Convolutional Neural Networks这篇文章，该文提到了许多关于如何提升CNN性能的trick。trick在CNN中起着非常重要的作用，然而很少有文章详细地介绍这些trick的使用。而这篇文章则对一些常用的trick做了详尽的介绍以及使用trick前后带来的对比，可以说是满满的">
+<meta name="keywords" content="deep learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图像分类算法优化技巧">
+<meta property="og:url" content="https://nicehuster.github.io/2019/06/13/0059-cnn_tricks/index.html">
+<meta property="og:site_name" content="nicehuster&#39;s blog">
+<meta property="og:description" content="上午看了一下Bag of Tricks for Image Classification with Convolutional Neural Networks这篇文章，该文提到了许多关于如何提升CNN性能的trick。trick在CNN中起着非常重要的作用，然而很少有文章详细地介绍这些trick的使用。而这篇文章则对一些常用的trick做了详尽的介绍以及使用trick前后带来的对比，可以说是满满的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.github.io/img/cnn_trick.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/cnn_trick2.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/cnn_trick_resnet.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/cnn_trick_resnet1.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/cnn_trick_resnet-res.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/cosine.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/distill.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/mixup.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/cnn_trick_res.png">
+<meta property="og:updated_time" content="2020-09-13T06:54:12.039Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="图像分类算法优化技巧">
+<meta name="twitter:description" content="上午看了一下Bag of Tricks for Image Classification with Convolutional Neural Networks这篇文章，该文提到了许多关于如何提升CNN性能的trick。trick在CNN中起着非常重要的作用，然而很少有文章详细地介绍这些trick的使用。而这篇文章则对一些常用的trick做了详尽的介绍以及使用trick前后带来的对比，可以说是满满的">
+<meta name="twitter:image" content="https://nicehuster.github.io/img/cnn_trick.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.github.io/2019/06/13/0059-cnn_tricks/"/>
+
+
+
+
+
+  <title>图像分类算法优化技巧 | nicehuster's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nicehuster's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">不积跬步，无以至千里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2019/06/13/0059-cnn_tricks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nicehuster's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">图像分类算法优化技巧</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-13T19:13:39+08:00">
+                2019-06-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>上午看了一下<a href="https://arxiv.org/pdf/1812.01187.pdf" target="_blank" rel="noopener">Bag of Tricks for Image Classification with Convolutional Neural Networks</a>这篇文章，该文提到了许多关于如何提升CNN性能的trick。trick在CNN中起着非常重要的作用，然而很少有文章详细地介绍这些trick的使用。而这篇文章则对一些常用的trick做了详尽的介绍以及使用trick前后带来的对比，可以说是满满的干货，对应的代码实现，在<a href="https://github.com/dmlc/gluon-cv" target="_blank" rel="noopener">这里</a>。文章提到的trick包括：模型结构调整，数据增强，学习率调整，训练速度优化等等。<br><a id="more"></a></p>
+<h3 id="加快模型训练"><a href="#加快模型训练" class="headerlink" title="加快模型训练"></a>加快模型训练</h3><p>目前加快模型训练有效的两种方式是：（1）使用大的batch size；（2）采用低精度训练；</p>
+<p>（1）<strong>使用大的batch size训练</strong><br>使用较大的 batch size 时，如果还是使用同样的 epochs 数量进行运算，则准确度往往低于 batch size 较小的场景。为了确保使用较大的 batch size 训练能够在相同 epochs 前提下获得与较小的 batch size 相近的测试准确度。这部分具体可以参考<a href="https://arxiv.org/pdf/1706.02677.pdf" target="_blank" rel="noopener">Accurate, Large Minibatch SGD</a>这篇文章。作者总结了如下几种解决方案：</p>
+<p><strong>A.增大学习率</strong>：如果我们将 batch size 由 B 增加至 kB，我们亦需要将学习率由η增加至 kη（其中 k 为倍数）。</p>
+<p><strong>B.warm up</strong>：先用一个小的学习率先训几个epoch（warmup），因为网络的参数是随机初始化的，假如一开始就采用较大的学习率容易出现数值不稳定，这是使用warmup的原因。等到训练过程基本稳定了就可以使用原先设定的初始学习率进行训练了。论文中提到了warmup采用线性增加策略实现。举例而言，假设，初始学习率为η,选择前m个batch用于warm up，则在第i个batch时, 1 ≤ i ≤ m，设置学习率为 iη/m。</p>
+<p><strong>C.每个残差模块最后的BN层中γ设置为0</strong>：BN层的γ、β参数是用来对标准化后的输入做线性变换的，也就是γx^+β，一般γ参数都会初始化为1，β参数会初始化为0，作者认为初始化为0更有利于模型的训练。</p>
+<p><strong>D.不对bias执行weight decay操作</strong>：weight decay通常用于所有网络层的可学习参数（包括weight和bias）。其作用等效于对所有参数做L2正则化，以达到减少模型过拟合的作用。作者推荐仅仅只对weight进行weight decay操作。</p>
+<p>（2）<strong>使用低精度训练</strong><br>采用低精度比如FP16训练可以在数值层面上对网络训练加速。通过大多数网络训练都是采用FP32精度训练，是因为网络的输入，网络参数以及网络输出都是采用FP32。如果能使用16位浮点型参数进行训练，就可以大大加快模型的训练速度。下表是使用大的batch size和半精度FP16进行训练的前后对比，其中baseline 使用BS=256,FP32，efficient使用BS=1024,FP16：<br><img src="/img/cnn_trick.png" alt=""><br>从实验结果可以看出，相比baseline,训练速度得到明显提升，而且准确率上也得到了一定程度提升。更加详细的对比实验如下：<br><img src="/img/cnn_trick2.png" alt=""></p>
+<h3 id="模型结构调整"><a href="#模型结构调整" class="headerlink" title="模型结构调整"></a>模型结构调整</h3><p>这种模型结构调整是在不显著增加计算量的情况下对模型性能进行进一步提升。作者以ResNet为例进行优化。ResNet通常包括一个input stem，4个stage和1个output。下图展示的是原始resnet50结构。<br><img src="/img/cnn_trick_resnet.png" alt=""><br>作者在downsampling 部分，input stem以及Path B部分做了一些小的调整，对应如下图(a),(b),(c)<br><img src="/img/cnn_trick_resnet1.png" alt=""><br>实验结果对比如下：<br><img src="/img/cnn_trick_resnet-res.png" alt=""><br>从实验结果可以看出，这些结构上微小的调整，并没有对计算量带来较大的变化，但对accuracy带来不小的提升。</p>
+<h3 id="模型训练调优"><a href="#模型训练调优" class="headerlink" title="模型训练调优"></a>模型训练调优</h3><p>作者在这一部分提到了四种调优技巧：</p>
+<p><strong>采用cosine学习率衰减策略</strong>：实验对比结果如下，相比于常用的step decay,cosine decay在起始阶段开始衰减学习率，在step decay的学习率下降了10x时，cosine依然可以保持较大的学习率，这潜在的提高了训练速度。<br><img src="/img/cosine.png" alt=""></p>
+<p><strong>知识蒸馏</strong>：使用一个效果更好的teacher model训练student model，使得student model在模型结构不改变的情况下提升效果。作者采用ResNet-152作为teacher model，用ResNet-50作为student model。代码上通过在ResNet网络后添加一个蒸馏损失函数实现，这个损失函数用来评价teacher model输出和student model输出的差异，因此整体的损失函数原损失函数和蒸馏损失函数的结合：<br><img src="/img/distill.png" alt=""><br>其中p表示真实标签，z表示student model的全连接层输出，r表示teacher model的全连接层输出，T是超参数，用来平滑softmax函数的输出。</p>
+<p><strong>mixup</strong>：mixup也是一种数据增强操作，其大致操作是，每次读取2张输入图像，假设用（xi，yi）和（xj，yj）表示，那么通过如下公式就可以合成得到一张新的图像（x，y），然后用这张新图像进行训练：<br><img src="/img/mixup.png" alt=""><br>其中λ属于[0,1]服从Beta分布。实验结果如下<br><img src="/img/cnn_trick_res.png" alt=""></p>
+<p>此外，作者将这些trick应用于其他图像任务中，比如目标检测，图像分割上同样有效，可以带来2-3个点的提升。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/12/0058-fine-grain/" rel="next" title="细粒度图像识别">
+                <i class="fa fa-chevron-left"></i> 细粒度图像识别
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/18/0060-bash-parallel/" rel="prev" title="bash命令并行">
+                bash命令并行 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/weichat.jpg"
+               alt="nicehuster" />
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">62</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#加快模型训练"><span class="nav-number">1.</span> <span class="nav-text">加快模型训练</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模型结构调整"><span class="nav-number">2.</span> <span class="nav-text">模型结构调整</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模型训练调优"><span class="nav-number">3.</span> <span class="nav-text">模型训练调优</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

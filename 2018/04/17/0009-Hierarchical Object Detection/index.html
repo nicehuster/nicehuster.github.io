@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc" />
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9" />
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="detection,paper,reinforcement learning," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="论文信息：NIPS 2016 WorkShopProject Page:：https://github.com/imatge-upc/detection-2016-nipsws 整体框架：提出了一种基于强化学习的层次目标检测方法(Hierarchical Object Detection)。关键点在于: 专注于图像的含有更多信息量的区域, 并且放大该区域. 我们训练一个 intelligent a">
+<meta name="keywords" content="detection,paper,reinforcement learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文阅读：Hierarchical Object Detection with Deep Reinforcement Learning">
+<meta property="og:url" content="https://nicehuster.github.io/2018/04/17/0009-Hierarchical Object Detection/index.html">
+<meta property="og:site_name" content="nicehuster&#39;s blog">
+<meta property="og:description" content="论文信息：NIPS 2016 WorkShopProject Page:：https://github.com/imatge-upc/detection-2016-nipsws 整体框架：提出了一种基于强化学习的层次目标检测方法(Hierarchical Object Detection)。关键点在于: 专注于图像的含有更多信息量的区域, 并且放大该区域. 我们训练一个 intelligent a">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.github.io/img/8183c28464cf8cbb85e6cda4ea3d0829.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/fd088fb367350725430717e528aea87e.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/431de180b6c02203e96650ac20f5fe65.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/e1573f4f6a0e8337d5bc1f67c1411219.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/ef1b879aa9c487db5ead0851e23a163c.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/57c6769b2ae59a6b1042c0a85937c792.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/07d764103b870d7c096a2faf13385e09.png">
+<meta property="og:updated_time" content="2020-09-13T06:54:12.026Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="论文阅读：Hierarchical Object Detection with Deep Reinforcement Learning">
+<meta name="twitter:description" content="论文信息：NIPS 2016 WorkShopProject Page:：https://github.com/imatge-upc/detection-2016-nipsws 整体框架：提出了一种基于强化学习的层次目标检测方法(Hierarchical Object Detection)。关键点在于: 专注于图像的含有更多信息量的区域, 并且放大该区域. 我们训练一个 intelligent a">
+<meta name="twitter:image" content="https://nicehuster.github.io/img/8183c28464cf8cbb85e6cda4ea3d0829.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.github.io/2018/04/17/0009-Hierarchical Object Detection/"/>
+
+
+
+
+
+  <title>论文阅读：Hierarchical Object Detection with Deep Reinforcement Learning | nicehuster's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nicehuster's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">不积跬步，无以至千里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2018/04/17/0009-Hierarchical Object Detection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nicehuster's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">论文阅读：Hierarchical Object Detection with Deep Reinforcement Learning</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-17T15:41:22+08:00">
+                2018-04-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>论文信息</strong>：NIPS 2016 WorkShop<br><strong>Project Page:</strong>：<a href="https://github.com/imatge-upc/detection-2016-nipsws" target="_blank" rel="noopener">https://github.com/imatge-upc/detection-2016-nipsws</a></p>
+<p><strong>整体框架</strong>：提出了一种基于强化学习的层次目标检测方法(Hierarchical Object Detection)。关键点在于: <strong>专注于图像的含有更多信息量的区域, 并且放大该区域</strong>. 我们训练一个 intelligent agent, 给定一个图像窗口,能够确定将注意力集中于预先设定的五个区域中的哪一个. 这个过程迭代的提供了一个等级的图像分析. 我们对比了两个不同的候选 proposal 策略来引导图像搜索: With and without overlap. 此外, 我们的方法对比了两种不同的策略来提取特征: 第一种是对每一个 region proposal 计算新的 feature map ; 另一种方法是对于整幅图像计算 feature maps 并为后续的每一个 region proposal 提供 crop 的feature map.    当我们观察图像时，我们总是对信息进行连续的提取，以便理解它的内容。首先，我们将视线固定到图像的最突出部分，从提取的信息中，引导我们朝向另一个图像点，直到我们分析了所有的相关信息。<br><img src="/img/8183c28464cf8cbb85e6cda4ea3d0829.png" alt=""><br><a id="more"></a><br><strong>通常目标检测方法都是独立地分析图像区域，区域之间没有任何相关性，通过引入图像的层次表示，就能很容易探索区域之间的关系。文章使用一种top-down 扫描的方式：首先对image进行global view然后依次focus on 具有相关信息的local parts.</strong></p>
+<p>作者基于RL设计了一个agent,这个agent首先分析整个image，然后在预先准备好的5个region：four regions representing the four quadrants plus a central region（4个象限区域+1个中心区域）中选择一个。此外应用两种不同的策略来crop region : <strong>proposing overlapping or non-overlapping candidates</strong></p>
+<p><strong>使用上面的方法就使得object限制于predefined regions中。</strong></p>
+<p><strong>贡献：</strong></p>
+<p>1）将RL引入到object detection中，并引入hierarchical representation来引导agent寻找目标；</p>
+<p>2)使用了两种不同的hierarchical representation；</p>
+<p>2）提取每个区域的特征而不是reuse特征（roipooliing 特征）。</p>
+<p><strong>模型   Hierarchical Object Detection Model ：</strong></p>
+<p>作者定义了物体检测问题当做是序列决策过程 (the sequential decision process). 每一个时间步骤, <em>agent 应该决定图像的哪个区域应该集中注意力</em>, 以便于少量的步骤内找到物体. 我们将这个问题看作是 Markov Decision Process , 提供了一个框架来建模 decision making. </p>
+<p><strong>MDP formulation :</strong></p>
+<p>作者首先定义了 MDP 的大致过程 :<strong> state, actions, reward </strong>: </p>
+<p><strong>state :</strong> 当前区域 和 记忆向量 构成, 即: the current region and a memory vector. 描述子定义了两个模型: the Image-Zooms model and the Pool45-Crops model .状态的记忆向量（memory vector）捕获了agent 搜索物体当中,已经选择的过去 4  个 actions. <em>由于 agent 是学习一个 bounding box 的 refinement procedure,</em> 一个记忆向量编码了这个 refinement procedure 的状态 用来稳定搜索轨迹. 我们将过去的 4 个 actions 编码成一个 one-shot vector. 由于本文定义了 6 个 actions, 所以向量的维度是 24.</p>
+<p><strong>Actions : movement actions + terminal action</strong> 和ICCV 2015 年的那个检测的方法一样不一样的是，ICCV 2015定义的actions是9个：上下左右移动4个，尺寸放大缩小2个,宽高比例瘦高2个以及终止操作1个， 这里的action 有6个：4个quadrants区域移动+1个center区域移动+1个终止trigger。</p>
+<p><strong> Rewards :</strong> 此处的设计 与 ICCV 2015是一致的。下面公式（1）表示移动reward函数，（2）终止结束reward函数；  </p>
+<p><img src="/img/fd088fb367350725430717e528aea87e.png" alt=""></p>
+<p><img src="/img/431de180b6c02203e96650ac20f5fe65.png" alt=""></p>
+<p><strong>Q-learning函数设计</strong></p>
+<p><strong>在增强学习中，通过设计Q(s,a)函数来获得每个state的最佳actions。</strong></p>
+<p><img src="/img/e1573f4f6a0e8337d5bc1f67c1411219.png" alt=""></p>
+<p><strong>Model</strong></p>
+<p><img src="/img/ef1b879aa9c487db5ead0851e23a163c.png" alt=""></p>
+<p><strong>作者设计了两种不同的feature extraction。</strong>讨论了两种提取特征的方法, 上面就是所用的大致网络框架. Image-Zooms model and the Pool45-Crops model. </p>
+<p>　　对于 Image-Zooms model 来说, 每一个区域都 resize 成 224*224 的大小, 然后抽取 VGG-16 的 Pool 5 layer 的特征. </p>
+<p>　　对于 Pool45-Crops model, 图像是 full-resolution 传给 VGG-16 的 Pool 5 layer. </p>
+<p><strong>上面是对每个region进行一次前向操作，提取特征；后者是和faster rcnn 模式一样，只进行一次前向操作，提取roi pooling特征。实验结果表明，前者要比后者的实验效果更好，原因后者的有些目标的region经过1/16，并没有7*7的大小，那么在输入到DQN中时是需要up sampling.</strong></p>
+<p><a href="http://www.cnblogs.com/wangxiaocvpr/p/6066044.html" target="_blank" rel="noopener">http://www.cnblogs.com/wangxiaocvpr/p/6066044.html</a></p>
+<p><a href="https://www.youtube.com/watch?v=RdjuNpwKQi8" target="_blank" rel="noopener">https://www.youtube.com/watch?v=RdjuNpwKQi8</a></p>
+<p><img src="/img/57c6769b2ae59a6b1042c0a85937c792.png" alt=""></p>
+<p><img src="/img/07d764103b870d7c096a2faf13385e09.png" alt=""></p>
+<p><strong>上面是实验结果作者仅对PASCAL_VOC中的一类aero plane进行实验。</strong></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/detection/" rel="tag"># detection</a>
+          
+            <a href="/tags/paper/" rel="tag"># paper</a>
+          
+            <a href="/tags/reinforcement-learning/" rel="tag"># reinforcement learning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/16/0008-RetinaNet/" rel="next" title="论文阅读：Focal Loss for Dense Object Detection（RetinaNet）">
+                <i class="fa fa-chevron-left"></i> 论文阅读：Focal Loss for Dense Object Detection（RetinaNet）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/20/0010-Cmake/" rel="prev" title="CMakeLists使用：使用cmake构建工程的详细过程">
+                CMakeLists使用：使用cmake构建工程的详细过程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/weichat.jpg"
+               alt="nicehuster" />
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">62</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

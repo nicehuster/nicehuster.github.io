@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc" />
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9" />
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="detection,paper,deep learning," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="论文信息： Face++ &amp;amp;&amp;amp; Tsinghua，2017代码链接： https://github.com/zengarden/light_head_rcnn论文背景： 这篇文章主要是基于faster rcnn 和 r-fcn 做的改进。这篇文章将two stage的检测模型分为了两个部分，body和head。body指的是roi pooling之前的网络部分，head指的是roi">
+<meta name="keywords" content="detection,paper,deep learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文阅读：In Defense of Two-Stage Object Detector(Light-Head R-CNN)">
+<meta property="og:url" content="https://nicehuster.github.io/2018/04/25/0013-LH_RCNN/index.html">
+<meta property="og:site_name" content="nicehuster&#39;s blog">
+<meta property="og:description" content="论文信息： Face++ &amp;amp;&amp;amp; Tsinghua，2017代码链接： https://github.com/zengarden/light_head_rcnn论文背景： 这篇文章主要是基于faster rcnn 和 r-fcn 做的改进。这篇文章将two stage的检测模型分为了两个部分，body和head。body指的是roi pooling之前的网络部分，head指的是roi">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.github.io/img/e0b09994ed71fb60f57512ed7415d345.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/db9a03dda491e078b2cb060af28824e2.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/7bae9d69ff85bd13328fc18e33a450d3.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/42d3da03fc268eb23b8892c4c7ca0907.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/9d666cd8e8ba412c74135558c7733bf8.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/be3e6ba8cffc34d58b3591d160fb4737.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/429acd0dc96475260a8ea0d42d08b1d9.png">
+<meta property="og:updated_time" content="2020-09-13T06:54:12.027Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="论文阅读：In Defense of Two-Stage Object Detector(Light-Head R-CNN)">
+<meta name="twitter:description" content="论文信息： Face++ &amp;amp;&amp;amp; Tsinghua，2017代码链接： https://github.com/zengarden/light_head_rcnn论文背景： 这篇文章主要是基于faster rcnn 和 r-fcn 做的改进。这篇文章将two stage的检测模型分为了两个部分，body和head。body指的是roi pooling之前的网络部分，head指的是roi">
+<meta name="twitter:image" content="https://nicehuster.github.io/img/e0b09994ed71fb60f57512ed7415d345.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.github.io/2018/04/25/0013-LH_RCNN/"/>
+
+
+
+
+
+  <title>论文阅读：In Defense of Two-Stage Object Detector(Light-Head R-CNN) | nicehuster's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nicehuster's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">不积跬步，无以至千里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2018/04/25/0013-LH_RCNN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nicehuster's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">论文阅读：In Defense of Two-Stage Object Detector(Light-Head R-CNN)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-25T15:32:21+08:00">
+                2018-04-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>论文信息：</strong> Face++ &amp;&amp; Tsinghua，2017<br><strong>代码链接：</strong> <a href="https://github.com/zengarden/light_head_rcnn" target="_blank" rel="noopener">https://github.com/zengarden/light_head_rcnn</a><br><strong>论文背景：</strong> 这篇文章主要是基于faster rcnn 和 r-fcn 做的改进。这篇文章将two stage的检测模型分为了两个部分，body和head。body指的是roi pooling之前的网络部分，head指的是roi pooling和r-cnn子网络部分，r-cnn子网络是对roi进行分类和预测roi位置的那一部分。faster rcnn的roi pooling的channel数很大，有2048，这使得后面的两个fc层计算量很大， 而且faster rcnn的roi数目是很大的，针对每个roi都要调用一次r-cnn子网络，这个开销十分大。r-fcn在r-cnn子网络前设 了一个score map，试图共享roi的计算，以解决faster rcnn的这个问题，但是引入的score map的channel数很大，是 P*P（C+1），C为类别数，在COCO数据集上，这个值为3969（7*7*81），这使得r-fcn的计算量相比faster rcnn小了一些，但依然很大。综上，faster rcnn和r-fcn的head计算量都很大，即使body用了轻量化的网络，它们的速度依然比不上one stage的方法。这篇文章的主要目的就在于对head部分的结构重新设计，包括两个部分：R-CNN subnet + ROI warping ，减少head部分的计算量。模型的改进是在R-FCN上进行的。</p>
+<p><img src="/img/e0b09994ed71fb60f57512ed7415d345.png" alt=""><br><a id="more"></a></p>
+<p>图1本文结构与Faster RCNN，R-FCN对比</p>
+<p><strong>1-R-CNN subnet</strong></p>
+<p>首先看R-CNN subnet（图中虚线框出来的部分）的设计。这里作者和两个经典网络Faster rcnn（称A）、R-FCN（B）进行了对比，如上图。作者从accuracy 和 speed 两方面进行阐述，说明另两个优缺点。</p>
+<p>accuracy：A在FC层前，为了减小之后FC的计算量，使用了pooling，但这会对空间位置信息造成伤害；B也在prediction前直接用了pooling。</p>
+<p>Speed：A 每一个ROI都是独立的经过一个subnet得到结果，会降低整个网络的速度，尤其proposal多的话，影响会更大；B<br>虽然采用cost-free R-CNN subnet，但是之前需要得到一个非常多的score map。</p>
+<p>而作者提出的Light-Head R-CNN 只有一个FC层，用作者的话说 makes a good trade-off between the performance and computational speed。</p>
+<p><strong>2-ROI warping</strong></p>
+<p>在ROI warping 方面，由于是在R-FCN上进行的，一个很直观的想法就是降低进入head 部分feature map的channel数，文章就是讲R-FCN上的score map从P*P*(C+1)减少到P*P*a，a是一个与类别数无关的数值，比如10。这样score map与类别数无关，在roi pooling之后再添加一个fc层，用于预测类别和位置。作者实验发现，在channel数少的feature maps上做ROI pooling，不仅准确率提高，还会节约内存及计算量资源。一举两得。</p>
+<p>整体结构：</p>
+<p>作者的实验是基于两种setting的，setting “L” ：用 Resnet 101 做基础的feature extractor 网络，证明作者算法的performance ； setting “S”：用一个类似 Xception的小网络做基础网络。</p>
+<p>作者在base model 的最后一个卷积层用 large separable convolution layers获得 channel数少的feature map。结构如下。k在论文方法里设置为15，Cmid在setting L时是256，在setting S时是64，Cout为10*p*p（比R-FCN用的#classes*p*p 小很多）。k很大，感受野增大，因此feature maps效果更好。</p>
+<p><img src="/img/db9a03dda491e078b2cb060af28824e2.png" alt=""></p>
+<p>经过上面的large separable convolution layers之后，再进行PSROI，然后接fc2048用于分类和回归。</p>
+<p><strong>3-实验部分（coco）</strong></p>
+<p>为了研究channel 数少的feature map 对ROI warping的影响，作者采用R-FCN作为 baseline，并且还对baseline<br>进行了少许改进，这里就不赘述，可以看论文的4.2.1。之后在baseline的基础上进行了如下变化：（1）将feature map channels 从 3969 (81 × 7 × 7) 改为 490 (10 × 7 ×7)；（2）因为channel数少了，并不能直接voting得到最终的结果，所以最后加了fc进行prediction。结构如下图。</p>
+<p>这里不得不说一下，作者在R-FCN的基础上做了三个trick{anchor数量，balance loss weight，256 top ranked for<br>BP},就提高了3.1个点，可见作者在使用各种trick方面非常强。</p>
+<p><img src="/img/7bae9d69ff85bd13328fc18e33a450d3.png" alt=""></p>
+<p>从实验结果来看，feature map channel虽然减少了，但是performance基本上没有差别。如下表格。</p>
+<p><img src="/img/42d3da03fc268eb23b8892c4c7ca0907.png" alt=""></p>
+<p>然后作者又做了实验研究large separable convolution的作用（同时也用的channel数更少），如下表</p>
+<p><img src="/img/9d666cd8e8ba412c74135558c7733bf8.png" alt=""></p>
+<p><strong>accuracy：</strong>  ms-train指的是训练时采用scale jittering，crop size固定，但是图片的短边可以有不同尺寸。feature pyramid采用不同的尺寸的feature map上都有预测。align指采用ROI align</p>
+<p><img src="/img/be3e6ba8cffc34d58b3591d160fb4737.png" alt=""></p>
+<p>Speed：</p>
+<p><img src="/img/429acd0dc96475260a8ea0d42d08b1d9.png" alt=""></p>
+<p>仅从创新的角度上来看，个人觉得这篇文章的工作很一般，idea也比较简单，但却很work。可以看出作者的工程能力方面很扎实。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/detection/" rel="tag"># detection</a>
+          
+            <a href="/tags/paper/" rel="tag"># paper</a>
+          
+            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/23/0012-R-FCN/" rel="next" title="论文阅读：Object Detection via Region-based Fully Convolutional Networks(R-FCN)">
+                <i class="fa fa-chevron-left"></i> 论文阅读：Object Detection via Region-based Fully Convolutional Networks(R-FCN)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/01/0014-blog/" rel="prev" title="hexo教程：将个人博客部署到GitHubPage过程记录">
+                hexo教程：将个人博客部署到GitHubPage过程记录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/weichat.jpg"
+               alt="nicehuster" />
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">62</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

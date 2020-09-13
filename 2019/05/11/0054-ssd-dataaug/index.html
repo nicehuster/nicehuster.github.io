@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc" />
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9" />
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="object detection," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="在SSD中数据增强起着至关重要的作用，从原文的实验结果可以看出，数据增强可以为提高8.8%mAP。如下表所示：数据增强对于提高小目标的检测精度尤为重要，因为它在分类器可以看到更多对象结构的图像中创建放大图像。数据增强还可用于处理包含被遮挡对象的图像，通过将裁剪的图像包括在训练数据中，在训练数据中只能看到对象的一部分。在SSD中数据增强包括如下步骤：">
+<meta name="keywords" content="object detection">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSD中的数据增强细节">
+<meta property="og:url" content="https://nicehuster.github.io/2019/05/11/0054-ssd-dataaug/index.html">
+<meta property="og:site_name" content="nicehuster&#39;s blog">
+<meta property="og:description" content="在SSD中数据增强起着至关重要的作用，从原文的实验结果可以看出，数据增强可以为提高8.8%mAP。如下表所示：数据增强对于提高小目标的检测精度尤为重要，因为它在分类器可以看到更多对象结构的图像中创建放大图像。数据增强还可用于处理包含被遮挡对象的图像，通过将裁剪的图像包括在训练数据中，在训练数据中只能看到对象的一部分。在SSD中数据增强包括如下步骤：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.github.io/img/img_5b340d37f2563.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/img_5b345c68e6487-768x489.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/img_5b345fd789997.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/img_5b3463b4d93e0.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/img_5b34650f2861b.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/img_5b35382c10419.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/img_5b3544b2a975a.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/img_5b35476dbeb90.png">
+<meta property="og:updated_time" content="2020-09-13T06:54:12.038Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SSD中的数据增强细节">
+<meta name="twitter:description" content="在SSD中数据增强起着至关重要的作用，从原文的实验结果可以看出，数据增强可以为提高8.8%mAP。如下表所示：数据增强对于提高小目标的检测精度尤为重要，因为它在分类器可以看到更多对象结构的图像中创建放大图像。数据增强还可用于处理包含被遮挡对象的图像，通过将裁剪的图像包括在训练数据中，在训练数据中只能看到对象的一部分。在SSD中数据增强包括如下步骤：">
+<meta name="twitter:image" content="https://nicehuster.github.io/img/img_5b340d37f2563.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.github.io/2019/05/11/0054-ssd-dataaug/"/>
+
+
+
+
+
+  <title>SSD中的数据增强细节 | nicehuster's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nicehuster's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">不积跬步，无以至千里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2019/05/11/0054-ssd-dataaug/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nicehuster's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SSD中的数据增强细节</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-11T19:13:39+08:00">
+                2019-05-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/project/" itemprop="url" rel="index">
+                    <span itemprop="name">project</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在SSD中数据增强起着至关重要的作用，从原文的实验结果可以看出，数据增强可以为提高8.8%mAP。如下表所示：<br><img src="/img/img_5b340d37f2563.png" alt=""><br>数据增强对于提高小目标的检测精度尤为重要，因为它在分类器可以看到更多对象结构的图像中创建放大图像。数据增强还可用于处理包含被遮挡对象的图像，通过将裁剪的图像包括在训练数据中，在训练数据中只能看到对象的一部分。在SSD中数据增强包括如下步骤：<br><a id="more"></a></p>
+<ul>
+<li>光度畸变（Photometric Distortions）<ul>
+<li>随机亮度（Random Brightness）</li>
+<li>随机对比度，色调和饱和度（Random Contrast, Hue, Saturation）</li>
+<li>随机光噪声（RandomLightingNoise）</li>
+</ul>
+</li>
+<li>几何畸变（Geometric Distortions）<ul>
+<li>随机扩展（RandomExpand）</li>
+<li>随机裁剪（RandomCrop）</li>
+<li>随机翻转（RandomMirror）</li>
+</ul>
+</li>
+</ul>
+<p><img src="/img/img_5b345c68e6487-768x489.png" alt=""></p>
+<h3 id="Photometric-Distortions"><a href="#Photometric-Distortions" class="headerlink" title="Photometric Distortions"></a><strong>Photometric Distortions</strong></h3><h4 id="Random-Brightness"><a href="#Random-Brightness" class="headerlink" title="Random Brightness"></a><strong>Random Brightness</strong></h4><p>这个是从$[-\delta,\delta]$中随机选择一个值添加到图像的所有像素中，默认值设置为32。<br><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def __call__(self, <span class="built_in">image</span>, boxes=None, <span class="built_in">labels</span>=None):</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">random</span>.randint(<span class="number">2</span>):</span><br><span class="line">        <span class="built_in">delta</span> = <span class="built_in">random</span>.uniform(-self.<span class="built_in">delta</span>, self.<span class="built_in">delta</span>)</span><br><span class="line">        <span class="built_in">image</span> += <span class="built_in">delta</span></span><br><span class="line">    <span class="built_in">return</span> <span class="built_in">image</span>, boxes, <span class="built_in">labels</span></span><br></pre></td></tr></table></figure></p>
+<p><img src="/img/img_5b345fd789997.png" alt=""></p>
+<h4 id="Random-Contrast-Hue-Saturation"><a href="#Random-Contrast-Hue-Saturation" class="headerlink" title="Random Contrast, Hue, Saturation"></a><strong>Random Contrast, Hue, Saturation</strong></h4><p>对于Contrast, Hue, Saturation的应用，有两种选择：Contrast + Hue + Saturation和Hue + Saturation + Contrast。每种选择概率为0.5.<br><figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">self<span class="selector-class">.pd</span> = [</span><br><span class="line">            RandomContrast(),</span><br><span class="line">            ConvertColor(<span class="attribute">transform</span>=<span class="string">'HSV'</span>),</span><br><span class="line">            RandomSaturation(),</span><br><span class="line">            RandomHue(),</span><br><span class="line">            ConvertColor(current=<span class="string">'HSV'</span>, <span class="attribute">transform</span>=<span class="string">'BGR'</span>),</span><br><span class="line">            RandomContrast()</span><br><span class="line">        ]</span><br><span class="line"></span><br><span class="line"> im, boxes, labels = self.rand_brightness(im, boxes, labels)</span><br><span class="line">        <span class="keyword">if</span> random.randint(<span class="number">2</span>):</span><br><span class="line">            distort = Compose(self<span class="selector-class">.pd</span>[:-<span class="number">1</span>])</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            distort = Compose(self<span class="selector-class">.pd</span>[<span class="number">1</span>:])</span><br><span class="line">        im, boxes, labels = distort(im, boxes, labels)</span><br></pre></td></tr></table></figure></p>
+<p>需要注意的是，Contrast应用于RGB空间，而Hue, Saturation则是应用HSV空间。因此，在应用每个操作之前，必须执行适当的颜色空间转换。应用随机contrast之后，随机hue and 随机saturation操作与随机Brightness类似。随机saturation如下：<br><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def __call__(self, <span class="built_in">image</span>, boxes=None, <span class="built_in">labels</span>=None):</span><br><span class="line">       <span class="keyword">if</span> <span class="built_in">random</span>.randint(<span class="number">2</span>):</span><br><span class="line">           <span class="built_in">image</span>[:, :, <span class="number">1</span>] *= <span class="built_in">random</span>.uniform(self.lower, self.upper)</span><br><span class="line"></span><br><span class="line">       <span class="built_in">return</span> <span class="built_in">image</span>, boxes, <span class="built_in">labels</span></span><br></pre></td></tr></table></figure></p>
+<p><img src="/img/img_5b3463b4d93e0.png" alt=""></p>
+<h4 id="RandomLightingNoise"><a href="#RandomLightingNoise" class="headerlink" title="RandomLightingNoise"></a><strong>RandomLightingNoise</strong></h4><p>最后一个 光度畸变是随机光噪声，这种操作主要是颜色通道的随机交换。三个通道有六种jiaohua<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">self.perms = ((<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>), (<span class="number">0</span>, <span class="number">2</span>, <span class="number">1</span>),</span><br><span class="line">                      (<span class="number">1</span>, <span class="number">0</span>, <span class="number">2</span>), (<span class="number">1</span>, <span class="number">2</span>, <span class="number">0</span>),</span><br><span class="line">                      (<span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>), (<span class="number">2</span>, <span class="number">1</span>, <span class="number">0</span>))</span><br></pre></td></tr></table></figure></p>
+<p>随机交换后如下：<br><img src="/img/img_5b34650f2861b.png" alt=""></p>
+<h3 id="Geometric-Distortions"><a href="#Geometric-Distortions" class="headerlink" title="Geometric Distortions"></a><strong>Geometric Distortions</strong></h3><h4 id="RandomExpand"><a href="#RandomExpand" class="headerlink" title="RandomExpand"></a><strong>RandomExpand</strong></h4><p>随机扩展的发生概率为0.5，随机扩展的步骤如下<br><img src="/img/img_5b35382c10419.png" alt=""></p>
+<h4 id="RandomCrop"><a href="#RandomCrop" class="headerlink" title="RandomCrop"></a><strong>RandomCrop</strong></h4><p>这一步主要是在上一步随机扩展的基础上，对目标进行随机裁剪，有利于缓解目标遮挡问题。随机生成裁剪框，如果框与目标的iou不满足要求则删除，如果iou满足要求，而目标中心点不包含在随机裁剪框也删除。<br><img src="/img/img_5b3544b2a975a.png" alt=""><br>部分例子如下：<br><img src="/img/img_5b35476dbeb90.png" alt=""><br>其中，红色表示ground truth，绿色表示随机裁剪的框。</p>
+<h4 id="RandomMirror"><a href="#RandomMirror" class="headerlink" title="RandomMirror"></a><strong>RandomMirror</strong></h4><p>随机裁剪主要是镜像翻转。很简单。</p>
+<p>最后，对经过数据增强的图像resize到（300,300），然后减均值。<br>代码参考：  <a href="https://github.com/amdegroot/ssd.pytorch/" target="_blank" rel="noopener">https://github.com/amdegroot/ssd.pytorch/</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/object-detection/" rel="tag"># object detection</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/09/0053-ssd-explained with code/" rel="next" title="SSD详解以及代码实现">
+                <i class="fa fa-chevron-left"></i> SSD详解以及代码实现
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/14/0055-pytorch-api/" rel="prev" title="Pytorch常用API解析">
+                Pytorch常用API解析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/weichat.jpg"
+               alt="nicehuster" />
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">62</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Photometric-Distortions"><span class="nav-number">1.</span> <span class="nav-text">Photometric Distortions</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Random-Brightness"><span class="nav-number">1.1.</span> <span class="nav-text">Random Brightness</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Random-Contrast-Hue-Saturation"><span class="nav-number">1.2.</span> <span class="nav-text">Random Contrast, Hue, Saturation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RandomLightingNoise"><span class="nav-number">1.3.</span> <span class="nav-text">RandomLightingNoise</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Geometric-Distortions"><span class="nav-number">2.</span> <span class="nav-text">Geometric Distortions</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#RandomExpand"><span class="nav-number">2.1.</span> <span class="nav-text">RandomExpand</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RandomCrop"><span class="nav-number">2.2.</span> <span class="nav-text">RandomCrop</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RandomMirror"><span class="nav-number">2.3.</span> <span class="nav-text">RandomMirror</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

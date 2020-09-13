@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc" />
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9" />
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="tensorRT," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="前面介绍了tensorRT的安装过程，这里就介绍一下tensorRT的用途，以及为啥能实现网络加速。当前，深度学习的发展推动了一大批的深度学习框架，caffe，tf,pytorch等等，然而基于这些框架搭建出来的网络的效率一直是大家所关注的，为提高网络效率，通常都会对网络进行压缩，而网络压缩的最常见的两个思路就是：量化和剪枝。相比剪枝来说，网络的量化更容易实现。tensorRT就是通过量化，将FP">
+<meta name="keywords" content="tensorRT">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tensorRT-介绍">
+<meta property="og:url" content="https://nicehuster.github.io/2018/07/26/0026-tensorRT_introduce/index.html">
+<meta property="og:site_name" content="nicehuster&#39;s blog">
+<meta property="og:description" content="前面介绍了tensorRT的安装过程，这里就介绍一下tensorRT的用途，以及为啥能实现网络加速。当前，深度学习的发展推动了一大批的深度学习框架，caffe，tf,pytorch等等，然而基于这些框架搭建出来的网络的效率一直是大家所关注的，为提高网络效率，通常都会对网络进行压缩，而网络压缩的最常见的两个思路就是：量化和剪枝。相比剪枝来说，网络的量化更容易实现。tensorRT就是通过量化，将FP">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.github.io/img/tensorRT1.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/tensorRT2.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/tensorRT3.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/tensorRT4.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/tensorRT5.png">
+<meta property="og:updated_time" content="2020-09-13T06:54:12.029Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="tensorRT-介绍">
+<meta name="twitter:description" content="前面介绍了tensorRT的安装过程，这里就介绍一下tensorRT的用途，以及为啥能实现网络加速。当前，深度学习的发展推动了一大批的深度学习框架，caffe，tf,pytorch等等，然而基于这些框架搭建出来的网络的效率一直是大家所关注的，为提高网络效率，通常都会对网络进行压缩，而网络压缩的最常见的两个思路就是：量化和剪枝。相比剪枝来说，网络的量化更容易实现。tensorRT就是通过量化，将FP">
+<meta name="twitter:image" content="https://nicehuster.github.io/img/tensorRT1.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.github.io/2018/07/26/0026-tensorRT_introduce/"/>
+
+
+
+
+
+  <title>tensorRT-介绍 | nicehuster's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nicehuster's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">不积跬步，无以至千里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2018/07/26/0026-tensorRT_introduce/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nicehuster's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">tensorRT-介绍</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-26T21:13:39+08:00">
+                2018-07-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/project/" itemprop="url" rel="index">
+                    <span itemprop="name">project</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前面介绍了tensorRT的安装过程，这里就介绍一下tensorRT的用途，以及为啥能实现网络加速。当前，深度学习的发展推动了一大批的深度学习框架，caffe，tf,pytorch等等，然而基于这些框架搭建出来的网络的效率一直是大家所关注的，为提高网络效率，通常都会对网络进行压缩，而网络压缩的最常见的两个思路就是：量化和剪枝。相比剪枝来说，网络的量化更容易实现。tensorRT就是通过量化，将FP32位权值数据优化为 FP16 或者 INT8，而推理（前向计算过程）精度不发生明显的降低。TensorRT是一个C++库,TensorRT由英伟达(NVIDIA)发布，目前包括TensorRT1、TensorRT 2、TensorRT 3、tensorRT 4。由于环境的问题，我使用的是tensorRT 3.0.4版本。下面说一下tensorRT都支持哪些输入。下面是我根据官网翻译了一部分，想具体了解tensorRT可以看<a href="https://devblogs.nvidia.com/tensorrt-3-faster-tensorflow-inference/" target="_blank" rel="noopener">这里</a><br><a id="more"></a></p>
+<h3 id="tensorRT输入"><a href="#tensorRT输入" class="headerlink" title="tensorRT输入"></a>tensorRT输入</h3><p><strong>tensorRT输入之网络框架</strong> ：TensorRT3支持所有常见的深度学习框架包括Caffe、Chainer、CNTK、MXnet、PaddlePaddle、Pytorch、TensorFlow以及Theano。<br><strong>tensorRT输入之网络层</strong>：目前tensorRT支持所有标准层，包括如下这些层：<br><img src="/img/tensorRT1.png" alt=""><br><strong>tensorRT输入之接口</strong>：TensorRT3支持模型导入方式包括C++ API、Python API、NvCaffeParser和NvUffParser。<br><img src="/img/tensorRT2.png" alt=""><br>对于caffe和tensorflow,tensorRT直接提供了模型导入器，可以直接载入模型，对于其他的深度学习框架需要自己定义网络API接口。</p>
+<blockquote>
+<ul>
+<li><strong>caffe</strong> : 1)可以使用C++/Python API导入模型：通过代码定义网络结构，并载入模型weights的方式导入；2）也可以使用NvCaffeParser导入模型：导入时输入网络结构prototxt文件及caffemodel文件即可。</li>
+<li><strong>tensorflow</strong>: 训练完成后，使用uff python接口将模型转成uff格式，之后使用NvUffParaser导入；</li>
+</ul>
+</blockquote>
+<h3 id="tensorRT优化细节"><a href="#tensorRT优化细节" class="headerlink" title="tensorRT优化细节"></a>tensorRT优化细节</h3><p>网络模型在导入至TensorRT后会进行一系列的优化，主要优化内容如下图所示。<br><img src="/img/tensorRT3.png" alt=""></p>
+<h4 id="优化1-Layer-amp-Tensor-Fusion"><a href="#优化1-Layer-amp-Tensor-Fusion" class="headerlink" title="优化1  Layer &amp; Tensor Fusion"></a>优化1  Layer &amp; Tensor Fusion</h4><p>tensorRT在解析得到计算流图之后会对计算流图进行优化，这部分优化不会改变图中最底层计算内容，而是会去重构计算图来获得更快更高效的执行方式，即计算不变优化计算方法。如下图所示，下图是GoogLeNet 中的inception模块。<br><img src="/img/tensorRT4.png" alt=""><br>TensorRT的垂直和水平层融合和层消除优化简化了GoogLeNet Inception模块图，减少了计算和内存开销。<br>下表列出了常见几个网络在TensorRT优化后的网络层数量，很明显的看到TensorRT可以有效的优化网络结构、减少网络层数从而带来性能的提升。<br><img src="/img/tensorRT5.png" alt=""></p>
+<h4 id="优化2-FP16-and-INT8-Precision-Calibration"><a href="#优化2-FP16-and-INT8-Precision-Calibration" class="headerlink" title="优化2  FP16 and INT8 Precision Calibration"></a>优化2  FP16 and INT8 Precision Calibration</h4><p>大多数的网络都是使用FP32进行模型训练，因此模型最后的weights也是FP32格式。但是一旦完成训练，所有的网络参数就已经是最优，在推理过程中是无需进行反向迭代的，因此可以在推理中使用FP16或者INT8精度计算从而获得更小的模型，这样使用的显存也更小。</p>
+<p>上面介绍了一个层之间的优化，以及精度的量化，其实tensorRT还做了很多优化工作，比如Kernel Auto-Tuning，Dynamic Tensor Memory，等等。这里就不一一介绍。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tensorRT/" rel="tag"># tensorRT</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/25/0025-tensorRT_install/" rel="next" title="tensorRT-安装">
+                <i class="fa fa-chevron-left"></i> tensorRT-安装
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/27/0027-tensorRT_usage/" rel="prev" title="tensorRT-caffe2tensorRT">
+                tensorRT-caffe2tensorRT <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/avatar/weichat.jpg"
+               alt="nicehuster" />
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">62</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#tensorRT输入"><span class="nav-number">1.</span> <span class="nav-text">tensorRT输入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tensorRT优化细节"><span class="nav-number">2.</span> <span class="nav-text">tensorRT优化细节</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#优化1-Layer-amp-Tensor-Fusion"><span class="nav-number">2.1.</span> <span class="nav-text">优化1  Layer &amp; Tensor Fusion</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#优化2-FP16-and-INT8-Precision-Calibration"><span class="nav-number">2.2.</span> <span class="nav-text">优化2  FP16 and INT8 Precision Calibration</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

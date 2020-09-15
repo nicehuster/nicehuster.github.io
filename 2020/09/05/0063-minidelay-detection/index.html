@@ -100,20 +100,41 @@
 
 
 
-<meta name="description" content="最近逛知乎上了解到低延迟目标检测这个方向，这个方向解决的是视觉任务工程化过程中存在一个痛点问题，如何解决延迟和误报的情况。拿视频中的目标检测问题来讲，我们通常会使用一个单帧检测器来检测视频中每一帧存在目标情况，静态上看可能会存在一些误检漏检情况，动态上表现为检测到的模板一闪一闪的情况，导致视觉效果很不友好。而低延迟目标检测的任务就是通过贝叶斯概率建模的方式融合多帧信息来解决这样的问题。 总体来说，">
+<meta name="description" content="最近逛知乎上了解到低延迟目标检测这个方向，这个方向解决的是视觉任务工程化过程中存在一个痛点问题，如何解决延迟和误报的情况。拿视频中的目标检测问题来讲，我们通常会使用一个单帧检测器来检测视频中每一帧存在目标情况，静态上看可能会存在一些误检漏检情况，动态上表现为检测到的目标一闪一闪的情况，导致视觉效果很不友好。而低延迟目标检测的任务就是通过贝叶斯概率建模的方式融合多帧信息来解决这样的问题。 总体来说，">
 <meta name="keywords" content="detection">
 <meta property="og:type" content="article">
-<meta property="og:title" content="低延迟视频目标检测">
+<meta property="og:title" content="论文阅读：Minimum Delay Object Detection from Video">
 <meta property="og:url" content="https://nicehuster.github.io/2020/09/05/0063-minidelay-detection/index.html">
 <meta property="og:site_name" content="nicehuster&#39;s blog">
-<meta property="og:description" content="最近逛知乎上了解到低延迟目标检测这个方向，这个方向解决的是视觉任务工程化过程中存在一个痛点问题，如何解决延迟和误报的情况。拿视频中的目标检测问题来讲，我们通常会使用一个单帧检测器来检测视频中每一帧存在目标情况，静态上看可能会存在一些误检漏检情况，动态上表现为检测到的模板一闪一闪的情况，导致视觉效果很不友好。而低延迟目标检测的任务就是通过贝叶斯概率建模的方式融合多帧信息来解决这样的问题。 总体来说，">
+<meta property="og:description" content="最近逛知乎上了解到低延迟目标检测这个方向，这个方向解决的是视觉任务工程化过程中存在一个痛点问题，如何解决延迟和误报的情况。拿视频中的目标检测问题来讲，我们通常会使用一个单帧检测器来检测视频中每一帧存在目标情况，静态上看可能会存在一些误检漏检情况，动态上表现为检测到的目标一闪一闪的情况，导致视觉效果很不友好。而低延迟目标检测的任务就是通过贝叶斯概率建模的方式融合多帧信息来解决这样的问题。 总体来说，">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://pic4.zhimg.com/80/v2-2c0d4736cf5fde58e2b58530d7643006_1440w.jpg">
-<meta property="og:updated_time" content="2020-09-14T12:21:45.306Z">
+<meta property="og:image" content="https://nicehuster.github.io/Users/niceliu/Desktop/hexo-blog_v2/source/img/v2-2c0d4736cf5fde58e2b58530d7643006_1440w.jpg">
+<meta property="og:image" content="https://nicehuster.github.io/Users/niceliu/Desktop/hexo-blog_v2/source/img/v2-fcf08710643bcb172cb661c687f36fe5_b.webp">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=t_s">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=t_e">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=b_%7Bt_s%2Ct_e%7D+%5Ctriangleq+%28b_%7Bt_s%7D%2Cb_%7Bt_s%2B1%7D%2C%5Cdots%2Cb_%7Bt_e%7D%29">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=t">
+<meta property="og:image" content="https://pic2.zhimg.com/80/v2-02e191693df754adbfdc93e95b989667_1440w.jpg">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=D_t">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=I_t">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=%5CGamma_%7B0%2Ci%7D">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=i">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=p_i%28%E2%80%A2%29%5Ctriangleq+p%28%E2%80%A2%7Cl+%3Dl_i%29">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=i">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=%E2%80%A2">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=p_i%28%E2%80%A2%7Cb_t%29">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=i">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=b_t">
+<meta property="og:image" content="https://pic3.zhimg.com/80/v2-2abee55e75598de3d0c47181e3e01849_1440w.jpg">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=p">
+<meta property="og:image" content="https://www.zhihu.com/equation?tex=p">
+<meta property="og:image" content="https://pic4.zhimg.com/80/v2-bd434876b196828b2db7d14ea5eb8c52_1440w.jpg">
+<meta property="og:image" content="https://pic3.zhimg.com/80/v2-aaf520648a1b1a58ff8a1abe43131535_1440w.jpg">
+<meta property="og:updated_time" content="2020-09-15T01:59:14.345Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="低延迟视频目标检测">
-<meta name="twitter:description" content="最近逛知乎上了解到低延迟目标检测这个方向，这个方向解决的是视觉任务工程化过程中存在一个痛点问题，如何解决延迟和误报的情况。拿视频中的目标检测问题来讲，我们通常会使用一个单帧检测器来检测视频中每一帧存在目标情况，静态上看可能会存在一些误检漏检情况，动态上表现为检测到的模板一闪一闪的情况，导致视觉效果很不友好。而低延迟目标检测的任务就是通过贝叶斯概率建模的方式融合多帧信息来解决这样的问题。 总体来说，">
-<meta name="twitter:image" content="https://pic4.zhimg.com/80/v2-2c0d4736cf5fde58e2b58530d7643006_1440w.jpg">
+<meta name="twitter:title" content="论文阅读：Minimum Delay Object Detection from Video">
+<meta name="twitter:description" content="最近逛知乎上了解到低延迟目标检测这个方向，这个方向解决的是视觉任务工程化过程中存在一个痛点问题，如何解决延迟和误报的情况。拿视频中的目标检测问题来讲，我们通常会使用一个单帧检测器来检测视频中每一帧存在目标情况，静态上看可能会存在一些误检漏检情况，动态上表现为检测到的目标一闪一闪的情况，导致视觉效果很不友好。而低延迟目标检测的任务就是通过贝叶斯概率建模的方式融合多帧信息来解决这样的问题。 总体来说，">
+<meta name="twitter:image" content="https://nicehuster.github.io/Users/niceliu/Desktop/hexo-blog_v2/source/img/v2-2c0d4736cf5fde58e2b58530d7643006_1440w.jpg">
 
 
 
@@ -148,7 +169,7 @@
 
 
 
-  <title>低延迟视频目标检测 | nicehuster's blog</title>
+  <title>论文阅读：Minimum Delay Object Detection from Video | nicehuster's blog</title>
   
 
 
@@ -308,7 +329,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">低延迟视频目标检测</h1>
+          <h1 class="post-title" itemprop="name headline">论文阅读：Minimum Delay Object Detection from Video</h1>
         
 
         <div class="post-meta">
@@ -380,9 +401,25 @@
       
 
       
-        <p>最近逛知乎上了解到低延迟目标检测这个方向，这个方向解决的是视觉任务工程化过程中存在一个痛点问题，如何解决延迟和误报的情况。拿视频中的目标检测问题来讲，我们通常会使用一个单帧检测器来检测视频中每一帧存在目标情况，静态上看可能会存在一些误检漏检情况，动态上表现为检测到的模板一闪一闪的情况，导致视觉效果很不友好。而低延迟目标检测的任务就是通过贝叶斯概率建模的方式融合多帧信息来解决这样的问题。</p>
+        <p>最近逛知乎上了解到<strong>低延迟目标检测</strong>这个方向，这个方向解决的是视觉任务工程化过程中存在一个痛点问题，如何解决延迟和误报的情况。拿视频中的目标检测问题来讲，我们通常会使用一个单帧检测器来检测视频中每一帧存在目标情况，静态上看可能会存在一些误检漏检情况，动态上表现为检测到的目标一闪一闪的情况，导致视觉效果很不友好。而低延迟目标检测的任务就是通过贝叶斯概率建模的方式融合多帧信息来解决这样的问题。</p>
 <p>总体来说，对于任何检测任务来说，延迟和误报存在如下图的关系：</p>
-<p><img src="https://pic4.zhimg.com/80/v2-2c0d4736cf5fde58e2b58530d7643006_1440w.jpg" alt="img"></p>
+<p><img src="/Users/niceliu/Desktop/hexo-blog_v2/source/img/v2-2c0d4736cf5fde58e2b58530d7643006_1440w.jpg" alt="img"></p>
+<p>这个关系不难理解，不只是视觉问题，世间万物，更长的决策过程（delay）往往能带来更高的准确度，但是这个更长的决策过程也会带来更大的延迟。两者之间的平衡，对很多需要在线决策（online process）的系统来说非常重要。例如生物视觉，假定一个动物检测到掠食者就需要逃跑，如果追求低误报率，就要承担高延迟带来的风险，有可能检测到掠食者时为时已晚无法逃脱；如果追求低延迟，虽然相对安全，但是误报率高，有一点风吹草动就犹如惊弓之鸟。</p>
+<h3 id="低延迟检测思路"><a href="#低延迟检测思路" class="headerlink" title="低延迟检测思路"></a>低延迟检测思路</h3><p>在视频物体检测中，如果使用上一帧的检测结果作为先验，将下一帧的检测结果输入贝叶斯框架，输出后验，那么总体来说，这个后验结果融合了两帧的信息，会比单帧更准。在这个思路下，理论上来说使用的帧数越多，检测越准。如以下单帧和多帧的对比：</p>
+<p><img src="/Users/niceliu/Desktop/hexo-blog_v2/source/img/v2-fcf08710643bcb172cb661c687f36fe5_b.webp" alt="img"></p>
+<p>但是同时更多的帧数会造成更长的延迟（延迟 := 物体被检测到的时刻 - 物体出现的时刻）。如何在保证物体检测精度的情况下，尽量降低延迟呢？我们参照QD理论进行如下建模：</p>
+<p>假设一个物体在时刻 <img src="https://www.zhihu.com/equation?tex=t_s" alt="[公式]"> 出现在视频中，在 <img src="https://www.zhihu.com/equation?tex=t_e" alt="[公式]"> 离开视频，则这个物体的移动轨迹可以用时序上的一组检测框 <img src="https://www.zhihu.com/equation?tex=b_%7Bt_s%2Ct_e%7D+%5Ctriangleq+%28b_%7Bt_s%7D%2Cb_%7Bt_s%2B1%7D%2C%5Cdots%2Cb_%7Bt_e%7D%29" alt="[公式]"> 表示。这样的一组检测框检测框序列，在目标追踪（Data association / tracking）领域被一些人称作tracklet。简单说，我们的算法目标是以低延迟判断检测框序列内是否含有物体。因此，我们称这样一组检测框序列为一个candidate。在quickest change detection框架下， 可以用如下似然比检验判断<img src="https://www.zhihu.com/equation?tex=t" alt="[公式]"> 时刻物体是否出现在该candidate内：</p>
+<p><img src="https://pic2.zhimg.com/80/v2-02e191693df754adbfdc93e95b989667_1440w.jpg" alt="img"></p>
+<p>其中 <img src="https://www.zhihu.com/equation?tex=D_t" alt="[公式]"> 代表一个单帧检测器在 <img src="https://www.zhihu.com/equation?tex=I_t" alt="[公式]"> 上的检测结果， <img src="https://www.zhihu.com/equation?tex=%5CGamma_%7B0%2Ci%7D" alt="[公式]"> 代表candidate中的内容从背景变为第 <img src="https://www.zhihu.com/equation?tex=i" alt="[公式]"> 类物体（如行人）这一事件发生的时刻， <img src="https://www.zhihu.com/equation?tex=p_i%28%E2%80%A2%29%5Ctriangleq+p%28%E2%80%A2%7Cl+%3Dl_i%29" alt="[公式]"> 代表给定类别 <img src="https://www.zhihu.com/equation?tex=i" alt="[公式]"> 的时候，事件 <img src="https://www.zhihu.com/equation?tex=%E2%80%A2" alt="[公式]"> 发生的概率。由条件概率的独立性， <img src="https://www.zhihu.com/equation?tex=p_i%28%E2%80%A2%7Cb_t%29" alt="[公式]"> 与类别 <img src="https://www.zhihu.com/equation?tex=i" alt="[公式]"> 和检测框 <img src="https://www.zhihu.com/equation?tex=b_t" alt="[公式]"> 独立，继而时序上各时刻检测结果的联合概率变成各时刻概率的连乘：</p>
+<p><img src="https://pic3.zhimg.com/80/v2-2abee55e75598de3d0c47181e3e01849_1440w.jpg" alt="img"></p>
+<p>这里需要明确一下，上边公式中的条件概率并非简单的检测器输出的结果，具体如何计算 <img src="https://www.zhihu.com/equation?tex=p" alt="[公式]"> 需要一套比较复杂的建模。由于这里只介绍低延迟检测的整体思路，关于 <img src="https://www.zhihu.com/equation?tex=p" alt="[公式]"> 的建模待我有空时会附在文末，有兴趣的朋友可以直接去论文查阅。总之，我们可以对这个似然比取阈值，进行检测。阈值越高，结果越准，但是延迟越大，反之同理。由QD理论中递归算法（CuSum算法），我们可以对上述似然比取log，记为W。最终的检测流程可以参照如下框图。</p>
+<p><img src="https://pic4.zhimg.com/80/v2-bd434876b196828b2db7d14ea5eb8c52_1440w.jpg" alt="img"></p>
+<p>整体流程为：（1）将已有但似然比未超过阈值的candidate做tracking进入下一帧；（2）在下一帧进行单帧检测，生成新的检测框，与前一帧tracking后的检测框合并到一起；（3）对这些candidate进行似然比检验，W超出阈值则输出检测结果，W小于零则去除该检测框，W大于零小于阈值则回到（1），进入下一帧。这样一个检测框架，可以与<strong>任何</strong>单帧检测器结合。</p>
+<h2 id="结果："><a href="#结果：" class="headerlink" title="结果："></a>结果：</h2><p>这篇工作和先前的工作一样，由于是新问题，并没有现成的数据集，于是我们只能对KITTI进行魔改，将KITTI中对物体的第一帧标注作为这个物体出现的时间，计算平均检测延迟。可以看到，无论与哪种检测器相结合，相比单帧检测，这种多帧框架下的检测方法在相同精度下都可以有效降低检测延迟。</p>
+<p><img src="https://pic3.zhimg.com/80/v2-aaf520648a1b1a58ff8a1abe43131535_1440w.jpg" alt="img"></p>
+<p>更加有趣的是，这些曲线都是由COCO上预训练好的检测器直接得出，根本没有在KITTI上做过任何finetune。即便如此，只要能够接受足够多帧的延迟，这些方法依然可以达到很低的误报率。这其实是一个非常有意思的结果，说明用延迟换精度是一个完全可行的思路。</p>
+<p>文章中还有一些其他图表，证明了这样一个多帧的方法不光可以有效降低检测延迟，还可以增加同误报率下被准确检出的物体数量，就不一一罗列了。另外，目前使用神经网络进行检测都是在GPU进行，而该多帧框架则可以在CPU并行执行，执行速度约50fps。两者并行的话，已经有潜力实时应用在真正的系统中了。下边放一个同误报率下，单帧方法和本文方法的对比，注意视频上下两组结果使用的是完全相同的神经网络。</p>
+<p>以上理论内容转自：<a href="https://zhuanlan.zhihu.com/p/212842916" target="_blank" rel="noopener">计算机视觉中低延迟检测的相关理论和应用</a>；</p>
 
       
     </div>
@@ -473,8 +510,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/avatar/weichat.jpg"
@@ -578,6 +624,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#低延迟检测思路"><span class="nav-number">1.</span> <span class="nav-text">低延迟检测思路</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结果："><span class="nav-number"></span> <span class="nav-text">结果：</span></a></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

@@ -111,7 +111,7 @@
 <meta property="og:image" content="https://nicehuster.github.io/img/blog.png">
 <meta property="og:image" content="https://nicehuster.github.io/img/snipaste20161118_102609.png">
 <meta property="og:image" content="https://nicehuster.github.io/img/snipaste20161118_104731.png">
-<meta property="og:updated_time" content="2020-09-15T03:38:44.453Z">
+<meta property="og:updated_time" content="2020-09-16T01:56:02.511Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="hexo教程：将个人博客部署到GitHubPage过程记录">
 <meta name="twitter:description" content="下面仅仅是我个人记录一下博客配置好了之后，在更换机器之后如何再次将博文部署到GitHub Page上去。至于如何配置博客，并将其部署到GitHub Page 上去，各位可以参考这篇博客，这篇博客有详细记录。博客地址：在这里 按照博客上的步骤就能配置好个人博客。">
@@ -391,21 +391,9 @@
 </li>
 </ul>
 </blockquote>
-<h3 id="安装Hexo-win"><a href="#安装Hexo-win" class="headerlink" title="安装Hexo(win)"></a>安装Hexo(win)</h3><p>在git bash 命令行输入如下命令：<br><figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-<span class="keyword">cli</span> -g</span><br></pre></td></tr></table></figure></p>
+<h3 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h3><p>在git bash 命令行输入如下命令：<br><figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install hexo-<span class="keyword">cli</span> -g</span><br></pre></td></tr></table></figure></p>
 <p>成功安装后，会出现诸如 + hexo-cli@1.1.0 的提示信息。<br><img src="/img/blog.png" alt></p>
-<h3 id="安装Hexo-Mac"><a href="#安装Hexo-Mac" class="headerlink" title="安装Hexo(Mac)"></a>安装Hexo(Mac)</h3><p>正确安装node.js和npm的安装方式如下：</p>
-<p>第一步：安装nvm和确认是否安装成功</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -o- https:<span class="regexp">//</span>raw.githubusercontent.com<span class="regexp">/creationix/</span>nvm<span class="regexp">/v0.33.1/i</span>nstall.sh | bash</span><br></pre></td></tr></table></figure>
-<p>然后输入 <code>command -v nvm</code>命令会出现nvm，如果没有出现，可以先关闭terminal，然后重启一下~。</p>
-<p>第二步：使用腾讯镜像，在命令行运行如下命令：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> NVM_NODEJS_ORG_MIRROR=http://tnpm.oa.com/mirrors/node/</span><br></pre></td></tr></table></figure>
 <p>如果可以打印出来，说明生效了</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$NVM_NODEJS_ORG_MIRROR</span></span><br></pre></td></tr></table></figure>
-<p>第三步：用nvm安装node</p>
-<figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ nvm install node</span><br><span class="line">Downloading and installing node v14<span class="number">.10</span><span class="number">.1</span>...</span><br><span class="line">Downloading http:<span class="comment">//tnpm.oa.com/mirrors/node//v14.10.1/node-v14.10.1-darwin-x64.tar.xz...</span></span><br><span class="line">######################################################################## <span class="number">100.0</span>%</span><br><span class="line">Computing checksum <span class="keyword">with</span> shasum -a <span class="number">256</span></span><br><span class="line">Checksums matched!</span><br><span class="line">Now using node v14<span class="number">.10</span><span class="number">.1</span> (npm v6<span class="number">.14</span><span class="number">.8</span>)</span><br><span class="line">Creating default alias: default -&gt; node (-&gt; v14<span class="number">.10</span><span class="number">.1</span>)</span><br></pre></td></tr></table></figure>
-<p>接下来可以开始安装hexo;</p>
-<p>第四步：安装hexo</p>
-<figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">npm install -g hexo-<span class="keyword">cli</span></span><br></pre></td></tr></table></figure>
 <h3 id="本地Git客户端配置"><a href="#本地Git客户端配置" class="headerlink" title="本地Git客户端配置"></a>本地Git客户端配置</h3><p>本地 Git 客户端配置，主要是为了能够在命令行模式下与远程的 GitHub 通信。</p>
 <h4 id="Git配置"><a href="#Git配置" class="headerlink" title="Git配置"></a>Git配置</h4><p>打开git bash 命令行，键入以下命令：<br><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git<span class="built_in"> config </span>--global user.name <span class="string">"你的用户名"</span></span><br><span class="line">git<span class="built_in"> config </span>--global user.email <span class="string">"你的email"</span></span><br></pre></td></tr></table></figure></p>
 <p>其中，字符串中的内容替换为你自己的信息，这里为了清晰一致，建议使用 GitHub 账户相同的配置信息。这里的用户名就是你的github账号名，我的是nicehuster,我的邮箱是nicehuster@gmail.com.</p>
@@ -544,7 +532,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">63</span>
+                <span class="site-state-item-count">64</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -555,7 +543,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -643,7 +631,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装前提"><span class="nav-number">1.</span> <span class="nav-text">安装前提</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Hexo-win"><span class="nav-number">2.</span> <span class="nav-text">安装Hexo(win)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Hexo-Mac"><span class="nav-number">3.</span> <span class="nav-text">安装Hexo(Mac)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本地Git客户端配置"><span class="nav-number">4.</span> <span class="nav-text">本地Git客户端配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Git配置"><span class="nav-number">4.1.</span> <span class="nav-text">Git配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建SSH-Key-WIN"><span class="nav-number">4.2.</span> <span class="nav-text">创建SSH Key(WIN)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建SSH-Key-Mac"><span class="nav-number">4.3.</span> <span class="nav-text">创建SSH Key(Mac)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#远程GitHub"><span class="nav-number">5.</span> <span class="nav-text">远程GitHub</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-SSH-Key"><span class="nav-number">5.1.</span> <span class="nav-text">配置 SSH Key</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#本地Git与远程GitHub通信"><span class="nav-number">5.2.</span> <span class="nav-text">本地Git与远程GitHub通信</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发表博文"><span class="nav-number">5.3.</span> <span class="nav-text">发表博文</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#公式渲染问题"><span class="nav-number">6.</span> <span class="nav-text">公式渲染问题</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装前提"><span class="nav-number">1.</span> <span class="nav-text">安装前提</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Hexo"><span class="nav-number">2.</span> <span class="nav-text">安装Hexo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本地Git客户端配置"><span class="nav-number">3.</span> <span class="nav-text">本地Git客户端配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Git配置"><span class="nav-number">3.1.</span> <span class="nav-text">Git配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建SSH-Key-WIN"><span class="nav-number">3.2.</span> <span class="nav-text">创建SSH Key(WIN)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建SSH-Key-Mac"><span class="nav-number">3.3.</span> <span class="nav-text">创建SSH Key(Mac)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#远程GitHub"><span class="nav-number">4.</span> <span class="nav-text">远程GitHub</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-SSH-Key"><span class="nav-number">4.1.</span> <span class="nav-text">配置 SSH Key</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#本地Git与远程GitHub通信"><span class="nav-number">4.2.</span> <span class="nav-text">本地Git与远程GitHub通信</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发表博文"><span class="nav-number">4.3.</span> <span class="nav-text">发表博文</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#公式渲染问题"><span class="nav-number">5.</span> <span class="nav-text">公式渲染问题</span></a></li></ol></div>
             
 
           </div>

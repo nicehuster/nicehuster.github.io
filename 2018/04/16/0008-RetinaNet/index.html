@@ -6,10 +6,10 @@
 
 
 <html class="theme-next muse use-motion" lang="zh-Hans">
-<head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#222">
 
 
@@ -20,12 +20,12 @@
 
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
 
 
-  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc" />
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
 
 
 
@@ -33,7 +33,7 @@
 
 
 
-  <meta name="baidu-site-verification" content="wgGFRLcCc9" />
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
 
 
 
@@ -43,7 +43,7 @@
 
   
   
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
 
 
 
@@ -77,23 +77,23 @@
 
 
 
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
 
-<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="detection,deep learning,paper," />
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
 
 
-
-
-
-  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml" />
+  <meta name="keywords" content="deep learning,detection,paper,">
 
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
 
 
 
@@ -101,7 +101,7 @@
 
 
 <meta name="description" content="论文信息： Tsung-Yi Lin,Kaiming He, Best Student Paper Award at ICCV 2017代码链接： https://github.com/fizyr/keras-retinanet 整体框架： 目标检测方法有两大类：基于proposal的two-stage方法和基于regression的one-stage方法。后者虽然比前者速度快，但是单精度要低于前">
-<meta name="keywords" content="detection,deep learning,paper">
+<meta name="keywords" content="deep learning,detection,paper">
 <meta property="og:type" content="article">
 <meta property="og:title" content="论文阅读：Focal Loss for Dense Object Detection（RetinaNet）">
 <meta property="og:url" content="https://nicehuster.github.io/2018/04/16/0008-RetinaNet/index.html">
@@ -149,7 +149,7 @@
 
 
 
-  <link rel="canonical" href="https://nicehuster.github.io/2018/04/16/0008-RetinaNet/"/>
+  <link rel="canonical" href="https://nicehuster.github.io/2018/04/16/0008-RetinaNet/">
 
 
 
@@ -189,7 +189,7 @@
     
 
     <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
+      <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">nicehuster's blog</span>
         <span class="logo-line-after"><i></i></span>
@@ -219,7 +219,7 @@
         <li class="menu-item menu-item-home">
           <a href="/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
             
             首页
           </a>
@@ -229,7 +229,7 @@
         <li class="menu-item menu-item-categories">
           <a href="/categories/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
             
             分类
           </a>
@@ -239,7 +239,7 @@
         <li class="menu-item menu-item-about">
           <a href="/about/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
             
             关于
           </a>
@@ -249,7 +249,7 @@
         <li class="menu-item menu-item-archives">
           <a href="/archives/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
             
             归档
           </a>
@@ -259,7 +259,7 @@
         <li class="menu-item menu-item-tags">
           <a href="/tags/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
             
             标签
           </a>
@@ -302,7 +302,7 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content>
       <meta itemprop="image" content="/avatar/weichat.jpg">
     </span>
 
@@ -338,7 +338,7 @@
           </span>
 
           
-            <span class="post-category" >
+            <span class="post-category">
             
               <span class="post-meta-divider">|</span>
             
@@ -389,21 +389,21 @@
       
         <p><strong>论文信息：</strong> Tsung-Yi Lin,Kaiming He, Best Student Paper Award at ICCV 2017<br><strong>代码链接：</strong> <a href="https://github.com/fizyr/keras-retinanet" target="_blank" rel="noopener">https://github.com/fizyr/keras-retinanet</a></p>
 <p><strong>整体框架：</strong> 目标检测方法有两大类：基于proposal的two-stage方法和基于regression的one-stage方法。后者虽然比前者速度快，但是单精度要低于前者，作者通过分析发现，造成这种情况的主要原因是训练正负样本存在类别不平衡问题。作者针对这个问题提出了一个focal loss，并在FPN网络基础是使用focal loss 实例化提出了一个one-stage 法的网络：RetinaNet。在不影响其速度的情况下，在精度上可以超越当前的SOAT。</p>
-<p><img src="/img/retinanet_1.PNG" alt=""><br><a id="more"></a></p>
+<p><img src="/img/retinanet_1.PNG" alt><br><a id="more"></a></p>
 <p><strong>one-stage detector存在的问题:类别不平衡</strong></p>
 <p>这种方法的detector一般都是通过密集采样的方式从一张图片中密集采样出10\^4~10\^5个候选框，但这些候选框中只有少部分是包含有目标。即前景/背景之间存在严重的不平衡现象，这种不平衡会导致一个问题：负样本太多，占总的loss的大部分，而且都是easy负样本，这对网络训练来说没有任何帮助而且会降低网络泛化能力。针对这种情况一个普遍的做法是采用 hard negative mining：在训练时采样困难样本对网络训练或者训练时采用更复杂的采样策略。作者在文章中发现这种方法并不是那么的work，于是就提出了focal loss，这样不需要使用任何困难样本采样策略，可以对所有样本进行训练。</p>
 <p><strong>Focal loss：</strong> 用于处理 one-stage 目标检测场景在训练中出现的前景/背景类别极度不平衡问题（eg, 1:1000）。</p>
 <p>对于二分类交叉熵（cross entropy，CE）定义如下：</p>
-<p><img src="/img/retinanet_2.png" alt=""></p>
+<p><img src="/img/retinanet_2.png" alt></p>
 <p>为方便起见，定义$\text{pt}$ ,</p>
-<p><img src="/img/retinanet_3.png" alt=""></p>
+<p><img src="/img/retinanet_3.png" alt></p>
 <script type="math/tex; mode=display">\ CE(p,y)\  = \ CE(pt\ )\  = \  - log(pt\ )</script><p>从上左图的蓝线可以看出即使是容易分类样本($pt\ \gg 0.5)$，也能带来不小的损失。Focal loss 的目的是($p\ t\  \gg0.5)$的样本的loss更小。因此focal loss定义如下：</p>
-<p><img src="/img/retinanet_4.png" alt=""></p>
+<p><img src="/img/retinanet_4.png" alt></p>
 <p>r取值[0,5]如上图。从上面的FL公式可以看出，FL具有两个性质：(1)样本分类错误时，$\text{pt}$很小，$(1</p>
 <ul>
-<li>pt)\hat{}r$趋近1，整个FL基本不变，当$pt \rightarrow 1$时，$(1 -pt)\hat{}r$趋近0，分类正确的样本就能被很好的down-weighted;(2)聚焦参数γ可以平滑地调节易分类样本被down-weighted的速率，当$\gamma =0$时，FL等于CE。总的来说，FL的目的还是在于减少易分类样本的权重，从而使模型在训练时更加专注于难分类的样本。<br>在具体实现时，作者还另外添加了一个超参数，FL如下：<br><img src="/img/retinanet_5.png" alt=""><br><img src="/img/retinanet_6.png" alt=""><br><strong>RetinaNet:</strong> 作者在FPN网络的基础上应用focal loss，来实例化RetinaNet.大致网络结构如上图所示，具体细节可以看原文。如果之前有了解过OHEM（online hard example mining）的话，可以看出FL和OHEM很像，不过两者还是存在区别：</li>
+<li>pt)\hat{}r$趋近1，整个FL基本不变，当$pt \rightarrow 1$时，$(1 -pt)\hat{}r$趋近0，分类正确的样本就能被很好的down-weighted;(2)聚焦参数γ可以平滑地调节易分类样本被down-weighted的速率，当$\gamma =0$时，FL等于CE。总的来说，FL的目的还是在于减少易分类样本的权重，从而使模型在训练时更加专注于难分类的样本。<br>在具体实现时，作者还另外添加了一个超参数，FL如下：<br><img src="/img/retinanet_5.png" alt><br><img src="/img/retinanet_6.png" alt><br><strong>RetinaNet:</strong> 作者在FPN网络的基础上应用focal loss，来实例化RetinaNet.大致网络结构如上图所示，具体细节可以看原文。如果之前有了解过OHEM（online hard example mining）的话，可以看出FL和OHEM很像，不过两者还是存在区别：</li>
 </ul>
-<p><strong>1)</strong> OHEM是只取3:1负样本用于计算loss，之外的全部置零，也就是将easy的样本全部抛弃；<br><strong>2)</strong> Focal loss是取所有样本，根据难易程度给不同权重。<br>作者专门做了实验与OHEM进行对比发现，focal loss完全可以吊打OHEM。如下图左下角实验结果。<br><img src="/img/retinanet_7.png" alt=""><br>我也对自己的数据训练了一下效果还不错，不过针对一些密集目标还是会出现了一些bad case。下面是在coco和自己的数据上训练的结果<br><img src="/img/retinanet_8.png" alt=""></p>
+<p><strong>1)</strong> OHEM是只取3:1负样本用于计算loss，之外的全部置零，也就是将easy的样本全部抛弃；<br><strong>2)</strong> Focal loss是取所有样本，根据难易程度给不同权重。<br>作者专门做了实验与OHEM进行对比发现，focal loss完全可以吊打OHEM。如下图左下角实验结果。<br><img src="/img/retinanet_7.png" alt><br>我也对自己的数据训练了一下效果还不错，不过针对一些密集目标还是会出现了一些bad case。下面是在coco和自己的数据上训练的结果<br><img src="/img/retinanet_8.png" alt></p>
 
       
     </div>
@@ -421,9 +421,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/detection/" rel="tag"># detection</a>
-          
             <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+            <a href="/tags/detection/" rel="tag"># detection</a>
           
             <a href="/tags/paper/" rel="tag"># paper</a>
           
@@ -505,9 +505,7 @@
 
       <section class="site-overview sidebar-panel sidebar-panel-active">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="/avatar/weichat.jpg"
-               alt="nicehuster" />
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
           <p class="site-author-name" itemprop="name">nicehuster</p>
            
               <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
@@ -621,7 +619,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright" >
+        <div class="copyright">
   
   &copy; 
   <span itemprop="copyrightYear">2020</span>

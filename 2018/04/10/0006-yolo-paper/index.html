@@ -6,10 +6,10 @@
 
 
 <html class="theme-next muse use-motion" lang="zh-Hans">
-<head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#222">
 
 
@@ -20,12 +20,12 @@
 
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
 
 
-  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc" />
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
 
 
 
@@ -33,7 +33,7 @@
 
 
 
-  <meta name="baidu-site-verification" content="wgGFRLcCc9" />
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
 
 
 
@@ -43,7 +43,7 @@
 
   
   
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
 
 
 
@@ -77,23 +77,23 @@
 
 
 
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
 
-<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="detection,deep learning,paper,yolo," />
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
 
 
-
-
-
-  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml" />
+  <meta name="keywords" content="deep learning,detection,paper,yolo,">
 
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
 
 
 
@@ -101,7 +101,7 @@
 
 
 <meta name="description" content="YOLO(You Only Look Once)是一个流行的目标检测方法，和Faster RCNN等state of the art方法比起来，主打检测速度快。截止到目前为止（2017年2月初），YOLO已经发布了两个版本，在下文中分别称为YOLO V1和YOLO V2。YOLO V2的代码目前作为Darknet的一部分开源在GitHub。在这篇博客中，记录了阅读YOLO两个版本论文中的重点内容，">
-<meta name="keywords" content="detection,deep learning,paper,yolo">
+<meta name="keywords" content="deep learning,detection,paper,yolo">
 <meta property="og:type" content="article">
 <meta property="og:title" content="YOLO 论文阅读">
 <meta property="og:url" content="https://nicehuster.github.io/2018/04/10/0006-yolo-paper/index.html">
@@ -153,7 +153,7 @@
 
 
 
-  <link rel="canonical" href="https://nicehuster.github.io/2018/04/10/0006-yolo-paper/"/>
+  <link rel="canonical" href="https://nicehuster.github.io/2018/04/10/0006-yolo-paper/">
 
 
 
@@ -193,7 +193,7 @@
     
 
     <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
+      <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">nicehuster's blog</span>
         <span class="logo-line-after"><i></i></span>
@@ -223,7 +223,7 @@
         <li class="menu-item menu-item-home">
           <a href="/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
             
             首页
           </a>
@@ -233,7 +233,7 @@
         <li class="menu-item menu-item-categories">
           <a href="/categories/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
             
             分类
           </a>
@@ -243,7 +243,7 @@
         <li class="menu-item menu-item-about">
           <a href="/about/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
             
             关于
           </a>
@@ -253,7 +253,7 @@
         <li class="menu-item menu-item-archives">
           <a href="/archives/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
             
             归档
           </a>
@@ -263,7 +263,7 @@
         <li class="menu-item menu-item-tags">
           <a href="/tags/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
             
             标签
           </a>
@@ -306,7 +306,7 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content>
       <meta itemprop="image" content="/avatar/weichat.jpg">
     </span>
 
@@ -342,7 +342,7 @@
           </span>
 
           
-            <span class="post-category" >
+            <span class="post-category">
             
               <span class="post-meta-divider">|</span>
             
@@ -391,7 +391,7 @@
       
 
       
-        <p>YOLO(<strong>Y</strong>ou <strong>O</strong>nly <strong>L</strong>ook <strong>O</strong>nce)是一个流行的目标检测方法，和Faster RCNN等state of the art方法比起来，主打检测速度快。截止到目前为止（2017年2月初），YOLO已经发布了两个版本，在下文中分别称为<a href="https://arxiv.org/abs/1506.02640" target="_blank" rel="noopener">YOLO V1</a>和<a href="https://arxiv.org/abs/1612.08242" target="_blank" rel="noopener">YOLO V2</a>。YOLO V2的代码目前作为<a href="http://pjreddie.com/darknet/yolo/" target="_blank" rel="noopener">Darknet</a>的一部分开源在<a href="">GitHub</a>。在这篇博客中，记录了阅读YOLO两个版本论文中的重点内容，并着重总结V2版本的改进。</p>
+        <p>YOLO(<strong>Y</strong>ou <strong>O</strong>nly <strong>L</strong>ook <strong>O</strong>nce)是一个流行的目标检测方法，和Faster RCNN等state of the art方法比起来，主打检测速度快。截止到目前为止（2017年2月初），YOLO已经发布了两个版本，在下文中分别称为<a href="https://arxiv.org/abs/1506.02640" target="_blank" rel="noopener">YOLO V1</a>和<a href="https://arxiv.org/abs/1612.08242" target="_blank" rel="noopener">YOLO V2</a>。YOLO V2的代码目前作为<a href="http://pjreddie.com/darknet/yolo/" target="_blank" rel="noopener">Darknet</a>的一部分开源在<a href>GitHub</a>。在这篇博客中，记录了阅读YOLO两个版本论文中的重点内容，并着重总结V2版本的改进。</p>
 <p>Update@2018/04: <a href="https://pjreddie.com/darknet/yolo/" target="_blank" rel="noopener">YOLO v3</a>已经发布！下次有时间会把yolo v3的内容补充一下。</p>
 <p><img src="/img/yolo2_result.png" alt="YOLO V2的检测效果示意"><br><a id="more"></a></p>
 <h2 id="YOLO-V1"><a href="#YOLO-V1" class="headerlink" title="YOLO V1"></a>YOLO V1</h2><p>这里不妨把YOLO V1论文<a href="https://arxiv.org/abs/1506.02640" target="_blank" rel="noopener">“You Only Look Once: Unitied, Real-Time Object Detection”</a>的摘要部分意译如下：</p>
@@ -452,7 +452,7 @@ x, &\text{if}\ x > 0 \\\\
 <li>作者使用的聚类方法是K-Means；</li>
 <li>相似性度量不用欧氏距离，而是用IoU，定义如下：<script type="math/tex; mode=display">d(\text{box}, \text{centroid}) = 1-\text{IoU}(\text{box}, \text{centroid})</script></li>
 </ul>
-<p>使用不同的$k$，聚类实验结果如下，作者折中采用了$k = 5$。而且经过实验，发现当取$k=9$时候，已经能够超过Faster RCNN采用的手工固定anchor box的方法。下图右侧图是在COCO和VOC数据集上$k=5$的聚类后结果。这些box可以作为anchor box使用。<br><img src="/img/yolo2_cluster_result.png" alt=""></p>
+<p>使用不同的$k$，聚类实验结果如下，作者折中采用了$k = 5$。而且经过实验，发现当取$k=9$时候，已经能够超过Faster RCNN采用的手工固定anchor box的方法。下图右侧图是在COCO和VOC数据集上$k=5$的聚类后结果。这些box可以作为anchor box使用。<br><img src="/img/yolo2_cluster_result.png" alt></p>
 <h3 id="改进5：直接位置预测（Direct-Location-Prediction）"><a href="#改进5：直接位置预测（Direct-Location-Prediction）" class="headerlink" title="改进5：直接位置预测（Direct Location Prediction）"></a>改进5：直接位置预测（Direct Location Prediction）</h3><p>我们仍然延续了YOLO V1中的思路，预测box相对于grid cell的位置。使用sigmoid函数作为激活函数，使得最终输出值落在$[0, 1]$这个区间上。</p>
 <p>在output的feature map上，对于每个cell（共计$13\times 13$个），给出对应每个bounding box的输出$t_x$, $t_y$, $t_w$, $t_h$。每个cell共计$k=5$个bounding box。如何由这几个参数确定bounding box的真实位置呢？见下图。</p>
 <p><img src="/img/yolo2_bbox_location.png" alt="确定bbox的位置"></p>
@@ -489,9 +489,9 @@ x, &\text{if}\ x > 0 \\\\
       
         <div class="post-tags">
           
-            <a href="/tags/detection/" rel="tag"># detection</a>
-          
             <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+            <a href="/tags/detection/" rel="tag"># detection</a>
           
             <a href="/tags/paper/" rel="tag"># paper</a>
           
@@ -573,7 +573,7 @@ x, &\text{if}\ x > 0 \\\\
 
       
         <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
             文章目录
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview">
@@ -584,9 +584,7 @@ x, &\text{if}\ x > 0 \\\\
 
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="/avatar/weichat.jpg"
-               alt="nicehuster" />
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
           <p class="site-author-name" itemprop="name">nicehuster</p>
            
               <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
@@ -716,7 +714,7 @@ x, &\text{if}\ x > 0 \\\\
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright" >
+        <div class="copyright">
   
   &copy; 
   <span itemprop="copyrightYear">2020</span>

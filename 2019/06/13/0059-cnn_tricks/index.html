@@ -6,10 +6,10 @@
 
 
 <html class="theme-next muse use-motion" lang="zh-Hans">
-<head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#222">
 
 
@@ -20,12 +20,12 @@
 
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
 
 
-  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc" />
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
 
 
 
@@ -33,7 +33,7 @@
 
 
 
-  <meta name="baidu-site-verification" content="wgGFRLcCc9" />
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
 
 
 
@@ -43,7 +43,7 @@
 
   
   
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
 
 
 
@@ -77,23 +77,23 @@
 
 
 
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
 
-<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="deep learning," />
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
 
 
-
-
-
-  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml" />
+  <meta name="keywords" content="deep learning,">
 
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
 
 
 
@@ -150,7 +150,7 @@
 
 
 
-  <link rel="canonical" href="https://nicehuster.github.io/2019/06/13/0059-cnn_tricks/"/>
+  <link rel="canonical" href="https://nicehuster.github.io/2019/06/13/0059-cnn_tricks/">
 
 
 
@@ -190,7 +190,7 @@
     
 
     <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
+      <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">nicehuster's blog</span>
         <span class="logo-line-after"><i></i></span>
@@ -220,7 +220,7 @@
         <li class="menu-item menu-item-home">
           <a href="/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
             
             首页
           </a>
@@ -230,7 +230,7 @@
         <li class="menu-item menu-item-categories">
           <a href="/categories/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
             
             分类
           </a>
@@ -240,7 +240,7 @@
         <li class="menu-item menu-item-about">
           <a href="/about/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
             
             关于
           </a>
@@ -250,7 +250,7 @@
         <li class="menu-item menu-item-archives">
           <a href="/archives/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
             
             归档
           </a>
@@ -260,7 +260,7 @@
         <li class="menu-item menu-item-tags">
           <a href="/tags/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
             
             标签
           </a>
@@ -303,7 +303,7 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content>
       <meta itemprop="image" content="/avatar/weichat.jpg">
     </span>
 
@@ -339,7 +339,7 @@
           </span>
 
           
-            <span class="post-category" >
+            <span class="post-category">
             
               <span class="post-meta-divider">|</span>
             
@@ -395,12 +395,12 @@
 <p><strong>B.warm up</strong>：先用一个小的学习率先训几个epoch（warmup），因为网络的参数是随机初始化的，假如一开始就采用较大的学习率容易出现数值不稳定，这是使用warmup的原因。等到训练过程基本稳定了就可以使用原先设定的初始学习率进行训练了。论文中提到了warmup采用线性增加策略实现。举例而言，假设，初始学习率为η,选择前m个batch用于warm up，则在第i个batch时, 1 ≤ i ≤ m，设置学习率为 iη/m。</p>
 <p><strong>C.每个残差模块最后的BN层中γ设置为0</strong>：BN层的γ、β参数是用来对标准化后的输入做线性变换的，也就是γx^+β，一般γ参数都会初始化为1，β参数会初始化为0，作者认为初始化为0更有利于模型的训练。</p>
 <p><strong>D.不对bias执行weight decay操作</strong>：weight decay通常用于所有网络层的可学习参数（包括weight和bias）。其作用等效于对所有参数做L2正则化，以达到减少模型过拟合的作用。作者推荐仅仅只对weight进行weight decay操作。</p>
-<p>（2）<strong>使用低精度训练</strong><br>采用低精度比如FP16训练可以在数值层面上对网络训练加速。通过大多数网络训练都是采用FP32精度训练，是因为网络的输入，网络参数以及网络输出都是采用FP32。如果能使用16位浮点型参数进行训练，就可以大大加快模型的训练速度。下表是使用大的batch size和半精度FP16进行训练的前后对比，其中baseline 使用BS=256,FP32，efficient使用BS=1024,FP16：<br><img src="/img/cnn_trick.png" alt=""><br>从实验结果可以看出，相比baseline,训练速度得到明显提升，而且准确率上也得到了一定程度提升。更加详细的对比实验如下：<br><img src="/img/cnn_trick2.png" alt=""></p>
-<h3 id="模型结构调整"><a href="#模型结构调整" class="headerlink" title="模型结构调整"></a>模型结构调整</h3><p>这种模型结构调整是在不显著增加计算量的情况下对模型性能进行进一步提升。作者以ResNet为例进行优化。ResNet通常包括一个input stem，4个stage和1个output。下图展示的是原始resnet50结构。<br><img src="/img/cnn_trick_resnet.png" alt=""><br>作者在downsampling 部分，input stem以及Path B部分做了一些小的调整，对应如下图(a),(b),(c)<br><img src="/img/cnn_trick_resnet1.png" alt=""><br>实验结果对比如下：<br><img src="/img/cnn_trick_resnet-res.png" alt=""><br>从实验结果可以看出，这些结构上微小的调整，并没有对计算量带来较大的变化，但对accuracy带来不小的提升。</p>
+<p>（2）<strong>使用低精度训练</strong><br>采用低精度比如FP16训练可以在数值层面上对网络训练加速。通过大多数网络训练都是采用FP32精度训练，是因为网络的输入，网络参数以及网络输出都是采用FP32。如果能使用16位浮点型参数进行训练，就可以大大加快模型的训练速度。下表是使用大的batch size和半精度FP16进行训练的前后对比，其中baseline 使用BS=256,FP32，efficient使用BS=1024,FP16：<br><img src="/img/cnn_trick.png" alt><br>从实验结果可以看出，相比baseline,训练速度得到明显提升，而且准确率上也得到了一定程度提升。更加详细的对比实验如下：<br><img src="/img/cnn_trick2.png" alt></p>
+<h3 id="模型结构调整"><a href="#模型结构调整" class="headerlink" title="模型结构调整"></a>模型结构调整</h3><p>这种模型结构调整是在不显著增加计算量的情况下对模型性能进行进一步提升。作者以ResNet为例进行优化。ResNet通常包括一个input stem，4个stage和1个output。下图展示的是原始resnet50结构。<br><img src="/img/cnn_trick_resnet.png" alt><br>作者在downsampling 部分，input stem以及Path B部分做了一些小的调整，对应如下图(a),(b),(c)<br><img src="/img/cnn_trick_resnet1.png" alt><br>实验结果对比如下：<br><img src="/img/cnn_trick_resnet-res.png" alt><br>从实验结果可以看出，这些结构上微小的调整，并没有对计算量带来较大的变化，但对accuracy带来不小的提升。</p>
 <h3 id="模型训练调优"><a href="#模型训练调优" class="headerlink" title="模型训练调优"></a>模型训练调优</h3><p>作者在这一部分提到了四种调优技巧：</p>
-<p><strong>采用cosine学习率衰减策略</strong>：实验对比结果如下，相比于常用的step decay,cosine decay在起始阶段开始衰减学习率，在step decay的学习率下降了10x时，cosine依然可以保持较大的学习率，这潜在的提高了训练速度。<br><img src="/img/cosine.png" alt=""></p>
-<p><strong>知识蒸馏</strong>：使用一个效果更好的teacher model训练student model，使得student model在模型结构不改变的情况下提升效果。作者采用ResNet-152作为teacher model，用ResNet-50作为student model。代码上通过在ResNet网络后添加一个蒸馏损失函数实现，这个损失函数用来评价teacher model输出和student model输出的差异，因此整体的损失函数原损失函数和蒸馏损失函数的结合：<br><img src="/img/distill.png" alt=""><br>其中p表示真实标签，z表示student model的全连接层输出，r表示teacher model的全连接层输出，T是超参数，用来平滑softmax函数的输出。</p>
-<p><strong>mixup</strong>：mixup也是一种数据增强操作，其大致操作是，每次读取2张输入图像，假设用（xi，yi）和（xj，yj）表示，那么通过如下公式就可以合成得到一张新的图像（x，y），然后用这张新图像进行训练：<br><img src="/img/mixup.png" alt=""><br>其中λ属于[0,1]服从Beta分布。实验结果如下<br><img src="/img/cnn_trick_res.png" alt=""></p>
+<p><strong>采用cosine学习率衰减策略</strong>：实验对比结果如下，相比于常用的step decay,cosine decay在起始阶段开始衰减学习率，在step decay的学习率下降了10x时，cosine依然可以保持较大的学习率，这潜在的提高了训练速度。<br><img src="/img/cosine.png" alt></p>
+<p><strong>知识蒸馏</strong>：使用一个效果更好的teacher model训练student model，使得student model在模型结构不改变的情况下提升效果。作者采用ResNet-152作为teacher model，用ResNet-50作为student model。代码上通过在ResNet网络后添加一个蒸馏损失函数实现，这个损失函数用来评价teacher model输出和student model输出的差异，因此整体的损失函数原损失函数和蒸馏损失函数的结合：<br><img src="/img/distill.png" alt><br>其中p表示真实标签，z表示student model的全连接层输出，r表示teacher model的全连接层输出，T是超参数，用来平滑softmax函数的输出。</p>
+<p><strong>mixup</strong>：mixup也是一种数据增强操作，其大致操作是，每次读取2张输入图像，假设用（xi，yi）和（xj，yj）表示，那么通过如下公式就可以合成得到一张新的图像（x，y），然后用这张新图像进行训练：<br><img src="/img/mixup.png" alt><br>其中λ属于[0,1]服从Beta分布。实验结果如下<br><img src="/img/cnn_trick_res.png" alt></p>
 <p>此外，作者将这些trick应用于其他图像任务中，比如目标检测，图像分割上同样有效，可以带来2-3个点的提升。</p>
 
       
@@ -497,7 +497,7 @@
 
       
         <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
             文章目录
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview">
@@ -508,9 +508,7 @@
 
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="/avatar/weichat.jpg"
-               alt="nicehuster" />
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
           <p class="site-author-name" itemprop="name">nicehuster</p>
            
               <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
@@ -640,7 +638,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright" >
+        <div class="copyright">
   
   &copy; 
   <span itemprop="copyrightYear">2020</span>

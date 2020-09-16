@@ -6,10 +6,10 @@
 
 
 <html class="theme-next muse use-motion" lang="zh-Hans">
-<head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#222">
 
 
@@ -20,12 +20,12 @@
 
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
 
 
-  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc" />
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
 
 
 
@@ -33,7 +33,7 @@
 
 
 
-  <meta name="baidu-site-verification" content="wgGFRLcCc9" />
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
 
 
 
@@ -43,7 +43,7 @@
 
   
   
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
 
 
 
@@ -77,23 +77,23 @@
 
 
 
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
 
-<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="detection,deep learning,paper," />
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
 
 
-
-
-
-  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml" />
+  <meta name="keywords" content="deep learning,detection,paper,">
 
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
 
 
 
@@ -101,7 +101,7 @@
 
 
 <meta name="description" content="论文信息：He Kaiming ,ICCV2017 best paper,2017 coco object detection,2017 coco instance segmentation winner. 整体框架：mask rcnn 在Faster RCNN的基础上，使用FCN来增加一个mask branch，从而解决instance segmentation问题，而且这个还能从一点程度上提高">
-<meta name="keywords" content="detection,deep learning,paper">
+<meta name="keywords" content="deep learning,detection,paper">
 <meta property="og:type" content="article">
 <meta property="og:title" content="论文阅读：Mask R-CNN">
 <meta property="og:url" content="https://nicehuster.github.io/2018/03/29/0005-Mask_RCNN/index.html">
@@ -152,7 +152,7 @@
 
 
 
-  <link rel="canonical" href="https://nicehuster.github.io/2018/03/29/0005-Mask_RCNN/"/>
+  <link rel="canonical" href="https://nicehuster.github.io/2018/03/29/0005-Mask_RCNN/">
 
 
 
@@ -192,7 +192,7 @@
     
 
     <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
+      <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">nicehuster's blog</span>
         <span class="logo-line-after"><i></i></span>
@@ -222,7 +222,7 @@
         <li class="menu-item menu-item-home">
           <a href="/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
             
             首页
           </a>
@@ -232,7 +232,7 @@
         <li class="menu-item menu-item-categories">
           <a href="/categories/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
             
             分类
           </a>
@@ -242,7 +242,7 @@
         <li class="menu-item menu-item-about">
           <a href="/about/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
             
             关于
           </a>
@@ -252,7 +252,7 @@
         <li class="menu-item menu-item-archives">
           <a href="/archives/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
             
             归档
           </a>
@@ -262,7 +262,7 @@
         <li class="menu-item menu-item-tags">
           <a href="/tags/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
             
             标签
           </a>
@@ -305,7 +305,7 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content>
       <meta itemprop="image" content="/avatar/weichat.jpg">
     </span>
 
@@ -341,7 +341,7 @@
           </span>
 
           
-            <span class="post-category" >
+            <span class="post-category">
             
               <span class="post-meta-divider">|</span>
             
@@ -392,17 +392,17 @@
       
         <p><strong>论文信息</strong>：He Kaiming ,ICCV2017 best paper,2017 coco object detection,2017 coco instance segmentation winner.</p>
 <p><strong>整体框架</strong>：mask rcnn 在Faster RCNN的基础上，使用FCN来增加一个mask branch，从而解决instance segmentation问题，而且这个还能从一点程度上提高object detection的检测效果。此外，该网络框架通用性强，使用灵活，通过关键点分支，还可以实现关键点检测。</p>
-<p><img src="/img/294e4644643eb5f59bcef085a75166d0.png" alt=""><br><a id="more"></a><br><strong>1.Instance segmentation难点</strong></p>
+<p><img src="/img/294e4644643eb5f59bcef085a75166d0.png" alt><br><a id="more"></a><br><strong>1.Instance segmentation难点</strong></p>
 <p>分割主要分为两种：Semantic segmentation和Instance segmentation。前者是语义分割，用于对不同种类的目标进行分割，区分的仅仅是不同种类之间的差异；后者是实例分割，是在前者的基础上，不仅仅要区分不同种类之前的差异，还要区分开同种类目标的不同个体。如下如所示</p>
-<p><img src="/img/cc70655b7f8ec0d5eb56ad9e54a644c3.png" alt=""></p>
+<p><img src="/img/cc70655b7f8ec0d5eb56ad9e54a644c3.png" alt></p>
 <p>如果认为instance segmentation=detection +semantic segmentation，就会产生一些错误，比如图中person3和person4的交集部分都是属于“人”，那么该如何区分交集部分的像素是属于person3还是person4？现有大多数instance segmentation 算法都很难完全解决这问题，无论是COCO2015（MNC）还是COCO2016（FCIS）实例分割的winner都是很难完全解决这个问题。而mask rcnn的提出就是解决instance segmentation的这个问题。</p>
 <p><strong>2.Faster RCNN与Mask RCNN的区别</strong></p>
-<p><img src="/img/48e85d1db346617827ab312e1e57507b.png" alt=""></p>
+<p><img src="/img/48e85d1db346617827ab312e1e57507b.png" alt></p>
 <p>从上图可以看出有两个区别：(1)RoIPool layer 和RoIAlign layer；(2)RoI特征前者用于分类+回归，而后者用于分类+回归+mask分割；</p>
 <p>至于RoIPool和RoIAlign的区别，有时间再细讲。总之，RoIAlign的提出就是为了解决RoIPool的两次量化操作导致的不匹配问题(misalignment),而这个是直接影响分割的效果。</p>
 <p><strong>3.网络结构</strong></p>
 <p>从上图（2）可以看出，mask rcnn主要有两部分组成：backbone+head。</p>
-<p><img src="/img/c67d0e601075a71da044ed037f006e01.png" alt=""></p>
+<p><img src="/img/c67d0e601075a71da044ed037f006e01.png" alt></p>
 <p>上图是作者给出的基于两个不同backbone的mask rcnn网络的head部分。前者是基于ResNet-C4，后者是基于FPN。Mask branch分支部分都是通过FCN实现的。之所以用FCN去实现，是因为使用FCN不会像FC层那样会丢失空间信息（spatial<br>layout），而且这样可以避免使用FC带来的参数的增加。</p>
 <p>注：14*14*80中，80指的是类别，因为在物体检测时已经得到类别，所以直接选择对应类别的那个14*14特征图，然后resize到检测box尺寸就是最终结果。</p>
 <p><strong>3.训练</strong></p>
@@ -412,23 +412,23 @@
 <p>Loss function= class loss + box loss + mask loss</p>
 <p>注：每个ROI都会预测K个m*m大小的mask输出。M通常等于14或28，K是类别个数。使用sigmoid作为激活函数，并没有使用sofmax，这需要注意。训练的时候，只把第k个m*m的预测的mask加入到loss中去。</p>
 <p>Mask loss中使用的是sigmoid(binary cross entropy loss),为什么不使用softmax?(像传统的FCN那样)</p>
-<p><img src="/img/7f5aa3c01dca26904469668457507b99.png" alt=""></p>
+<p><img src="/img/7f5aa3c01dca26904469668457507b99.png" alt></p>
 <p>作者通过实验对比发现，sigmoid的结果比softmax结果大约高5.5AP。</p>
 <p><strong>4.实验结果</strong></p>
-<p><img src="/img/c86ab9ecb9809b59f244f2536e4933f8.png" alt=""></p>
+<p><img src="/img/c86ab9ecb9809b59f244f2536e4933f8.png" alt></p>
 <p><strong>5.通用性</strong></p>
 <p>此外mask rcnn除了能产生mask之外，也可以用于检测人体关键点，只需要增加一个人体关键点的分支就OK。</p>
-<p><img src="/img/7edea97659679babb3ff08a2ee11c9c6.png" alt=""></p>
+<p><img src="/img/7edea97659679babb3ff08a2ee11c9c6.png" alt></p>
 <p>整个文章的大致内容就这些，上面只是蜻蜓点水的随便的介绍了mask rcnn的内容。具体细节可以去参考原文。</p>
 <p><strong>6.最后</strong></p>
 <p>这周使用自己的数据集训练，总的实验结果来说还是不错的。下面是我的实验结果和mask rcnn的实验结果。</p>
 <p>我的实验结果</p>
-<p><img src="/img/95066fb4ecf22a3fd3ed8ef3625353e1.png" alt=""></p>
-<p><img src="/img/13e27af1ef0d21be00cd5c5d9c9d4d10.png" alt=""></p>
+<p><img src="/img/95066fb4ecf22a3fd3ed8ef3625353e1.png" alt></p>
+<p><img src="/img/13e27af1ef0d21be00cd5c5d9c9d4d10.png" alt></p>
 <p>从右图可以看出，最右边分割的时候漏掉了一个商品。也就是说在检测小目标时MNC还是存在一点的局限性的。</p>
 <p>Mask RCNN的结果</p>
-<p><img src="/img/91a8ac2d8b5cd4da07010c82f52e30a3.png" alt=""></p>
-<p><img src="/img/66098381841a0120a3efd68686f0978a.png" alt=""></p>
+<p><img src="/img/91a8ac2d8b5cd4da07010c82f52e30a3.png" alt></p>
+<p><img src="/img/66098381841a0120a3efd68686f0978a.png" alt></p>
 <p>不得不说，mask rcnn太强大了。</p>
 
       
@@ -447,9 +447,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/detection/" rel="tag"># detection</a>
-          
             <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
+          
+            <a href="/tags/detection/" rel="tag"># detection</a>
           
             <a href="/tags/paper/" rel="tag"># paper</a>
           
@@ -531,9 +531,7 @@
 
       <section class="site-overview sidebar-panel sidebar-panel-active">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="/avatar/weichat.jpg"
-               alt="nicehuster" />
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
           <p class="site-author-name" itemprop="name">nicehuster</p>
            
               <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
@@ -647,7 +645,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright" >
+        <div class="copyright">
   
   &copy; 
   <span itemprop="copyrightYear">2020</span>

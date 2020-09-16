@@ -6,10 +6,10 @@
 
 
 <html class="theme-next muse use-motion" lang="zh-Hans">
-<head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#222">
 
 
@@ -20,12 +20,12 @@
 
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
 
 
-  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc" />
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
 
 
 
@@ -33,7 +33,7 @@
 
 
 
-  <meta name="baidu-site-verification" content="wgGFRLcCc9" />
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
 
 
 
@@ -43,7 +43,7 @@
 
   
   
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
 
 
 
@@ -77,23 +77,23 @@
 
 
 
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
 
-<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="PyTorch," />
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
 
 
-
-
-
-  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml" />
+  <meta name="keywords" content="PyTorch,">
 
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
 
 
 
@@ -142,7 +142,7 @@
 
 
 
-  <link rel="canonical" href="https://nicehuster.github.io/2019/05/14/0055-pytorch-api/"/>
+  <link rel="canonical" href="https://nicehuster.github.io/2019/05/14/0055-pytorch-api/">
 
 
 
@@ -182,7 +182,7 @@
     
 
     <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
+      <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">nicehuster's blog</span>
         <span class="logo-line-after"><i></i></span>
@@ -212,7 +212,7 @@
         <li class="menu-item menu-item-home">
           <a href="/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
             
             首页
           </a>
@@ -222,7 +222,7 @@
         <li class="menu-item menu-item-categories">
           <a href="/categories/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
             
             分类
           </a>
@@ -232,7 +232,7 @@
         <li class="menu-item menu-item-about">
           <a href="/about/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
             
             关于
           </a>
@@ -242,7 +242,7 @@
         <li class="menu-item menu-item-archives">
           <a href="/archives/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
             
             归档
           </a>
@@ -252,7 +252,7 @@
         <li class="menu-item menu-item-tags">
           <a href="/tags/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
             
             标签
           </a>
@@ -295,7 +295,7 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content>
       <meta itemprop="image" content="/avatar/weichat.jpg">
     </span>
 
@@ -331,7 +331,7 @@
           </span>
 
           
-            <span class="post-category" >
+            <span class="post-category">
             
               <span class="post-meta-divider">|</span>
             
@@ -404,7 +404,7 @@
 <li>pin_memory：是否将数据保存在pin memory区，pin memory中的数据转到GPU会快一些</li>
 <li>drop_last：dataset中的数据个数可能不是batch_size的整数倍，drop_last为True会将多出来不足一个batch的数据丢弃</li>
 </ul>
-<h4 id="collate-fn"><a href="#collate-fn" class="headerlink" title="collate_fn()"></a>collate_fn()</h4><p>到这里，我们可以发现pytorch数据载入很简单，基本上对于简单地任务都不会出啥问题，然而数据载入容易出错的地方往往在于collate_fn函数。尤其是对于batch大小不一致的情况，比如目标检测，需要检测出图片中所有的目标。如下：<br><img src="/img/yolo2_result.png" alt=""><br>问题就是，输入的是一张张图片，大小不同可以resize成一样大小组成一个batch，但是它的label是每个目标的boxes和categories。而且每张图片中的目标个数也不一样，怎么组成一个batch。这个时候我们就需要自定义实现一个collate_fn函数。这里可以使用任何名字，只要在DataLoader里面传入就可以了。<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">def collate_fn(self, batch):</span><br><span class="line">    <span class="string">""</span><span class="comment">"</span></span><br><span class="line">    Since each image may have <span class="keyword">a</span> different <span class="keyword">number</span> of objects, we need <span class="keyword">a</span> collate <span class="function"><span class="keyword">function</span> <span class="params">(to be passed to the DataLoader)</span>.</span></span><br><span class="line"></span><br><span class="line">    This describes how <span class="keyword">to</span> combine these tensors of different sizes. We use lists.</span><br><span class="line"></span><br><span class="line">    Note: this need not <span class="keyword">be</span> defined in this Class, can <span class="keyword">be</span> standalone.</span><br><span class="line"></span><br><span class="line">    :param batch: <span class="keyword">an</span> iterable of <span class="keyword">N</span> sets from __getitem__()</span><br><span class="line">    :<span class="keyword">return</span>: <span class="keyword">a</span> tensor of images, lists of varying-size tensors of bounding boxes, labels, <span class="built_in">and</span> difficulties</span><br><span class="line">    <span class="string">""</span><span class="comment">"</span></span><br><span class="line">    </span><br><span class="line">    images = <span class="keyword">list</span>()</span><br><span class="line">    boxes = <span class="keyword">list</span>()</span><br><span class="line">    labels = <span class="keyword">list</span>()</span><br><span class="line">    difficulties = <span class="keyword">list</span>()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> <span class="keyword">b</span> in batch:</span><br><span class="line">        images.<span class="keyword">append</span>(<span class="keyword">b</span>[<span class="number">0</span>])</span><br><span class="line">        boxes.<span class="keyword">append</span>(<span class="keyword">b</span>[<span class="number">1</span>])</span><br><span class="line">        labels.<span class="keyword">append</span>(<span class="keyword">b</span>[<span class="number">2</span>])</span><br><span class="line">        difficulties.<span class="keyword">append</span>(<span class="keyword">b</span>[<span class="number">3</span>])</span><br><span class="line"></span><br><span class="line">    images = torch.stack(images, dim=<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> images, boxes, labels, difficulties  # tensor (<span class="keyword">N</span>, <span class="number">3</span>, <span class="number">300</span>, <span class="number">300</span>), <span class="number">3</span> lists of <span class="keyword">N</span> tensors each</span><br></pre></td></tr></table></figure></p>
+<h4 id="collate-fn"><a href="#collate-fn" class="headerlink" title="collate_fn()"></a>collate_fn()</h4><p>到这里，我们可以发现pytorch数据载入很简单，基本上对于简单地任务都不会出啥问题，然而数据载入容易出错的地方往往在于collate_fn函数。尤其是对于batch大小不一致的情况，比如目标检测，需要检测出图片中所有的目标。如下：<br><img src="/img/yolo2_result.png" alt><br>问题就是，输入的是一张张图片，大小不同可以resize成一样大小组成一个batch，但是它的label是每个目标的boxes和categories。而且每张图片中的目标个数也不一样，怎么组成一个batch。这个时候我们就需要自定义实现一个collate_fn函数。这里可以使用任何名字，只要在DataLoader里面传入就可以了。<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">def collate_fn(self, batch):</span><br><span class="line">    <span class="string">""</span><span class="comment">"</span></span><br><span class="line">    Since each image may have <span class="keyword">a</span> different <span class="keyword">number</span> of objects, we need <span class="keyword">a</span> collate <span class="function"><span class="keyword">function</span> <span class="params">(to be passed to the DataLoader)</span>.</span></span><br><span class="line"></span><br><span class="line">    This describes how <span class="keyword">to</span> combine these tensors of different sizes. We use lists.</span><br><span class="line"></span><br><span class="line">    Note: this need not <span class="keyword">be</span> defined in this Class, can <span class="keyword">be</span> standalone.</span><br><span class="line"></span><br><span class="line">    :param batch: <span class="keyword">an</span> iterable of <span class="keyword">N</span> sets from __getitem__()</span><br><span class="line">    :<span class="keyword">return</span>: <span class="keyword">a</span> tensor of images, lists of varying-size tensors of bounding boxes, labels, <span class="built_in">and</span> difficulties</span><br><span class="line">    <span class="string">""</span><span class="comment">"</span></span><br><span class="line">    </span><br><span class="line">    images = <span class="keyword">list</span>()</span><br><span class="line">    boxes = <span class="keyword">list</span>()</span><br><span class="line">    labels = <span class="keyword">list</span>()</span><br><span class="line">    difficulties = <span class="keyword">list</span>()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> <span class="keyword">b</span> in batch:</span><br><span class="line">        images.<span class="keyword">append</span>(<span class="keyword">b</span>[<span class="number">0</span>])</span><br><span class="line">        boxes.<span class="keyword">append</span>(<span class="keyword">b</span>[<span class="number">1</span>])</span><br><span class="line">        labels.<span class="keyword">append</span>(<span class="keyword">b</span>[<span class="number">2</span>])</span><br><span class="line">        difficulties.<span class="keyword">append</span>(<span class="keyword">b</span>[<span class="number">3</span>])</span><br><span class="line"></span><br><span class="line">    images = torch.stack(images, dim=<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> images, boxes, labels, difficulties  # tensor (<span class="keyword">N</span>, <span class="number">3</span>, <span class="number">300</span>, <span class="number">300</span>), <span class="number">3</span> lists of <span class="keyword">N</span> tensors each</span><br></pre></td></tr></table></figure></p>
 <h4 id="pin-memory"><a href="#pin-memory" class="headerlink" title="pin_memory()"></a>pin_memory()</h4><p>上面提到了pin_memory参数，pin_memory就是锁页内存，创建DataLoader时，设置pin_memory=True，则意味着生成的Tensor数据最开始是属于内存中的锁页内存，这样将内存的Tensor转义到GPU的显存就会更快一些。</p>
 <p>主机中的内存，有两种存在方式，一是锁页，二是不锁页，锁页内存存放的内容在任何情况下都不会与主机的虚拟内存进行交换（注：虚拟内存就是硬盘），而不锁页内存在主机内存不足时，数据会存放在虚拟内存中。</p>
 <p>而显卡中的显存全部是锁页内存！</p>
@@ -504,7 +504,7 @@
 
       
         <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
             文章目录
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview">
@@ -515,9 +515,7 @@
 
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="/avatar/weichat.jpg"
-               alt="nicehuster" />
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
           <p class="site-author-name" itemprop="name">nicehuster</p>
            
               <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
@@ -647,7 +645,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright" >
+        <div class="copyright">
   
   &copy; 
   <span itemprop="copyrightYear">2020</span>

@@ -6,10 +6,10 @@
 
 
 <html class="theme-next muse use-motion" lang="zh-Hans">
-<head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="theme-color" content="#222">
 
 
@@ -20,12 +20,12 @@
 
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
 
 
-  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc" />
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
 
 
 
@@ -33,7 +33,7 @@
 
 
 
-  <meta name="baidu-site-verification" content="wgGFRLcCc9" />
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
 
 
 
@@ -43,7 +43,7 @@
 
   
   
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
 
 
 
@@ -77,23 +77,23 @@
 
 
 
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
 
-<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="dynamic programming," />
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
 
 
-
-
-
-  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml" />
+  <meta name="keywords" content="dynamic programming,">
 
 
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
 
 
 
@@ -145,7 +145,7 @@
 
 
 
-  <link rel="canonical" href="https://nicehuster.github.io/2018/08/03/0030-leetcode_dynamic2/"/>
+  <link rel="canonical" href="https://nicehuster.github.io/2018/08/03/0030-leetcode_dynamic2/">
 
 
 
@@ -185,7 +185,7 @@
     
 
     <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
+      <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">nicehuster's blog</span>
         <span class="logo-line-after"><i></i></span>
@@ -215,7 +215,7 @@
         <li class="menu-item menu-item-home">
           <a href="/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
             
             首页
           </a>
@@ -225,7 +225,7 @@
         <li class="menu-item menu-item-categories">
           <a href="/categories/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
             
             分类
           </a>
@@ -235,7 +235,7 @@
         <li class="menu-item menu-item-about">
           <a href="/about/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
             
             关于
           </a>
@@ -245,7 +245,7 @@
         <li class="menu-item menu-item-archives">
           <a href="/archives/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
             
             归档
           </a>
@@ -255,7 +255,7 @@
         <li class="menu-item menu-item-tags">
           <a href="/tags/" rel="section">
             
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
             
             标签
           </a>
@@ -298,7 +298,7 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
-      <meta itemprop="description" content="">
+      <meta itemprop="description" content>
       <meta itemprop="image" content="/avatar/weichat.jpg">
     </span>
 
@@ -334,7 +334,7 @@
           </span>
 
           
-            <span class="post-category" >
+            <span class="post-category">
             
               <span class="post-meta-divider">|</span>
             
@@ -398,13 +398,13 @@
 <p>（2）<strong>从下到上 bottom-to-top</strong><br>边界条件：dp的最下面一层的值应该等于原始三角形最下面一层的值,有<script type="math/tex">dp[dp.size()-1][i]=triangle[dp.size()-1][i]</script><br>状态方程：当前位置只能是从正下方位置或者右下方位置上来，因此有，</p>
 <script type="math/tex; mode=display">dp[i][j]=min(dp[i+1][j],dp[i+1][j+1])+triangle[i][j]</script><p>完整代码如下：<br><figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">int</span> minimumTotal(vector&lt;vector&lt;<span class="built_in">int</span>&gt;&gt;&amp; <span class="built_in">triangle</span>) &#123;</span><br><span class="line">        vector&lt;vector&lt;<span class="built_in">int</span>&gt;&gt;dp;</span><br><span class="line">        <span class="keyword">for</span>(<span class="built_in">int</span> i=<span class="number">0</span>;i&lt;<span class="built_in">triangle</span>.<span class="built_in">size</span>()<span class="number">-1</span>;i++)</span><br><span class="line">            dp.push_back(vector&lt;<span class="built_in">int</span>&gt;(<span class="built_in">triangle</span>[i].<span class="built_in">size</span>(),<span class="number">0</span>));</span><br><span class="line">        dp.push_back(<span class="built_in">triangle</span>[<span class="built_in">triangle</span>.<span class="built_in">size</span>()<span class="number">-1</span>]); <span class="comment">//等价于边界条件</span></span><br><span class="line">      da  <span class="keyword">for</span>(<span class="built_in">int</span> i=dp.<span class="built_in">size</span>()<span class="number">-2</span>;i&gt;=<span class="number">0</span>;i--)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="built_in">int</span> j=<span class="number">0</span>;j&lt;dp[i].<span class="built_in">size</span>();j++)</span><br><span class="line">                dp[i][j]=std::<span class="built_in">min</span>(dp[i+<span class="number">1</span>][j],dp[i+<span class="number">1</span>][j+<span class="number">1</span>])+<span class="built_in">triangle</span>[i][j];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[<span class="number">0</span>][<span class="number">0</span>];</span><br><span class="line">       </span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
 <p>从上面的两种方法可以看出，倒着来的方式递推会更容易点，而且更少的考虑边界条件问题。其实，这个题我一开始是用一维dp数组去做的，从上到下的方式求路径最小和，每走一次就记住当前位置，一维dp数组空间复杂度更小。可惜，这种方法只通过了21/43，代码如下：<br><figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">int</span> minimumTotal(vector&lt;vector&lt;<span class="built_in">int</span>&gt;&gt;&amp; <span class="built_in">triangle</span>) &#123;</span><br><span class="line">        vector&lt;<span class="built_in">int</span>&gt;dp(<span class="built_in">triangle</span>.<span class="built_in">size</span>(),<span class="number">0</span>);</span><br><span class="line">        dp[<span class="number">0</span>]=<span class="built_in">triangle</span>[<span class="number">0</span>][<span class="number">0</span>];<span class="built_in">int</span> pos=<span class="number">0</span>;</span><br><span class="line">        <span class="keyword">for</span>(<span class="built_in">int</span> i=<span class="number">1</span>;i&lt;<span class="built_in">triangle</span>.<span class="built_in">size</span>();i++)</span><br><span class="line">        &#123;  </span><br><span class="line">            dp[i]=dp[i<span class="number">-1</span>]+std::<span class="built_in">min</span>(<span class="built_in">triangle</span>[i][pos],<span class="built_in">triangle</span>[i][pos+<span class="number">1</span>]);</span><br><span class="line">            <span class="keyword">if</span>(dp[i]==dp[i<span class="number">-1</span>]+<span class="built_in">triangle</span>[i][pos+<span class="number">1</span>])</span><br><span class="line">                pos=pos+<span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> dp[<span class="built_in">triangle</span>.<span class="built_in">size</span>()<span class="number">-1</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<h3 id="例题9、-出界的路径-LeetCode-576"><a href="#例题9、-出界的路径-LeetCode-576" class="headerlink" title="例题9、 出界的路径 LeetCode 576"></a>例题9、 <a href="https://leetcode.com/problems/out-of-boundary-paths/description/" target="_blank" rel="noopener">出界的路径 LeetCode 576</a></h3><p>有一个m*n大小的网格和一个球，给定球的起始位置(i,j)，球可以每次朝上下左右四个方向移动一个位置。最多可以移动N次。计算球移除边界的路径数，因为可能有太多种可能了，对结果进行一个大数取余，mod=$10^7 +9$。<br>Example1:<br><img src="/img/out_of_boundary_paths_1.png" alt=""><br>Example2:<br><img src="/img/out_of_boundary_paths_2.png" alt=""></p>
+<h3 id="例题9、-出界的路径-LeetCode-576"><a href="#例题9、-出界的路径-LeetCode-576" class="headerlink" title="例题9、 出界的路径 LeetCode 576"></a>例题9、 <a href="https://leetcode.com/problems/out-of-boundary-paths/description/" target="_blank" rel="noopener">出界的路径 LeetCode 576</a></h3><p>有一个m*n大小的网格和一个球，给定球的起始位置(i,j)，球可以每次朝上下左右四个方向移动一个位置。最多可以移动N次。计算球移除边界的路径数，因为可能有太多种可能了，对结果进行一个大数取余，mod=$10^7 +9$。<br>Example1:<br><img src="/img/out_of_boundary_paths_1.png" alt><br>Example2:<br><img src="/img/out_of_boundary_paths_2.png" alt></p>
 <p>分析：同样看到这种关于路径的问题，基本就是动态规划的题目。我们使用一个三维的DP数组，其中dp[k][i][j]表示总共走k步，从(i,j)位置走出边界的总路径数。由于只能上下左右四个方向移动，因此走k步出边界的总路径数一定等于其周围四个位置走k-1步出边界的路径数的总和。<br>参考代码如下：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">findPaths</span><span class="params">(<span class="keyword">int</span> m, <span class="keyword">int</span> n, <span class="keyword">int</span> N, <span class="keyword">int</span> i, <span class="keyword">int</span> j)</span> </span>&#123;</span><br><span class="line">         <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&gt;&gt; dp(N + <span class="number">1</span>, <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&gt;(m, <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;(n, <span class="number">0</span>)));</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">1</span>; k &lt;= N; ++k) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> x = <span class="number">0</span>; x &lt; m; ++x) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> y = <span class="number">0</span>; y &lt; n; ++y) &#123;</span><br><span class="line">                    <span class="keyword">long</span> <span class="keyword">long</span> v1 = (x == <span class="number">0</span>) ? <span class="number">1</span> : dp[k - <span class="number">1</span>][x - <span class="number">1</span>][y];<span class="comment">//上</span></span><br><span class="line">                    <span class="keyword">long</span> <span class="keyword">long</span> v2 = (x == m - <span class="number">1</span>) ? <span class="number">1</span> : dp[k - <span class="number">1</span>][x + <span class="number">1</span>][y];<span class="comment">//下</span></span><br><span class="line">                    <span class="keyword">long</span> <span class="keyword">long</span> v3 = (y == <span class="number">0</span>) ? <span class="number">1</span> : dp[k - <span class="number">1</span>][x][y - <span class="number">1</span>];<span class="comment">//左</span></span><br><span class="line">                    <span class="keyword">long</span> <span class="keyword">long</span> v4 = (y == n - <span class="number">1</span>) ? <span class="number">1</span> : dp[k - <span class="number">1</span>][x][y + <span class="number">1</span>];<span class="comment">//右</span></span><br><span class="line">                    dp[k][x][y] = (v1 + v2 + v3 + v4) % mod;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; </span><br><span class="line">        <span class="keyword">return</span> dp[N][i][j];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
-<h3 id="例题10、棋盘上的骑士-LeetCode-688"><a href="#例题10、棋盘上的骑士-LeetCode-688" class="headerlink" title="例题10、棋盘上的骑士 LeetCode 688"></a>例题10、<a href="https://leetcode.com/problems/knight-probability-in-chessboard/description/" target="_blank" rel="noopener">棋盘上的骑士 LeetCode 688</a></h3><p>给定一个N*N大小的棋盘，骑士的起始位置为(r,c),允许骑士走K步，计算走K步还留在棋盘上的概率。骑士每次可以超8个方向走，类似于中国象棋的马走“日”，如下图示。<br><img src="/img/knight.png" alt=""><br><figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Example:</span><br><span class="line">Input: <span class="number">3</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">Output: <span class="number">0.0625</span></span><br><span class="line">Explanation: There are <span class="literal">two</span> moves (<span class="built_in">to</span> (<span class="number">1</span>,<span class="number">2</span>), (<span class="number">2</span>,<span class="number">1</span>)) that will keep <span class="keyword">the</span> knight <span class="keyword">on</span> <span class="title">the</span> <span class="title">board</span>.</span><br><span class="line">From <span class="keyword">each</span> <span class="keyword">of</span> those positions, there are also <span class="literal">two</span> moves that will keep <span class="keyword">the</span> knight <span class="keyword">on</span> <span class="title">the</span> <span class="title">board</span>.</span><br><span class="line">The total probability <span class="keyword">the</span> knight stays <span class="keyword">on</span> <span class="title">the</span> <span class="title">board</span> <span class="title">is</span> <span class="title">0</span><span class="number">.0625</span>.</span><br></pre></td></tr></table></figure></p>
+<h3 id="例题10、棋盘上的骑士-LeetCode-688"><a href="#例题10、棋盘上的骑士-LeetCode-688" class="headerlink" title="例题10、棋盘上的骑士 LeetCode 688"></a>例题10、<a href="https://leetcode.com/problems/knight-probability-in-chessboard/description/" target="_blank" rel="noopener">棋盘上的骑士 LeetCode 688</a></h3><p>给定一个N*N大小的棋盘，骑士的起始位置为(r,c),允许骑士走K步，计算走K步还留在棋盘上的概率。骑士每次可以超8个方向走，类似于中国象棋的马走“日”，如下图示。<br><img src="/img/knight.png" alt><br><figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Example:</span><br><span class="line">Input: <span class="number">3</span>, <span class="number">2</span>, <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">Output: <span class="number">0.0625</span></span><br><span class="line">Explanation: There are <span class="literal">two</span> moves (<span class="built_in">to</span> (<span class="number">1</span>,<span class="number">2</span>), (<span class="number">2</span>,<span class="number">1</span>)) that will keep <span class="keyword">the</span> knight <span class="keyword">on</span> <span class="title">the</span> <span class="title">board</span>.</span><br><span class="line">From <span class="keyword">each</span> <span class="keyword">of</span> those positions, there are also <span class="literal">two</span> moves that will keep <span class="keyword">the</span> knight <span class="keyword">on</span> <span class="title">the</span> <span class="title">board</span>.</span><br><span class="line">The total probability <span class="keyword">the</span> knight stays <span class="keyword">on</span> <span class="title">the</span> <span class="title">board</span> <span class="title">is</span> <span class="title">0</span><span class="number">.0625</span>.</span><br></pre></td></tr></table></figure></p>
 <p>分析：这道题和上面那道题很相似，只不过上面的那道题只能上下左右四个方向移动，而这道题可以朝8个方向移动。在这里，可以使用一个二维矩阵来存储，每一个矩阵中存储方向向量的坐标，即<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="number">-1</span>, <span class="number">-2</span>&#125;, &#123;<span class="number">-2</span>, <span class="number">-1</span>&#125;, &#123;<span class="number">-1</span>, <span class="number">2</span>&#125;, &#123;<span class="number">-2</span>, <span class="number">1</span>&#125;, &#123;<span class="number">1</span>, <span class="number">-2</span>&#125;, &#123;<span class="number">2</span>, <span class="number">-1</span>&#125;, &#123;<span class="number">1</span>, <span class="number">2</span>&#125;, &#123;<span class="number">2</span>, <span class="number">1</span>&#125;; <span class="comment">// 八个方向</span></span><br></pre></td></tr></table></figure></p>
 <p>暂时还不会做，这里就不贴代码了。</p>
 <p>参考：<br><a href="https://www.jianshu.com/p/4990e684ac09" target="_blank" rel="noopener">https://www.jianshu.com/p/4990e684ac09</a><br><a href="https://www.cnblogs.com/grandyang/p/7639153.html" target="_blank" rel="noopener">https://www.cnblogs.com/grandyang/p/7639153.html</a></p>
-<h3 id="例题11、地下城游戏-LeetCode-174"><a href="#例题11、地下城游戏-LeetCode-174" class="headerlink" title="例题11、地下城游戏 LeetCode 174"></a>例题11、<a href="https://leetcode.com/problems/dungeon-game/description/" target="_blank" rel="noopener">地下城游戏 LeetCode 174</a></h3><p><img src="/img/dungeon_game.png" alt=""></p>
+<h3 id="例题11、地下城游戏-LeetCode-174"><a href="#例题11、地下城游戏-LeetCode-174" class="headerlink" title="例题11、地下城游戏 LeetCode 174"></a>例题11、<a href="https://leetcode.com/problems/dungeon-game/description/" target="_blank" rel="noopener">地下城游戏 LeetCode 174</a></h3><p><img src="/img/dungeon_game.png" alt></p>
 <p>这道题暂无思路，情况比较复杂，有点难。</p>
 <h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>不得不说，动态规划的题目都挺难的，有的时候一道题鼓捣一下午，都不见得能做出来，做得都快怀疑人生。</p>
 
@@ -502,7 +502,7 @@
 
       
         <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
             文章目录
           </li>
           <li class="sidebar-nav-overview" data-target="site-overview">
@@ -513,9 +513,7 @@
 
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="/avatar/weichat.jpg"
-               alt="nicehuster" />
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
           <p class="site-author-name" itemprop="name">nicehuster</p>
            
               <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
@@ -645,7 +643,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright" >
+        <div class="copyright">
   
   &copy; 
   <span itemprop="copyrightYear">2020</span>

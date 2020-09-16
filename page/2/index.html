@@ -289,6 +289,154 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2019/05/14/0055-pytorch-api/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nicehuster's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2019/05/14/0055-pytorch-api/" itemprop="url">Pytorch常用API解析</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-14T19:13:39+08:00">
+                2019-05-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/project/" itemprop="url" rel="index">
+                    <span itemprop="name">project</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>好记性不如烂笔头，主要是纪录一些Pytorch中常用函数用法以及自定义数据读取collate_fn()介绍。</p>
+<h3 id="常用数学类操作符"><a href="#常用数学类操作符" class="headerlink" title="常用数学类操作符"></a>常用数学类操作符</h3><h4 id="torchTensor-transpose-amp-Tensor-permute"><a href="#torchTensor-transpose-amp-Tensor-permute" class="headerlink" title="torchTensor.transpose() &amp; Tensor.permute()"></a>torchTensor.transpose() &amp; Tensor.permute()</h4><p>transpose只能操作矩阵的两个维度。只接受两个维度参数。若要对多个维度进行操作，使用permute更加灵活方便。<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a=torch.rand(<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>)  #torch.Size([<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>])</span><br><span class="line">b=a.transpose(<span class="number">0</span>,<span class="number">1</span>)   #torch.Size([<span class="number">3</span>, <span class="number">2</span>, <span class="number">4</span>])</span><br><span class="line"></span><br><span class="line">c=a.transpose(<span class="number">0</span>,<span class="number">1</span>).transpose(<span class="number">1</span>,<span class="number">2</span>)  #torch.Size([<span class="number">3</span>, <span class="number">4</span>, <span class="number">2</span>])</span><br><span class="line">d=a.permute(<span class="number">1</span>,<span class="number">2</span>,<span class="number">0</span>)                 #torch.Size([<span class="number">3</span>, <span class="number">4</span>, <span class="number">2</span>])</span><br></pre></td></tr></table></figure></p>
+<p>同样是对三个维度进行变换，transpose需要操作三次，而是用permute只需要操作一次，因此对于高维度的矩阵变化，permute更加方便。<br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2019/05/14/0055-pytorch-api/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </p></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2019/05/11/0054-ssd-dataaug/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1586,152 +1734,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2019/04/08/0045-mmdetection/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="nicehuster">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/avatar/weichat.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="nicehuster's blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2019/04/08/0045-mmdetection/" itemprop="url">mmdetection使用以及源码解析</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-08T19:13:39+08:00">
-                2019-04-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/project/" itemprop="url" rel="index">
-                    <span itemprop="name">project</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p><a href="https://github.com/open-mmlab/mmdetection" target="_blank" rel="noopener">mmdetection</a>是一款优秀的基于PyTorch的开源目标检测系统，由香港中文大学(CUHK)多媒体实验室(mmlab)开发。基本上支持所有当前SOTA二阶段的目标检测算法，比如faster rcnn，mask rcnn，r-fcn，cascade rcnn，此外还支持了SSD和RetinaNet等一阶段的目标检测算法。花了一天的时间大致地看了下框架的相关源代码，以下是部分整理纪录。<br><img src="/img/coco_test_12510.jpg" alt><br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2019/04/08/0045-mmdetection/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1780,7 +1782,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">64</span>
+                <span class="site-state-item-count">65</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1802,7 +1804,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">38</span>
+                <span class="site-state-item-count">39</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

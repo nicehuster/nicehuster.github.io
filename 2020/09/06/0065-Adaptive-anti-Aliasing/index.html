@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="classification,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="论文信息： Xueyan Zou,UC Davis,NVIDIA代码链接：https://github.com/MaureenZOU/整体框架：这篇文章是前几天BMVC2020获得best paper award 的一篇文章，这篇文章提出了一个plugin  module ，用来提高CNN的鲁棒性。在图像分类、图像分割、目标检测等任务上都能带来1+个点的提升。对于cnn，众所周知存在一个比较明显的">
+<meta name="keywords" content="classification">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文阅读：Delving Deeper into Anti-aliasing in ConvNets">
+<meta property="og:url" content="https://nicehuster.github.io/2020/09/06/0065-Adaptive-anti-Aliasing/index.html">
+<meta property="og:site_name" content="nicehuster&#39;s blog">
+<meta property="og:description" content="论文信息： Xueyan Zou,UC Davis,NVIDIA代码链接：https://github.com/MaureenZOU/整体框架：这篇文章是前几天BMVC2020获得best paper award 的一篇文章，这篇文章提出了一个plugin  module ，用来提高CNN的鲁棒性。在图像分类、图像分割、目标检测等任务上都能带来1+个点的提升。对于cnn，众所周知存在一个比较明显的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.github.io/img/image-20200916161719818.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/image-20200916161851654.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/%E4%BC%81%E4%B8%9A%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_16002437758073.png">
+<meta property="og:updated_time" content="2020-09-16T08:21:46.093Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="论文阅读：Delving Deeper into Anti-aliasing in ConvNets">
+<meta name="twitter:description" content="论文信息： Xueyan Zou,UC Davis,NVIDIA代码链接：https://github.com/MaureenZOU/整体框架：这篇文章是前几天BMVC2020获得best paper award 的一篇文章，这篇文章提出了一个plugin  module ，用来提高CNN的鲁棒性。在图像分类、图像分割、目标检测等任务上都能带来1+个点的提升。对于cnn，众所周知存在一个比较明显的">
+<meta name="twitter:image" content="https://nicehuster.github.io/img/image-20200916161719818.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.github.io/2020/09/06/0065-Adaptive-anti-Aliasing/">
+
+
+
+
+
+  <title>论文阅读：Delving Deeper into Anti-aliasing in ConvNets | nicehuster's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nicehuster's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">不积跬步，无以至千里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2020/09/06/0065-Adaptive-anti-Aliasing/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nicehuster's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">论文阅读：Delving Deeper into Anti-aliasing in ConvNets</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-06T19:13:39+08:00">
+                2020-09-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>论文信息：</strong> Xueyan Zou,UC Davis,NVIDIA<br><strong>代码链接：</strong><a href="https://github.com/MaureenZOU/" target="_blank" rel="noopener">https://github.com/MaureenZOU/</a><br><strong>整体框架：</strong>这篇文章是前几天BMVC2020获得best paper award 的一篇文章，这篇文章提出了一个plugin  module ，用来提高CNN的鲁棒性。在图像分类、图像分割、目标检测等任务上都能带来1+个点的提升。对于cnn，众所周知存在一个比较明显的缺陷：即使图像移动几个pixel都可能导致分类识别任务结果发生改变，作者发现其中重要原因在于网络中被大量用来降低参数量的下采样层导致混叠(aliasing)问题，即高频信号在采样后退化为完全不同的部分现象。为此提出了这样一个content-aware anti-aliasing的模块，用于缓解下采样过程中带来的高频信息的退化问题。</p>
+<h3 id="下采样的问题"><a href="#下采样的问题" class="headerlink" title="下采样的问题"></a>下采样的问题</h3><p>以一维信号的的降采样为例：</p>
+<script type="math/tex; mode=display">
+\begin{array}{l}
+001100110011 \frac{\mathrm{k}=2, \text { stride }=2}{\operatorname{maxpool}} 010101 \\
+011001100110 \frac{\mathrm{k}=2, \text { stride }=2}{\operatorname{maxpool}} 111111
+\end{array}</script><a id="more"></a>
+<p>对于k=2,stride=2的maxpool操作而言，对输入信号移动一位数字，经过maxpool之后的输出结果是截然不同的。而在CNN中大量使用降采样来降低参数量，这种aliasing问题更为明显，标准解决方案是在下采样之前应用低通滤波器（例如，高斯模糊）。但是，在整个内容上应用相同的过滤器可能不是最佳选择，因为特征的频率可能会在<strong>空间位置</strong>和<strong>特征通道</strong>之间发生变化。可以看下作者在论文中给出的实验结果：</p>
+<p><img src="/img/image-20200916161719818.png" alt="image-20200916161719818" style="zoom:50%;"></p>
+<p>上图(a)输入图片；(b)直接4x下采样；(c)应用经过调整以匹配噪声频率的单个高斯滤波器后的下采样结果;(d)应用多个空间自适应高斯滤波后的下采样结果（具有很强的背景模糊和边界弱化能力）</p>
+<h3 id="解决方法"><a href="#解决方法" class="headerlink" title="解决方法"></a>解决方法</h3><p><img src="/img/image-20200916161851654.png" alt="image-20200916161851654" style="zoom:50%;"></p>
+<p>作者针对空间和通道分别生成低通滤波器用于缓解aliasing问题。基于空间自适应的低通滤波器就是一个简单的分组卷积操作：</p>
+<script type="math/tex; mode=display">
+Y_{i, j}=\sum_{p, q \in \Omega} w_{i, j}^{p, q} \cdot X_{i+p, j+q}</script><p>在论文中也有提及，为了避免权重为负数，作者取了一个softmax操作。</p>
+<p>之后对上面生成的权重进行分组再和输入进行一次卷积操作，最终输出Y：</p>
+<script type="math/tex; mode=display">
+Y_{i, j}^{g}=\sum_{p, q \in \Omega} w_{i, j, g}^{p, q} \cdot X_{i+p, j+q}^{c}</script><p>具体可以看下作者放出来的代码：</p>
+<blockquote>
+<p><a href="https://github.com/MaureenZOU/Adaptive-anti-Aliasing/blob/master/models_lpf/layers/pasa.py" target="_blank" rel="noopener">Adaptive-anti-Aliasing/models_lpf/layers/pasa.py</a></p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Downsample_PASA_group_softmax</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, in_channels, kernel_size, stride=<span class="number">1</span>, pad_type=<span class="string">'reflect'</span>, group=<span class="number">2</span>)</span>:</span></span><br><span class="line">        super(Downsample_PASA_group_softmax, self).__init__()</span><br><span class="line">        self.pad = get_pad_layer(pad_type)(kernel_size//<span class="number">2</span>)</span><br><span class="line">        self.stride = stride</span><br><span class="line">        self.kernel_size = kernel_size</span><br><span class="line">        self.group = group</span><br><span class="line"></span><br><span class="line">        self.conv = nn.Conv2d(in_channels, group*kernel_size*kernel_size, kernel_size=kernel_size, stride=<span class="number">1</span>, bias=<span class="keyword">False</span>)</span><br><span class="line">        self.bn = nn.BatchNorm2d(group*kernel_size*kernel_size)</span><br><span class="line">        self.softmax = nn.Softmax(dim=<span class="number">1</span>)</span><br><span class="line">        nn.init.kaiming_normal_(self.conv.weight, mode=<span class="string">'fan_out'</span>, nonlinearity=<span class="string">'relu'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        sigma = self.conv(self.pad(x))</span><br><span class="line">        sigma = self.bn(sigma)</span><br><span class="line">        sigma = self.softmax(sigma)</span><br><span class="line"></span><br><span class="line">        n,c,h,w = sigma.shape</span><br><span class="line"></span><br><span class="line">        sigma = sigma.reshape(n,<span class="number">1</span>,c,h*w)</span><br><span class="line"></span><br><span class="line">        n,c,h,w = x.shape</span><br><span class="line">        x = F.unfold(self.pad(x), kernel_size=self.kernel_size).reshape((n,c,self.kernel_size*self.kernel_size,h*w))</span><br><span class="line"></span><br><span class="line">        n,c1,p,q = x.shape</span><br><span class="line">        x = x.permute(<span class="number">1</span>,<span class="number">0</span>,<span class="number">2</span>,<span class="number">3</span>).reshape(self.group, c1//self.group, n, p, q).permute(<span class="number">2</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">3</span>,<span class="number">4</span>)</span><br><span class="line"></span><br><span class="line">        n,c2,p,q = sigma.shape</span><br><span class="line">        sigma = sigma.permute(<span class="number">2</span>,<span class="number">0</span>,<span class="number">1</span>,<span class="number">3</span>).reshape((p//(self.kernel_size*self.kernel_size), self.kernel_size*self.kernel_size,n,c2,q)).permute(<span class="number">2</span>,<span class="number">0</span>,<span class="number">3</span>,<span class="number">1</span>,<span class="number">4</span>)</span><br><span class="line"></span><br><span class="line">        x = torch.sum(x*sigma, dim=<span class="number">3</span>).reshape(n,c1,h,w)</span><br><span class="line">        <span class="keyword">return</span> x[:,:,torch.arange(h)%self.stride==<span class="number">0</span>,:][:,:,:,torch.arange(w)%self.stride==<span class="number">0</span>]</span><br></pre></td></tr></table></figure>
+<p>代码较好题解，就不详细解释。</p>
+<h3 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h3><p>作者分别在分类，检测，分割任务上均有验证其有效性，均能提高1个点左右。具体实验结果可以看原论文，这里就不贴上来了。</p>
+<h3 id="一致性指标"><a href="#一致性指标" class="headerlink" title="一致性指标"></a>一致性指标</h3><p>作者为了验证该方法的有效性，针对不同任务提出了一系列的一致性指标。</p>
+<h4 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h4><p>比如针对分类任务的一致性指标计算如下：</p>
+<script type="math/tex; mode=display">
+\text { Consistency }=\mathbb{E}_{X, h_{1}, w_{1}, h_{2}, w_{2}} \mathbb{I}\left\{F\left(X_{h_{1}, w_{1}}\right)=F\left(X_{h_{2}, w_{2}}\right)\right\}</script><p>X表示输入图像，$h_{1}, w_{1}, h_{2}, w_{2}$ 表示偏移量。$F(\cdot)$ 表示模型输出的top1的类别标签。具体代码实现可以看下面：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">output0 = model(input[:,:,off0[<span class="number">0</span>]:off0[<span class="number">0</span>]+args.size,off0[<span class="number">1</span>]:off0[<span class="number">1</span>]+args.size])</span><br><span class="line">output1 = model(input[:,:,off1[<span class="number">0</span>]:off1[<span class="number">0</span>]+args.size,off1[<span class="number">1</span>]:off1[<span class="number">1</span>]+args.size])</span><br><span class="line">cur_agree = agreement_correct(output0, output1, target).type(torch.FloatTensor).to(output0.device)</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">agreement_correct</span><span class="params">(output0, output1, target)</span>:</span></span><br><span class="line">    pred0 = output0.argmax(dim=<span class="number">1</span>, keepdim=<span class="keyword">False</span>)</span><br><span class="line">    pred1 = output1.argmax(dim=<span class="number">1</span>, keepdim=<span class="keyword">False</span>)</span><br><span class="line"></span><br><span class="line">    agree = pred0.eq(pred1)</span><br><span class="line">    agree_target_pred0 = pred0.eq(target)</span><br><span class="line">    agree_target_pred1 = pred1.eq(target)</span><br><span class="line"></span><br><span class="line">    correct_or = (agree_target_pred0 + agree_target_pred1) &gt; <span class="number">0</span></span><br><span class="line">    agree = agree * correct_or</span><br><span class="line"></span><br><span class="line">    agree = <span class="number">100.</span>*(torch.sum(agree).float() / (torch.sum(correct_or).float() + <span class="number">1e-10</span>)).to(output0.device)</span><br><span class="line">    <span class="keyword">return</span> agree</span><br></pre></td></tr></table></figure>
+<p><code>agreement_correct</code> 是统计一致性指标的函数，具体可看出来统计方法是分别对输入图像随机偏移<code>off0</code>和<code>off1</code> 然后统计在该偏移量下，两者输出一致且和gt一致的比例。</p>
+<h4 id="检测-分割"><a href="#检测-分割" class="headerlink" title="检测/分割"></a>检测/分割</h4><p>对于分类分割任务，作者也提出了相应的一致性指标计算方法。mAISC和mAISC这两个指标。具体计算如下图。</p>
+<p><img src="/img/%E4%BC%81%E4%B8%9A%E5%BE%AE%E4%BF%A1%E6%88%AA%E5%9B%BE_16002437758073.png" alt="企业微信截图_16002437758073"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/classification/" rel="tag"># classification</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/09/05/0063-minidelay-detection/" rel="next" title="论文阅读：Minimum Delay Object Detection from Video">
+                <i class="fa fa-chevron-left"></i> 论文阅读：Minimum Delay Object Detection from Video
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">65</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">39</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#下采样的问题"><span class="nav-number">1.</span> <span class="nav-text">下采样的问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方法"><span class="nav-number">2.</span> <span class="nav-text">解决方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结果"><span class="nav-number">3.</span> <span class="nav-text">结果</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一致性指标"><span class="nav-number">4.</span> <span class="nav-text">一致性指标</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#分类"><span class="nav-number">4.1.</span> <span class="nav-text">分类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#检测-分割"><span class="nav-number">4.2.</span> <span class="nav-text">检测/分割</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

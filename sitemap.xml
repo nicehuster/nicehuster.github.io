@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://nicehuster.github.io/about/index.html</loc>
+    
+    <lastmod>2020-09-16T11:43:52.098Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://nicehuster.github.io/2020/09/06/0065-Adaptive-anti-Aliasing/</loc>
     
     <lastmod>2020-09-16T09:01:33.472Z</lastmod>
@@ -331,7 +338,7 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2019/04/08/0045-mmdetection/</loc>
+    <loc>https://nicehuster.github.io/2019/04/23/0047-CornerNet/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -339,13 +346,6 @@
   
   <url>
     <loc>https://nicehuster.github.io/2019/04/15/0046-FCOS/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://nicehuster.github.io/2019/04/23/0047-CornerNet/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -366,7 +366,7 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2019/05/06/0050-CenterNet/</loc>
+    <loc>https://nicehuster.github.io/2019/04/08/0045-mmdetection/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -374,6 +374,13 @@
   
   <url>
     <loc>https://nicehuster.github.io/2019/05/07/0051-CornerNet-Objects%20as%20Points/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://nicehuster.github.io/2019/05/06/0050-CenterNet/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -457,7 +464,7 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/hello-world.html</loc>
+    <loc>https://nicehuster.github.io/hello-world_test.html</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -471,7 +478,7 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/hello-world_test.html</loc>
+    <loc>https://nicehuster.github.io/hello-world.html</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -479,13 +486,6 @@
   
   <url>
     <loc>https://nicehuster.github.io/categories/index.html</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://nicehuster.github.io/about/index.html</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     

@@ -4,7 +4,7 @@
   <url>
     <loc>https://nicehuster.github.io/2020/09/06/0065-Adaptive-anti-Aliasing/</loc>
     
-    <lastmod>2020-09-16T08:21:46.093Z</lastmod>
+    <lastmod>2020-09-16T09:01:33.472Z</lastmod>
     
   </url>
   
@@ -30,7 +30,7 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/03/15/0003-MNC/</loc>
+    <loc>https://nicehuster.github.io/2018/03/07/0001-nms/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -38,6 +38,13 @@
   
   <url>
     <loc>https://nicehuster.github.io/2018/03/09/0002-dl_environ/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://nicehuster.github.io/2018/03/15/0003-MNC/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -58,14 +65,14 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/04/11/0007-FPN/</loc>
+    <loc>https://nicehuster.github.io/2018/04/10/0006-yolo-paper/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/04/10/0006-yolo-paper/</loc>
+    <loc>https://nicehuster.github.io/2018/04/11/0007-FPN/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -93,6 +100,13 @@
   </url>
   
   <url>
+    <loc>https://nicehuster.github.io/2018/04/21/0011-Cmake_openCV/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://nicehuster.github.io/2018/04/23/0012-R-FCN/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
@@ -101,13 +115,6 @@
   
   <url>
     <loc>https://nicehuster.github.io/2018/04/25/0013-LH_RCNN/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://nicehuster.github.io/2018/04/21/0011-Cmake_openCV/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -142,6 +149,13 @@
   </url>
   
   <url>
+    <loc>https://nicehuster.github.io/2018/07/10/0019-leetcode_listnode1/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://nicehuster.github.io/2018/07/11/0020-leetcode_listnode3/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
@@ -170,14 +184,14 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/07/25/0025-tensorRT_install/</loc>
+    <loc>https://nicehuster.github.io/2018/07/22/0024-mobilenet/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/07/22/0024-mobilenet/</loc>
+    <loc>https://nicehuster.github.io/2018/07/25/0025-tensorRT_install/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -191,14 +205,14 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/07/29/0028-tensorRT_customlayer/</loc>
+    <loc>https://nicehuster.github.io/2018/07/27/0027-tensorRT_usage/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/07/10/0019-leetcode_listnode1/</loc>
+    <loc>https://nicehuster.github.io/2018/07/29/0028-tensorRT_customlayer/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -212,14 +226,7 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/07/27/0027-tensorRT_usage/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://nicehuster.github.io/2018/03/07/0001-nms/</loc>
+    <loc>https://nicehuster.github.io/2018/08/03/0030-leetcode_dynamic2/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -227,13 +234,6 @@
   
   <url>
     <loc>https://nicehuster.github.io/2018/08/07/0031-neural_style/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://nicehuster.github.io/2018/08/03/0030-leetcode_dynamic2/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -254,6 +254,13 @@
   </url>
   
   <url>
+    <loc>https://nicehuster.github.io/2018/08/17/0034-leetcode_stl2/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://nicehuster.github.io/2018/08/23/0035-leetcode_island/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
@@ -261,14 +268,14 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/08/26/0037-l1l2/</loc>
+    <loc>https://nicehuster.github.io/2018/08/25/0036-bn/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/08/17/0034-leetcode_stl2/</loc>
+    <loc>https://nicehuster.github.io/2018/08/26/0037-l1l2/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -296,13 +303,6 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/08/25/0036-bn/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://nicehuster.github.io/2018/09/19/0041-opencv_dnn/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
@@ -324,42 +324,7 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2019/04/15/0046-FCOS/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://nicehuster.github.io/2019/05/06/0050-CenterNet/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://nicehuster.github.io/2019/04/02/0044-docker/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://nicehuster.github.io/2019/04/28/0049-supervisely-person-datasets/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://nicehuster.github.io/2019/05/07/0051-CornerNet-Objects%20as%20Points/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://nicehuster.github.io/2019/05/11/0054-ssd-dataaug/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -373,14 +338,14 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2019/05/08/0052-Faster-rcnn%20Explained%20with%20code/</loc>
+    <loc>https://nicehuster.github.io/2019/04/15/0046-FCOS/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2019/05/16/0057-zero-game/</loc>
+    <loc>https://nicehuster.github.io/2019/04/23/0047-CornerNet/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -394,7 +359,35 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2019/05/15/0056-HRNet/</loc>
+    <loc>https://nicehuster.github.io/2019/04/28/0049-supervisely-person-datasets/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://nicehuster.github.io/2019/05/06/0050-CenterNet/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://nicehuster.github.io/2019/05/07/0051-CornerNet-Objects%20as%20Points/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://nicehuster.github.io/2019/05/08/0052-Faster-rcnn%20Explained%20with%20code/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://nicehuster.github.io/2019/05/11/0054-ssd-dataaug/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -408,7 +401,42 @@
   </url>
   
   <url>
+    <loc>https://nicehuster.github.io/2019/05/15/0056-HRNet/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://nicehuster.github.io/2019/05/09/0053-ssd-explained%20with%20code/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://nicehuster.github.io/2019/05/16/0057-zero-game/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://nicehuster.github.io/2019/06/12/0058-fine-grain/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://nicehuster.github.io/2019/06/13/0059-cnn_tricks/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://nicehuster.github.io/2019/10/18/0060-bash-parallel/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -429,42 +457,7 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2019/06/13/0059-cnn_tricks/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://nicehuster.github.io/2019/06/12/0058-fine-grain/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://nicehuster.github.io/2019/04/23/0047-CornerNet/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://nicehuster.github.io/2019/10/18/0060-bash-parallel/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://nicehuster.github.io/hello-world.html</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://nicehuster.github.io/hello-world_test.html</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -478,7 +471,7 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/about/index.html</loc>
+    <loc>https://nicehuster.github.io/hello-world_test.html</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -486,6 +479,13 @@
   
   <url>
     <loc>https://nicehuster.github.io/categories/index.html</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://nicehuster.github.io/about/index.html</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     

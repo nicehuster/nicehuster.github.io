@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://nicehuster.github.io/2020/09/07/0064-U-2-Net/</loc>
+    <lastmod>2020-09-18</lastmod>
+  </url>
+  <url>
     <loc>https://nicehuster.github.io/2020/08/06/0062-PILrotate/</loc>
     <lastmod>2020-09-18</lastmod>
   </url>
@@ -189,10 +193,6 @@
     <lastmod>2020-09-17</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2020/09/07/0064-U-2-Net/</loc>
-    <lastmod>2020-09-17</lastmod>
-  </url>
-  <url>
     <loc>https://nicehuster.github.io/2020/09/06/0065-Adaptive-anti-Aliasing/</loc>
     <lastmod>2020-09-16</lastmod>
   </url>
@@ -225,7 +225,7 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2018/07/15/0023-leetcode_stack_and_queue/</loc>
+    <loc>https://nicehuster.github.io/2018/07/12/0021-leetcode_listnode2/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
@@ -237,15 +237,11 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
+    <loc>https://nicehuster.github.io/2018/07/15/0023-leetcode_stack_and_queue/</loc>
+    <lastmod>2020-09-13</lastmod>
+  </url>
+  <url>
     <loc>https://nicehuster.github.io/2018/07/26/0026-tensorRT_introduce/</loc>
-    <lastmod>2020-09-13</lastmod>
-  </url>
-  <url>
-    <loc>https://nicehuster.github.io/2018/07/12/0021-leetcode_listnode2/</loc>
-    <lastmod>2020-09-13</lastmod>
-  </url>
-  <url>
-    <loc>https://nicehuster.github.io/2018/07/29/0028-tensorRT_customlayer/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
@@ -254,6 +250,10 @@
   </url>
   <url>
     <loc>https://nicehuster.github.io/2018/08/02/0029-leetcode_dynamic/</loc>
+    <lastmod>2020-09-13</lastmod>
+  </url>
+  <url>
+    <loc>https://nicehuster.github.io/2018/07/29/0028-tensorRT_customlayer/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
@@ -273,11 +273,11 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2020/03/26/0061-ffmpeg/</loc>
+    <loc>https://nicehuster.github.io/2019/06/12/0058-fine-grain/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2019/06/12/0058-fine-grain/</loc>
+    <loc>https://nicehuster.github.io/2020/03/26/0061-ffmpeg/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
 </urlset> 

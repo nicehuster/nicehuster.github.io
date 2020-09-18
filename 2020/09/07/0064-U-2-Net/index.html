@@ -112,9 +112,9 @@
 <meta property="og:image" content="https://nicehuster.github.io/img/image-20200917201033485.png">
 <meta property="og:image" content="https://nicehuster.github.io/img/image-20200917201132725.png">
 <meta property="og:image" content="https://nicehuster.github.io/img/image-20200917201255253.png">
-<meta property="og:image" content="https://nicehuster.github.io/img/v2-32d5896bf547f0aba425572932160a74_720w.jpg">
+<meta property="og:image" content="https://nicehuster.github.io/img/1*TXfEPqTbFBPCbXYh2bstlA.png">
 <meta property="og:image" content="https://nicehuster.github.io/img/image-20200917201523395.png">
-<meta property="og:updated_time" content="2020-09-17T12:23:31.886Z">
+<meta property="og:updated_time" content="2020-09-18T02:47:32.540Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="抠图神器U^2-Net">
 <meta name="twitter:description" content="论文信息： Going Deeper with Nested U-Structure for Salient Object Detection代码链接：https://github.com/NathanUA/U-2-Net整体信息： 这是发表在PR2020上的一篇关于显著性检测的文章，作者是秦雪彬。从标题上可以看到本文的一个idea是设计了一个deeper的U型结构的网络解决显著性目标检测问题。作">
@@ -419,7 +419,7 @@
 <h4 id="U-2-Net的结构"><a href="#U-2-Net的结构" class="headerlink" title="U^2-Net的结构"></a>U^2-Net的结构</h4><p>U^2-Net的网络结构如下：</p>
 <p><img src="/img/image-20200917201255253.png" alt="image-20200917201255253"></p>
 <p>与U-Net的网络结构做一个对比：</p>
-<p><img src="/img/v2-32d5896bf547f0aba425572932160a74_720w.jpg" alt="img "></p>
+<p><img src="/img/1*TXfEPqTbFBPCbXYh2bstlA.png" alt="Learn How to Train U-Net On Your Dataset | by Sukriti Paul | Coinmonks |  Medium"></p>
 <p>直观上可以发现，U^2-Net的每一个Block都是一个U-Net结构的模块，即上述Residual U-blocks。当然，你也可以继续Going Deeper, 每个Block里面的U-Net的子Block仍然可以是一个U-Net结构，命名为U^3-Net。</p>
 <h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p>所提出的模型是使用DUTS-TR数据集进行训练，该数据集包含大约10000个样本图像，并使用标准数据增强技术进行扩充。研究人员在6个用于突出目标检测的基准数据集上评估了该模型：DUT-OMRON、DUTS-TE、HKU-IS、ECSSD、PASCAL-S和SOD。评价结果表明，在这6个基准点上，新模型与现有方法具有相当好的性能。</p>
 <p>U^2-Net的实现是开源的，并为两种不同的方法提供了预训练的模型：U^2-Net(176.3M的较大模型，在GTX 1080Ti GPU上为30 FPS）和一个仅为4.7mb的较小的U^2-Net版本，最高可达到40 FPS。代码和预训练模型都可以在<a href="https://github.com/NathanUA/U-2-Net" target="_blank" rel="noopener">Github</a>。下面是我直接用作者开源的模型跑出来的结果，抠图效果很好，精细到发丝的那种。</p>
@@ -563,7 +563,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">36</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

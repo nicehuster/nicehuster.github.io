@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="mmdetection,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="nicehuster's blog" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="训练流程训练流程的包装过程大致如下:tools/train.py-&amp;gt;apis/train.py-&amp;gt;mmcv/runner.py-&amp;gt;mmcv/hook.py(后面是分散的), 其中 runner 维护了数据信息,优化器, 日志系统, 训练 loop 中的各节点信息, 模型保存, 学习率等. 另外补充一点, 以上包装过程, 在 mmdet 中无处不在, 包括 mmcv 的代码也是对日">
+<meta name="keywords" content="mmdetection">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mmdetection详解指北 (四)">
+<meta property="og:url" content="https://nicehuster.github.io/2020/09/08/2020-09-06-mmdetection-4/index.html">
+<meta property="og:site_name" content="nicehuster&#39;s blog">
+<meta property="og:description" content="训练流程训练流程的包装过程大致如下:tools/train.py-&amp;gt;apis/train.py-&amp;gt;mmcv/runner.py-&amp;gt;mmcv/hook.py(后面是分散的), 其中 runner 维护了数据信息,优化器, 日志系统, 训练 loop 中的各节点信息, 模型保存, 学习率等. 另外补充一点, 以上包装过程, 在 mmdet 中无处不在, 包括 mmcv 的代码也是对日">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.github.io/img/image-20200917203908378.png">
+<meta property="og:updated_time" content="2020-09-17T12:44:41.312Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mmdetection详解指北 (四)">
+<meta name="twitter:description" content="训练流程训练流程的包装过程大致如下:tools/train.py-&amp;gt;apis/train.py-&amp;gt;mmcv/runner.py-&amp;gt;mmcv/hook.py(后面是分散的), 其中 runner 维护了数据信息,优化器, 日志系统, 训练 loop 中的各节点信息, 模型保存, 学习率等. 另外补充一点, 以上包装过程, 在 mmdet 中无处不在, 包括 mmcv 的代码也是对日">
+<meta name="twitter:image" content="https://nicehuster.github.io/img/image-20200917203908378.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.github.io/2020/09/08/2020-09-06-mmdetection-4/">
+
+
+
+
+
+  <title>mmdetection详解指北 (四) | nicehuster's blog</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">nicehuster's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">不积跬步，无以至千里</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2020/09/08/2020-09-06-mmdetection-4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nicehuster's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">mmdetection详解指北 (四)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-08T19:16:39+08:00">
+                2020-09-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mmdetection/" itemprop="url" rel="index">
+                    <span itemprop="name">mmdetection</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="训练流程"><a href="#训练流程" class="headerlink" title="训练流程"></a>训练流程</h3><p>训练流程的包装过程大致如下:tools/train.py-&gt;apis/train.py-&gt;mmcv/runner.py-&gt;mmcv/hook.py(后面是分散的), 其中 runner 维护了数据信息,优化器, 日志系统, 训练 loop 中的各节点信息, 模型保存, 学习率等. 另外补充一点, 以上包装过程, 在 mmdet 中无处不在, 包括 mmcv 的代码也是对日常频繁使用的函数进行了统一封装。</p>
+<a id="more"></a>
+<h4 id="训练逻辑"><a href="#训练逻辑" class="headerlink" title="训练逻辑"></a>训练逻辑</h4><p><img src="/img/image-20200917203908378.png" alt="image-20200917203908378"></p>
+<p>图见2, 注意它的四个层级. 代码上, 主要查看 apis/train.py, mmcv 中的runner 相关文件. 核心围绕 Runner,Hook 两个类. Runner 将模型, 批处理函数 batch_pro cessor, 优化器作为基本属性, 训练过程中与训练状态, 各节点相关的信息被记录在mode,_hooks,_epoch,_iter,_inner_iter,_max_epochs, _max_iters中，这些信息维护了训练过程中插入不同 hook 的操作方式. 理清训练流程只需看 Runner 的成员函数 run. 在 run 里会根据 mode 按配置中 workflow 的 epoch 循环调用 train 和 val 函数, 跑完所有的 epoch. 比如train:</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">EpochBasedRunner</span>(<span class="title">BaseRunner</span>):</span></span><br><span class="line">    <span class="string">""</span><span class="string">"Epoch-based Runner.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    This runner train models epoch by epoch.</span></span><br><span class="line"><span class="string">    "</span><span class="string">""</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">train</span><span class="params">(<span class="keyword">self</span>, data_loader, **kwargs)</span></span><span class="symbol">:</span></span><br><span class="line">        <span class="keyword">self</span>.model.train()</span><br><span class="line">        <span class="keyword">self</span>.mode = <span class="string">'train'</span></span><br><span class="line">        <span class="keyword">self</span>.data_loader = data_loader</span><br><span class="line">        <span class="keyword">self</span>._max_iters = <span class="keyword">self</span>._max_epochs * len(<span class="keyword">self</span>.data_loader) <span class="comment"># 最大迭代次数</span></span><br><span class="line">        <span class="keyword">self</span>.call_hook(<span class="string">'before_train_epoch'</span>)<span class="comment"># 根据名字获取hook对象函数</span></span><br><span class="line">        time.sleep(<span class="number">2</span>)  <span class="comment"># Prevent possible deadlock during epoch transition</span></span><br><span class="line">        <span class="keyword">for</span> i, data_batch <span class="keyword">in</span> enumerate(<span class="keyword">self</span>.data_loader)<span class="symbol">:</span></span><br><span class="line">            <span class="keyword">self</span>._inner_iter = i <span class="comment"># 记录当前训练迭代次数</span></span><br><span class="line">            <span class="keyword">self</span>.call_hook(<span class="string">'before_train_iter'</span>) <span class="comment">#一个batch 前向操作开始</span></span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">self</span>.batch_processor is <span class="symbol">None:</span></span><br><span class="line">                outputs = <span class="keyword">self</span>.model.train_step(data_batch, <span class="keyword">self</span>.optimizer,</span><br><span class="line">                                                **kwargs)</span><br><span class="line">            <span class="symbol">else:</span></span><br><span class="line">                outputs = <span class="keyword">self</span>.batch_processor(</span><br><span class="line">                    <span class="keyword">self</span>.model, data_batch, train_mode=True, **kwargs) </span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> isinstance(outputs, dict)<span class="symbol">:</span></span><br><span class="line">                raise TypeError(<span class="string">'"batch_processor()" or "model.train_step()"'</span></span><br><span class="line">                                <span class="string">' must return a dict'</span>)</span><br><span class="line">            <span class="keyword">if</span> <span class="string">'log_vars'</span> <span class="keyword">in</span> <span class="symbol">outputs:</span></span><br><span class="line">                <span class="keyword">self</span>.log_buffer.update(outputs[<span class="string">'log_vars'</span>],</span><br><span class="line">                                       outputs[<span class="string">'num_samples'</span>])</span><br><span class="line">            <span class="keyword">self</span>.outputs = outputs</span><br><span class="line">            <span class="keyword">self</span>.call_hook(<span class="string">'after_train_iter'</span>)<span class="comment">#一个batch 前向操作结束</span></span><br><span class="line">            <span class="keyword">self</span>._iter += <span class="number">1</span> <span class="comment"># 方便resume，知道从哪次开始优化</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">self</span>.call_hook(<span class="string">'after_train_epoch'</span>) <span class="comment">#一个epoch结束</span></span><br><span class="line">        <span class="keyword">self</span>._epoch += <span class="number">1</span> <span class="comment">#记录训练epoch状态，方便resume</span></span><br></pre></td></tr></table></figure>
+<p>上面需要说明的是自定义 hook 类, 自定义 hook 类需继承 mmcv 的Hook 类, 其默认了 6+8+4 个成员函数, 也即2所示的 6 个层级节点, 外加 2*4 个区分 train 和 val 的节点记录函数, 以及 4 个边界检查函数. 从train.py 中容易看出, 在训练之前, 已经将需要的 hook 函数注册到 Runner的 self._hook 中了, 包括从配置文件解析的优化器, 学习率调整函数, 模型保存, 一个 batch 的时间记录等 (注册 hook 算子在 self._hook 中按优先级升序排列). 这里的 call_hook 函数定义如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseRunner</span><span class="params">(metaclass=ABCMeta)</span>:</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">call_hook</span><span class="params">(self, fn_name)</span>:</span></span><br><span class="line">        <span class="string">"""Call all hooks.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        Args:</span></span><br><span class="line"><span class="string">            fn_name (str): The function name in each hook to be called, such as</span></span><br><span class="line"><span class="string">                "before_train_epoch".</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">for</span> hook <span class="keyword">in</span> self._hooks:</span><br><span class="line">            getattr(hook, fn_name)(self)</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+<p>容易看出, 在训练的不同节点, 将从注册列表中调用实现了该节点函数的类成员函数. 比如</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@HOOKS.register_module()</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">OptimizerHook</span><span class="params">(Hook)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, grad_clip=None)</span>:</span></span><br><span class="line">        self.grad_clip = grad_clip</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">clip_grads</span><span class="params">(self, params)</span>:</span></span><br><span class="line">        params = list(</span><br><span class="line">            filter(<span class="keyword">lambda</span> p: p.requires_grad <span class="keyword">and</span> p.grad <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>, params))</span><br><span class="line">        <span class="keyword">if</span> len(params) &gt; <span class="number">0</span>:</span><br><span class="line">            <span class="keyword">return</span> clip_grad.clip_grad_norm_(params, **self.grad_clip)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">after_train_iter</span><span class="params">(self, runner)</span>:</span></span><br><span class="line">        runner.optimizer.zero_grad()</span><br><span class="line">        runner.outputs[<span class="string">'loss'</span>].backward()</span><br><span class="line">        <span class="keyword">if</span> self.grad_clip <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">            grad_norm = self.clip_grads(runner.model.parameters())</span><br><span class="line">            <span class="keyword">if</span> grad_norm <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">                <span class="comment"># Add grad norm to the logger</span></span><br><span class="line">                runner.log_buffer.update(&#123;<span class="string">'grad_norm'</span>: float(grad_norm)&#125;,</span><br><span class="line">                                         runner.outputs[<span class="string">'num_samples'</span>])</span><br><span class="line">        runner.optimizer.step()</span><br></pre></td></tr></table></figure>
+<p>将在每个 train_iter 后实现反向传播和参数更新。学习率优化相对复杂一点, 其基类 LrUpdaterHook, 实现了 before_run,before_train_epoch, before_train_iter 三个 hook 函数, 意义自明. . 这里选一个余弦式变化, 稍作说明:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">annealing_cos</span><span class="params">(start, end, factor, weight=<span class="number">1</span>)</span>:</span></span><br><span class="line">    <span class="string">"""Calculate annealing cos learning rate.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Cosine anneal from `weight * start + (1 - weight) * end` to `end` as</span></span><br><span class="line"><span class="string">    percentage goes from 0.0 to 1.0.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        start (float): The starting learning rate of the cosine annealing.</span></span><br><span class="line"><span class="string">        end (float): The ending learing rate of the cosine annealing.</span></span><br><span class="line"><span class="string">        factor (float): The coefficient of `pi` when calculating the current</span></span><br><span class="line"><span class="string">            percentage. Range from 0.0 to 1.0.</span></span><br><span class="line"><span class="string">        weight (float, optional): The combination factor of `start` and `end`</span></span><br><span class="line"><span class="string">            when calculating the actual starting learning rate. Default to 1.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    cos_out = cos(pi * factor) + <span class="number">1</span></span><br><span class="line">    <span class="keyword">return</span> end + <span class="number">0.5</span> * weight * (start - end) * cos_out</span><br><span class="line"></span><br><span class="line"><span class="meta">@HOOKS.register_module()</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CosineAnnealingLrUpdaterHook</span><span class="params">(LrUpdaterHook)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, min_lr=None, min_lr_ratio=None, **kwargs)</span>:</span></span><br><span class="line">        <span class="keyword">assert</span> (min_lr <span class="keyword">is</span> <span class="keyword">None</span>) ^ (min_lr_ratio <span class="keyword">is</span> <span class="keyword">None</span>)</span><br><span class="line">        self.min_lr = min_lr</span><br><span class="line">        self.min_lr_ratio = min_lr_ratio</span><br><span class="line">        super(CosineAnnealingLrUpdaterHook, self).__init__(**kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_lr</span><span class="params">(self, runner, base_lr)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> self.by_epoch:</span><br><span class="line">            progress = runner.epoch</span><br><span class="line">            max_progress = runner.max_epochs</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            progress = runner.iter</span><br><span class="line">            max_progress = runner.max_iters</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> self.min_lr_ratio <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">            target_lr = base_lr * self.min_lr_ratio</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            target_lr = self.min_lr</span><br><span class="line">        <span class="keyword">return</span> annealing_cos(base_lr, target_lr, progress / max_progress)</span><br></pre></td></tr></table></figure>
+<p>从 get_lr 可以看到, 学习率变换周期有两种,epoch-&gt;max_epoch, 或者更大的 iter-&gt;max_iter, 后者表明一个 epoch 内不同 batch 的学习率可以不同, 因为没有什么理论, 所有这两种方式都行. 其中 base_lr 为初始学习率,target_lr 为学习率衰减的上界, 而当前学习率即为返回值.</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mmdetection/" rel="tag"># mmdetection</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/09/08/2020-09-06-mmdetection-3/" rel="next" title="mmdetection详解指北 (三)">
+                <i class="fa fa-chevron-left"></i> mmdetection详解指北 (三)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到 刘文龙（@nicehuster）的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">70</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#训练流程"><span class="nav-number">1.</span> <span class="nav-text">训练流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#训练逻辑"><span class="nav-number">1.1.</span> <span class="nav-text">训练逻辑</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

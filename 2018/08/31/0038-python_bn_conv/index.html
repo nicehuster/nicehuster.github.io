@@ -82,7 +82,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
 
 
-  <meta name="keywords" content="deep learning,batch normalization,">
+  <meta name="keywords" content="BN,">
 
 
 
@@ -100,23 +100,23 @@
 
 
 
-<meta name="description" content="昨天TX代码面试让手撸IOU,BN和CONV，当时一听真的是有点懵，其实IOU倒还好点，比较简单，但是BN,CONV实现就有点难了，当时也只是实现了BN的前向，卷积也只是写了一个一维卷积的公式而已。感觉面试凉凉，进TX无望，虽然在TX实习过，现在已基本打消进TX的念头了。今天趁有空顺便实现了一下IOU和BN的前向和反向。">
-<meta name="keywords" content="deep learning,batch normalization">
+<meta name="description" content="昨天TX代码面试让手撸IOU,BN和CONV，当时一听真的是有点懵，其实IOU倒还好点，比较简单，但是BN,CONV实现就有点难了，当时也只是实现了BN的前向，卷积也只是写了一个一维卷积的公式而已。s今天趁有空顺便实现了一下IOU和BN的前向和反向。">
+<meta name="keywords" content="BN">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用Python实现Batch normalization和卷积层">
 <meta property="og:url" content="https://nicehuster.github.io/2018/08/31/0038-python_bn_conv/index.html">
 <meta property="og:site_name" content="nicehuster&#39;s blog">
-<meta property="og:description" content="昨天TX代码面试让手撸IOU,BN和CONV，当时一听真的是有点懵，其实IOU倒还好点，比较简单，但是BN,CONV实现就有点难了，当时也只是实现了BN的前向，卷积也只是写了一个一维卷积的公式而已。感觉面试凉凉，进TX无望，虽然在TX实习过，现在已基本打消进TX的念头了。今天趁有空顺便实现了一下IOU和BN的前向和反向。">
+<meta property="og:description" content="昨天TX代码面试让手撸IOU,BN和CONV，当时一听真的是有点懵，其实IOU倒还好点，比较简单，但是BN,CONV实现就有点难了，当时也只是实现了BN的前向，卷积也只是写了一个一维卷积的公式而已。s今天趁有空顺便实现了一下IOU和BN的前向和反向。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://nicehuster.github.io/img/bn.png">
 <meta property="og:image" content="https://nicehuster.github.io/img/BN_qiudao.jpg">
 <meta property="og:image" content="https://nicehuster.github.io/img/BN_qiudao_.jpg">
 <meta property="og:image" content="https://nicehuster.github.io/img/conv.png">
 <meta property="og:image" content="https://nicehuster.github.io/img/conv_backward.png">
-<meta property="og:updated_time" content="2020-09-13T06:54:12.000Z">
+<meta property="og:updated_time" content="2020-09-18T02:35:26.823Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Python实现Batch normalization和卷积层">
-<meta name="twitter:description" content="昨天TX代码面试让手撸IOU,BN和CONV，当时一听真的是有点懵，其实IOU倒还好点，比较简单，但是BN,CONV实现就有点难了，当时也只是实现了BN的前向，卷积也只是写了一个一维卷积的公式而已。感觉面试凉凉，进TX无望，虽然在TX实习过，现在已基本打消进TX的念头了。今天趁有空顺便实现了一下IOU和BN的前向和反向。">
+<meta name="twitter:description" content="昨天TX代码面试让手撸IOU,BN和CONV，当时一听真的是有点懵，其实IOU倒还好点，比较简单，但是BN,CONV实现就有点难了，当时也只是实现了BN的前向，卷积也只是写了一个一维卷积的公式而已。s今天趁有空顺便实现了一下IOU和BN的前向和反向。">
 <meta name="twitter:image" content="https://nicehuster.github.io/img/bn.png">
 
 
@@ -384,7 +384,7 @@
       
 
       
-        <p>昨天TX代码面试让手撸IOU,BN和CONV，当时一听真的是有点懵，其实IOU倒还好点，比较简单，但是BN,CONV实现就有点难了，当时也只是实现了BN的前向，卷积也只是写了一个一维卷积的公式而已。感觉面试凉凉，进TX无望，虽然在TX实习过，现在已基本打消进TX的念头了。今天趁有空顺便实现了一下IOU和BN的前向和反向。<br><a id="more"></a></p>
+        <p>昨天TX代码面试让手撸IOU,BN和CONV，当时一听真的是有点懵，其实IOU倒还好点，比较简单，但是BN,CONV实现就有点难了，当时也只是实现了BN的前向，卷积也只是写了一个一维卷积的公式而已。s今天趁有空顺便实现了一下IOU和BN的前向和反向。<br><a id="more"></a></p>
 <h3 id="IOU实现"><a href="#IOU实现" class="headerlink" title="IOU实现"></a>IOU实现</h3><p>iou的原理比较简单这里不予介绍。具体代码实现如下：<br><figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">def IoU(boxA,boxB):#x1,y1,x2,y2</span><br><span class="line">    xA=max(boxA<span class="string">[0]</span>,boxB<span class="string">[0]</span>)</span><br><span class="line">    yA=max(boxA<span class="string">[1]</span>,boxB<span class="string">[1]</span>)</span><br><span class="line">    xB=min(boxA<span class="string">[2]</span>,boxB<span class="string">[2]</span>)</span><br><span class="line">    yB=min(boxA<span class="string">[3]</span>,boxB<span class="string">[3]</span>)</span><br><span class="line">    interArea=max(<span class="number">0</span>,xB-xA+<span class="number">1</span>)*max(<span class="number">0</span>,yB-yA+<span class="number">1</span>)</span><br><span class="line">    boxAArea=(boxA<span class="string">[2]</span>-boxA<span class="string">[0]</span>+<span class="number">1</span>)*(boxA<span class="string">[3]</span>-boxA<span class="string">[1]</span>+<span class="number">1</span>)</span><br><span class="line">    boxBArea=(boxB<span class="string">[2]</span>-boxB<span class="string">[0]</span>+<span class="number">1</span>)*(boxB<span class="string">[3]</span>-boxB<span class="string">[1]</span>+<span class="number">1</span>)</span><br><span class="line">    iou=interArea/(boxAArea+boxBArea-interArea)</span><br><span class="line">    return iou</span><br></pre></td></tr></table></figure></p>
 <p>用C++实现和上面是一样的，如下：<br><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">struct Rect</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">int</span> x;<span class="keyword">int</span> y;</span><br><span class="line">	<span class="keyword">int</span> <span class="built_in">width</span>;<span class="keyword">int</span> <span class="built_in">height</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">int</span> IoU(Rect Box1, Rect Box2)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">int</span> XA = <span class="built_in">max</span>(Box1.x, Box2.x);</span><br><span class="line">	<span class="keyword">int</span> YA = <span class="built_in">max</span>(Box1.y, Box2.y);</span><br><span class="line">	<span class="keyword">int</span> XB = <span class="built_in">min</span>(Box1.x + Box1.<span class="built_in">width</span>, Box2.x + Box2.<span class="built_in">width</span>);</span><br><span class="line">	<span class="keyword">int</span> YB = <span class="built_in">min</span>(Box1.y + Box1.<span class="built_in">height</span>, Box2.y + Box2.<span class="built_in">height</span>);</span><br><span class="line">	<span class="keyword">int</span> interArea = <span class="built_in">max</span>(<span class="number">0</span>, XB - XA)*<span class="built_in">max</span>(<span class="number">0</span>, YB - YA);</span><br><span class="line">	<span class="keyword">int</span> box1Area = Box1.<span class="built_in">width</span>*Box1.<span class="built_in">height</span>;</span><br><span class="line">	<span class="keyword">int</span> box2Area = Box2.<span class="built_in">width</span>*Box2.<span class="built_in">height</span>;</span><br><span class="line">	<span class="keyword">int</span> iou = <span class="keyword">float</span>(interArea) / (box1Area + box2Area - interArea);</span><br><span class="line">	<span class="built_in">return</span> iou;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <h3 id="使用Python实现BN"><a href="#使用Python实现BN" class="headerlink" title="使用Python实现BN"></a>使用Python实现BN</h3><p>BN的前向操作只需要实现下面这些公式就行<br><img src="/img/bn.png" alt><br>对于反向传播的话，我们需要对x,r,β进行求导获得其梯度，然后进行反向传播。下面是原文给出的求导公式，原文给出的公式省略了一些中间步骤，下面我自己也推导了一下，如下图所示。<br><img src="/img/BN_qiudao.jpg" alt><br><img src="/img/BN_qiudao_.jpg" alt><br>具体实现如下：<br><figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">import numpy as <span class="built_in">np</span></span><br><span class="line">def bn_forward(x,<span class="built_in">gamma</span>,<span class="built_in">beta</span>,eps=<span class="number">1e-5</span>):#eps: 除以方差时为了防止方差太小而导致数值计算不稳定</span><br><span class="line">    #计算均值</span><br><span class="line">    sample_mean = <span class="built_in">np</span>.<span class="built_in">mean</span>(x, axis=<span class="number">0</span>)</span><br><span class="line">    #计算方差</span><br><span class="line">    sample_var = <span class="built_in">np</span>.<span class="built_in">var</span>(x, axis=<span class="number">0</span>)</span><br><span class="line">    #归一化</span><br><span class="line">    out_ = (x - sample_mean) / <span class="built_in">np</span>.<span class="built_in">sqrt</span>(sample_var + eps)</span><br><span class="line">    #缩放平移</span><br><span class="line">    out=<span class="built_in">gamma</span>*out_+<span class="built_in">beta</span></span><br><span class="line">    #缓存中间变量用于反向传播计算</span><br><span class="line">    cache=(x,out_,<span class="built_in">gamma</span>,<span class="built_in">beta</span>,sample_mean,sample_var,eps)</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">return</span> out,cache</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">def bn_backward(dout,cache):</span><br><span class="line">    </span><br><span class="line">    N,D = dout.shape</span><br><span class="line">    </span><br><span class="line">    x,out_,<span class="built_in">gamma</span>,<span class="built_in">beta</span>,sample_mean,sample_var,eps=cache</span><br><span class="line">    </span><br><span class="line">    dbeta=<span class="built_in">np</span>.<span class="built_in">sum</span>(dout,axis=<span class="number">0</span>)</span><br><span class="line">    </span><br><span class="line">    dgamma=<span class="built_in">np</span>.<span class="built_in">sum</span>(out_*dout,axis=<span class="number">0</span>)</span><br><span class="line">    </span><br><span class="line">    dxhat=<span class="built_in">gamma</span>*dout</span><br><span class="line">    </span><br><span class="line">    dvar=<span class="built_in">np</span>.<span class="built_in">sum</span>(dxhat*out_,axis=<span class="number">0</span>)*(-<span class="number">1</span>/<span class="number">2</span>.)*(<span class="number">1</span>./sample_var+eps)</span><br><span class="line">    </span><br><span class="line">    dmean=<span class="built_in">np</span>.<span class="built_in">sum</span>(dxhat,axis=<span class="number">0</span>)/<span class="built_in">np</span>.<span class="built_in">sqrt</span>(sample_var + eps) + dvar*(-<span class="number">2</span>)*sample_mean</span><br><span class="line">    </span><br><span class="line">    dx=dxhat/<span class="built_in">np</span>.<span class="built_in">sqrt</span>(sample_var + eps) + dvar*<span class="number">2</span>*(x-sample_mean)/N + dmean/N</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">return</span> dx,dgamma,dbeta</span><br></pre></td></tr></table></figure></p>
@@ -420,9 +420,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/deep-learning/" rel="tag"># deep learning</a>
-          
-            <a href="/tags/batch-normalization/" rel="tag"># batch normalization</a>
+            <a href="/tags/BN/" rel="tag"># BN</a>
           
         </div>
       
@@ -522,7 +520,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">65</span>
+                <span class="site-state-item-count">70</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -533,7 +531,7 @@
             
             <div class="site-state-item site-state-categories">
               <a href="/categories/index.html">
-                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-count">9</span>
                 <span class="site-state-item-name">分类</span>
               </a>
             </div>
@@ -544,7 +542,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">39</span>
+                <span class="site-state-item-count">52</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

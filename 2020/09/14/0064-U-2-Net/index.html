@@ -82,7 +82,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
 
 
-  <meta name="keywords" content="mmdetection,">
+  <meta name="keywords" content="saliency detection,">
 
 
 
@@ -100,20 +100,27 @@
 
 
 
-<meta name="description" content="平时做的都些检测相关的项目，因此对于各类检测框架使用较多，以及一些不知名的repo都有用过，平时接触的都是业务项目，很少去认真的看一个repo中算法的框架设计，最近项目处于交付阶段，主要是客户和平台开发人员对界面的问题。趁有空mmdetection的代码重新看了一遍，顺便做了一些笔记。 组件设计  BackBone: 特征提取骨架网络,ResNet,ResneXt,ssd_vgg, hrnet 等">
-<meta name="keywords" content="mmdetection">
+<meta name="description" content="论文信息： Going Deeper with Nested U-Structure for Salient Object Detection代码链接：https://github.com/NathanUA/U-2-Net整体信息： 这是发表在PR2020上的一篇关于显著性检测的文章，作者是秦雪彬。从标题上可以看到本文的一个idea是设计了一个deeper的U型结构的网络解决显著性目标检测问题。作">
+<meta name="keywords" content="saliency detection">
 <meta property="og:type" content="article">
-<meta property="og:title" content="mmdetection详解指北 (一)">
-<meta property="og:url" content="https://nicehuster.github.io/2020/09/08/2020-09-06-mmdetection-1/index.html">
+<meta property="og:title" content="抠图神器U^2-Net">
+<meta property="og:url" content="https://nicehuster.github.io/2020/09/14/0064-U-2-Net/index.html">
 <meta property="og:site_name" content="nicehuster&#39;s blog">
-<meta property="og:description" content="平时做的都些检测相关的项目，因此对于各类检测框架使用较多，以及一些不知名的repo都有用过，平时接触的都是业务项目，很少去认真的看一个repo中算法的框架设计，最近项目处于交付阶段，主要是客户和平台开发人员对界面的问题。趁有空mmdetection的代码重新看了一遍，顺便做了一些笔记。 组件设计  BackBone: 特征提取骨架网络,ResNet,ResneXt,ssd_vgg, hrnet 等">
+<meta property="og:description" content="论文信息： Going Deeper with Nested U-Structure for Salient Object Detection代码链接：https://github.com/NathanUA/U-2-Net整体信息： 这是发表在PR2020上的一篇关于显著性检测的文章，作者是秦雪彬。从标题上可以看到本文的一个idea是设计了一个deeper的U型结构的网络解决显著性目标检测问题。作">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://nicehuster.github.io/img/image-20200917202833058.png">
-<meta property="og:updated_time" content="2020-09-17T12:43:21.284Z">
+<meta property="og:image" content="https://nicehuster.github.io/img/image-20200918105536819.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/v2-422783ab5d5d66fd0dbf5653166ddbd8_720w.jpg">
+<meta property="og:image" content="https://nicehuster.github.io/img/image-20200917201033485.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/image-20200917201132725.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/image-20200917201255253.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/1*TXfEPqTbFBPCbXYh2bstlA.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/image-20200918110749081.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/image-20200917201523395.png">
+<meta property="og:updated_time" content="2020-09-18T07:17:55.130Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="mmdetection详解指北 (一)">
-<meta name="twitter:description" content="平时做的都些检测相关的项目，因此对于各类检测框架使用较多，以及一些不知名的repo都有用过，平时接触的都是业务项目，很少去认真的看一个repo中算法的框架设计，最近项目处于交付阶段，主要是客户和平台开发人员对界面的问题。趁有空mmdetection的代码重新看了一遍，顺便做了一些笔记。 组件设计  BackBone: 特征提取骨架网络,ResNet,ResneXt,ssd_vgg, hrnet 等">
-<meta name="twitter:image" content="https://nicehuster.github.io/img/image-20200917202833058.png">
+<meta name="twitter:title" content="抠图神器U^2-Net">
+<meta name="twitter:description" content="论文信息： Going Deeper with Nested U-Structure for Salient Object Detection代码链接：https://github.com/NathanUA/U-2-Net整体信息： 这是发表在PR2020上的一篇关于显著性检测的文章，作者是秦雪彬。从标题上可以看到本文的一个idea是设计了一个deeper的U型结构的网络解决显著性目标检测问题。作">
+<meta name="twitter:image" content="https://nicehuster.github.io/img/image-20200918105536819.png">
 
 
 
@@ -142,13 +149,13 @@
 
 
 
-  <link rel="canonical" href="https://nicehuster.github.io/2020/09/08/2020-09-06-mmdetection-1/">
+  <link rel="canonical" href="https://nicehuster.github.io/2020/09/14/0064-U-2-Net/">
 
 
 
 
 
-  <title>mmdetection详解指北 (一) | nicehuster's blog</title>
+  <title>抠图神器U^2-Net | nicehuster's blog</title>
   
 
 
@@ -291,7 +298,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2020/09/08/2020-09-06-mmdetection-1/">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2020/09/14/0064-U-2-Net/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
@@ -308,7 +315,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">mmdetection详解指北 (一)</h1>
+          <h1 class="post-title" itemprop="name headline">抠图神器U^2-Net</h1>
         
 
         <div class="post-meta">
@@ -320,8 +327,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-08T19:13:39+08:00">
-                2020-09-08
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-14T19:13:39+08:00">
+                2020-09-14
               </time>
             
 
@@ -343,8 +350,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/mmdetection/" itemprop="url" rel="index">
-                    <span itemprop="name">mmdetection</span>
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
                   </a>
                 </span>
 
@@ -380,74 +387,58 @@
       
 
       
-        <p>平时做的都些检测相关的项目，因此对于各类检测框架使用较多，以及一些不知名的repo都有用过，平时接触的都是业务项目，很少去认真的看一个repo中算法的框架设计，最近项目处于交付阶段，主要是客户和平台开发人员对界面的问题。趁有空mmdetection的代码重新看了一遍，顺便做了一些笔记。</p>
-<h3 id="组件设计"><a href="#组件设计" class="headerlink" title="组件设计"></a>组件设计</h3><blockquote>
-<ul>
-<li>BackBone: 特征提取骨架网络,ResNet,ResneXt,ssd_vgg, hrnet 等。</li>
-<li>Neck: 连接骨架和头部. 多层级特征融合,FPN,BFP,PAFPN 等。</li>
-<li>DenseHead: 处理特征图上的密集框部分, 主要分 AnchorHead。AnchorFreeHead 两大类，分别有 RPNHead, SSDHead,RetinaHead 和 FCOSHead 等。</li>
-<li>RoIHead (BBoxHead/MaskHead): 在特征图上对 roi 做类别分类或位置回归等 (1.x)。</li>
-<li>ROIHead:bbox 或 mask 的 roi_extractor+head(2.0, 合并了 extractor 和 head)</li>
-<li>SingleStage: BackBone + Neck + DenseHead</li>
-<li>TwoStage: BackBone + Neck + DenseHead + RoIHead(2.0)</li>
-</ul>
-</blockquote>
+        <p><strong>论文信息：</strong> Going Deeper with Nested U-Structure for Salient Object Detection<br><strong>代码链接：</strong><a href="https://github.com/NathanUA/U-2-Net" target="_blank" rel="noopener">https://github.com/NathanUA/U-2-Net</a><br><strong>整体信息：</strong> 这是发表在PR2020上的一篇关于显著性检测的文章，作者是秦雪彬。从标题上可以看到本文的一个idea是设计了一个deeper的U型结构的网络解决显著性目标检测问题。作者认为，目前显著性目标检测有两种主流思路，一为多层次深层特征集成multi-level deep feature integration，一为多尺度特征提取Multi-scale feature extraction。多层次深层特征集成方法主要集中在开发更好的多层次特征聚合策略上。而多尺度特征提取这一类方法旨在设计更新的模块，从主干网获取的特征中同时提取局部和全局信息。而几乎所有上述方法，都是为了更好地利用现有的图像分类的Backbones生成的特征映射。而作者另辟蹊径，提出了一种新颖而简单的结构，它直接逐级提取多尺度特征，用于显著目标检测，而不是利用这些主干的特征来开发和添加更复杂的模块和策略。下图是该方法与其他方法的一个比较：</p>
 <a id="more"></a>
-<h3 id="结构设计"><a href="#结构设计" class="headerlink" title="结构设计"></a>结构设计</h3><h4 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h4><blockquote>
-<ul>
-<li><p>configs 网络组件结构等配置信息 </p>
-</li>
-<li><p>tools: 训练和测试的最终包装和一些实用脚本 </p>
-</li>
-<li><p>mmdet:</p>
+<p><img src="/img/image-20200918105536819.png" alt="image-20200918105536819"></p>
+<h3 id="显著性检测"><a href="#显著性检测" class="headerlink" title="显著性检测"></a>显著性检测</h3><p>在讲这篇文章之前，有必要先了解显著性检测这个任务。</p>
+<blockquote>
+<p><a href="https://zhuanlan.zhihu.com/p/115002897" target="_blank" rel="noopener">显著性检测</a></p>
+</blockquote>
+<p><strong>显著性检测</strong>，就是使用图像处理技术和计算机视觉算法来定位图片中最“显著”的区域。显著区域就是指图片中引人注目的区域或比较重要的区域，例如人眼在观看一幅图片时会首先关注的区域。例如下图，我们人眼一眼看过去首先注意到的不是草坪，而是躺在草坪上的内马尔，内马尔所在的区域就是显著性区域。这种自动定位图像或场景重要区域的过程称为<strong>显着性检测</strong>。</p>
+<p><img src="/img/v2-422783ab5d5d66fd0dbf5653166ddbd8_720w.jpg" alt></p>
+<h4 id="显著性检测和图像分割区别"><a href="#显著性检测和图像分割区别" class="headerlink" title="显著性检测和图像分割区别"></a>显著性检测和图像分割区别</h4><p>这个任务和图像分割十分类似，区别在于：</p>
 <blockquote>
 <ul>
-<li>apis: 分布式环境设定 (1.x,2.0 移植到 mmcv), 推断, 测试, 训练基础代码;</li>
-<li>core: anchor 生成,bbox,mask 编解码, 变换, 标签锚定, 采样等, 模型评估, 加速, 优化器，后处理;</li>
-<li>datasets:coco,voc 等数据类, 数据 pipelines 的统一格式, 数据增强，数据采样;</li>
-<li>models: 模型组件 (backbone,head,loss,neck)，采用注册和组合构建的形式完成模型搭建</li>
-<li>ops: 优化加速代码, 包括 nms,roialign,dcn,masked_conv，focal_loss 等</li>
+<li>1.目标数量：显著性目标检测一般只检一个目标，一般目标检测不会限制数量；</li>
+<li>目标类别： 显著性目标检测不关心目标类别，只关心显著性强的目标，一般目标检测会得到目标位置和类别；</li>
+<li>问题建模不同：显著性目标检测，很早期的时候是通过对一些共性的特征建模，比如该目标一般在图像中心，一般是什么样的颜色分布等等。一般目标检测问题，则是希望特征能够更好的把目标表达出来，越细节越好，特征越丰富约好，因为要区分类别</li>
+<li>groundtruth定义不同：两者互有交集，也有不同；前者，往往定义的是一些显著性较强的目标，比如行人，动物等等，而且前者是不输出类别标签信息；后者，gt标签定义是明确的，可以严格的输出对应类别标签；</li>
 </ul>
 </blockquote>
-</li>
-</ul>
-</blockquote>
-<p><img src="/img/image-20200917202833058.png" alt="image-20200917202833058"></p>
-<h4 id="总体逻辑"><a href="#总体逻辑" class="headerlink" title="总体逻辑"></a>总体逻辑</h4><p>从 tools/train.py 中能看到整体可分如下 4 个步骤:</p>
+<p>其实，说白了，显著性检测等同于是一个二分类的语义分割模型，此外，显著的区域 不一定就是 目标，目标很可能不是显著的；</p>
+<h3 id="方法设计"><a href="#方法设计" class="headerlink" title="方法设计"></a>方法设计</h3><h4 id="Residual-U-blocks"><a href="#Residual-U-blocks" class="headerlink" title="Residual U-blocks"></a>Residual U-blocks</h4><p>了解了显著性检测这个任务之后，来具体了解一下这篇文章的具体方法设计。作者设计一种Residual U-blocks，用于捕获 intra-stage 的 multi-scales 特征。</p>
+<p><img src="/img/image-20200917201033485.png" alt="image-20200917201033485"></p>
+<p>上图为普通卷积block，Res-like block，Inception-like block，Dense-like block和Residual U-blocks的对比图，明显可以看出Residual U-blocks是受了U-Net的启发。</p>
+<p>Residual U-blocks有以下三部分组成：</p>
 <blockquote>
 <ul>
-<li><p>1.mmcv.Config.fromfile 从配置文件解析配置信息, 并做适当更新, 包括环境搜集，预加载模型文件, 分布式设置，日志记录等;</p>
-</li>
-<li><p>2.mmdet.models 中的 build_detector 根据配置信息构造模型 ;</p>
+<li>一个输入卷积层，它将输入的feature map x (H × W × $C_{in}$)转换成中间feature map $F_1(x)$，$F_1(x)$通道数为$C_{out}$。这是一个用于局部特征提取的普通卷积层。</li>
+<li>一个U-like的对称的encoder-decoder结构，高度为L，以中间feature map $F_1(x)$为输入，去学习提取和编码多尺度文本信息$U(F_1(x))$,U表示类U-Net结构。更大L会得到更深层的U-block（RSU），更多的池操作，更大的感受野和更丰富的局部和全局特征。配置此参数允许从具有任意空间分辨率的输入特征图中提取多尺度特征。从逐渐降采样特征映射中提取多尺度特征，并通过渐进上采样、合并和卷积等方法将其编码到高分辨率的特征图中。这一过程减少了大尺度直接上采样造成的细节损失。</li>
+<li>一种残差连接，它通过求和来融合局部特征和多尺度特征：$F_1(x) + U(F_1(x))$。</li>
+</ul>
+</blockquote>
+<p><img src="/img/image-20200917201132725.png" alt="image-20200917201132725"></p>
+<p>RSU与Res block的主要设计区别在于RSU用U-Net结构代替了普通的单流卷积，用一个权重层(weight layer)形成的局部特征来代替原始特征。这种设计的变更使网络能够从多个尺度直接从每个残差块提取特征。更值得注意的是，U结构的计算开销很小，因为大多数操作都是在下采样的特征映射上进行的。</p>
+<h4 id="U-2-Net的结构"><a href="#U-2-Net的结构" class="headerlink" title="U^2-Net的结构"></a>U^2-Net的结构</h4><p>U^2-Net的网络结构如下：</p>
+<p><img src="/img/image-20200917201255253.png" alt="image-20200917201255253"></p>
+<p>与U-Net的网络结构做一个对比：</p>
+<p><img src="/img/1*TXfEPqTbFBPCbXYh2bstlA.png" alt="Learn How to Train U-Net On Your Dataset | by Sukriti Paul | Coinmonks |  Medium"></p>
+<p>直观上可以发现，U^2-Net的每一个Block都是一个U-Net结构的模块，即上述Residual U-blocks。当然，你也可以继续Going Deeper, 每个Block里面的U-Net的子Block仍然可以是一个U-Net结构，命名为U^3-Net。</p>
+<h3 id="损失函数设计"><a href="#损失函数设计" class="headerlink" title="损失函数设计"></a>损失函数设计</h3><p>类似于HED算法的deep supervision方式，作者设计了如下函数：</p>
+<script type="math/tex; mode=display">
+\mathcal{L}=\sum_{m=1}^{M} w_{\text {side}}^{(m)} \ell_{\text {side}}^{(m)}+w_{\text {fuse}} \ell_{\text {fuse}}</script><p>其中，M=6, 为U2Net 的 Sup1, Sup2, …, Sup6 stage.$w_{\text {side}}^{(m)}$  $l_{\text {side}}^{(m)}$ 为对应的损失函数输出和权重；$w_{f u s e} \ell_{f u s e}$ 为融合的损失函数和权重;对于每一个$l$使用的都是标准的BCE Loss：</p>
+<script type="math/tex; mode=display">
+\ell=-\sum_{(r, c)}^{(H, W)}\left[P_{G(r, c)} \log P_{S(r, c)}+\left(1-P_{G(r, c)}\right) \log \left(1-P_{S(r, c)}\right)\right]</script><h3 id="实验可视化"><a href="#实验可视化" class="headerlink" title="实验可视化"></a>实验可视化</h3><p>所提出的模型是使用DUTS-TR数据集进行训练，该数据集包含大约10000个样本图像，并使用标准数据增强技术进行扩充。研究人员在6个用于突出目标检测的基准数据集上评估了该模型：DUT-OMRON、DUTS-TE、HKU-IS、ECSSD、PASCAL-S和SOD。评价结果表明，在这6个基准点上，新模型与现有方法具有相当好的性能。</p>
+<p><img src="/img/image-20200918110749081.png" alt="image-20200918110749081"></p>
+<p>U^2-Net的实现是开源的，并提供了两种不同的预训练模型：U2Net(176.3M的较大模型，在GTX 1080Ti GPU上为30 FPS)，以及U2NetP(4.7M小模型，最高可达到40 FPS)。代码和预训练模型都可以在<a href="https://github.com/NathanUA/U-2-Net" target="_blank" rel="noopener">Github</a>。下面是我直接用作者开源的模型跑出来的结果，抠图效果很好，精细到发丝的那种。</p>
+<p><img src="/img/image-20200917201523395.png" alt="image-20200917201523395"></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>该论文的优势在于：</p>
 <blockquote>
 <ul>
-<li>2.1 build 系列函数调用 build_from_cfg 函数, 按 type 关键字从注册表中获取相应的对象, 对象的具名参数在注册文件中赋值;</li>
-<li>2.2 registr.py 放置了模型的组件注册器。其中注册器的 register_module 成员函数是一个装饰器功能函数，在具体的类对象 <em>A</em> 头上装饰 @X.register _module，并同时在 <em>A</em> 对象所在包的初始化文件中调用 <em>A</em>，即可将 <em>A</em> 保存到 registry.module_dict 中, 完成注册;_</li>
-<li>2.3 目前包含 BACKBONES,NECKS,ROI_EXTRACTORS,SHARED_ HEADS,HEADS,LOSSES,DETECTORS 七个模型相关注册器，另外还有数据类，优化器等注册器;</li>
+<li>提出RSU模块，融合不同尺度感受野的特征，来捕捉不同尺度的上下文信息；</li>
+<li>基于 RSU 模块的 池化(pooling) 操作，在不显著增加计算成本的前提下，增加了整个网络结构的深度(depth).</li>
 </ul>
 </blockquote>
-</li>
-</ul>
-<ul>
-<li><p>3.build_dataset 根据配置信息获取数据类;</p>
-<blockquote>
-<ul>
-<li>3.1 coco，cityscapes，voc，deepfasion，lvis，wider_face 等数据 (数据类扩展见后续例子)。</li>
-</ul>
-</blockquote>
-</li>
-<li><p>4.train_detector 模型训练流程:</p>
-<blockquote>
-<ul>
-<li>4.1数据 loader 化, 模型分布式化，优化器选取</li>
-<li>4.2 进入 runner 训练流程 (来自 mmcv 库，采用 hook 方式，整合了 pytorch 训练流程)</li>
-<li>4.3 训练 pipelines 具体细节见后续展开。</li>
-</ul>
-</blockquote>
-</li>
-</ul>
-</blockquote>
-<p>后续说说配置文件，注册机制和训练逻辑。</p>
 
       
     </div>
@@ -465,7 +456,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/mmdetection/" rel="tag"># mmdetection</a>
+            <a href="/tags/saliency-detection/" rel="tag"># saliency detection</a>
           
         </div>
       
@@ -478,8 +469,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/09/06/0065-Adaptive-anti-Aliasing/" rel="next" title="论文阅读：Delving Deeper into Anti-aliasing in ConvNets">
-                <i class="fa fa-chevron-left"></i> 论文阅读：Delving Deeper into Anti-aliasing in ConvNets
+              <a href="/2020/09/08/2020-09-06-mmdetection-4/" rel="next" title="mmdetection详解指北 (四)">
+                <i class="fa fa-chevron-left"></i> mmdetection详解指北 (四)
               </a>
             
           </div>
@@ -487,10 +478,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2020/09/08/2020-09-06-mmdetection-2/" rel="prev" title="mmdetection详解指北 (二)">
-                mmdetection详解指北 (二) <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -664,7 +651,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#组件设计"><span class="nav-number">1.</span> <span class="nav-text">组件设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结构设计"><span class="nav-number">2.</span> <span class="nav-text">结构设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#代码结构"><span class="nav-number">2.1.</span> <span class="nav-text">代码结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总体逻辑"><span class="nav-number">2.2.</span> <span class="nav-text">总体逻辑</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#显著性检测"><span class="nav-number">1.</span> <span class="nav-text">显著性检测</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#显著性检测和图像分割区别"><span class="nav-number">1.1.</span> <span class="nav-text">显著性检测和图像分割区别</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法设计"><span class="nav-number">2.</span> <span class="nav-text">方法设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Residual-U-blocks"><span class="nav-number">2.1.</span> <span class="nav-text">Residual U-blocks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#U-2-Net的结构"><span class="nav-number">2.2.</span> <span class="nav-text">U^2-Net的结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#损失函数设计"><span class="nav-number">3.</span> <span class="nav-text">损失函数设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验可视化"><span class="nav-number">4.</span> <span class="nav-text">实验可视化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>

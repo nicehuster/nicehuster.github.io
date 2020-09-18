@@ -100,19 +100,19 @@
 
 
 
-<meta name="description" content="非极大值抑制非极大值抑制，简称为NMS算法，英文为Non-Maximum Suppression。其思想是搜素局部最大值，抑制极大值。NMS算法在不同应用中的具体实现不太一样，但思想是一样的。非极大值抑制，在计算机视觉任务中得到了广泛的应用，例如边缘检测、人脸检测、目标检测（DPM，YOLO，SSD，Faster R-CNN）等。 算法用途以目标检测为例：目标检测的过程中在同一目标的位置上会产生大">
+<meta name="description" content="非极大值抑制非极大值抑制，简称为NMS算法，英文为Non-Maximum Suppression。其思想是搜素局部最大值，抑制极大值。NMS算法在不同应用中的具体实现不太一样，但思想是一样的。非极大值抑制，在计算机视觉任务中得到了广泛的应用，例如边缘检测、人脸检测、目标检测（DPM，YOLO，SSD，Faster R-CNN）等。">
 <meta name="keywords" content="detection">
 <meta property="og:type" content="article">
 <meta property="og:title" content="非极大值抑制(Non-Maximum Suppression)">
 <meta property="og:url" content="https://nicehuster.github.io/2018/03/07/0001-nms/index.html">
 <meta property="og:site_name" content="一起打怪升级呀">
-<meta property="og:description" content="非极大值抑制非极大值抑制，简称为NMS算法，英文为Non-Maximum Suppression。其思想是搜素局部最大值，抑制极大值。NMS算法在不同应用中的具体实现不太一样，但思想是一样的。非极大值抑制，在计算机视觉任务中得到了广泛的应用，例如边缘检测、人脸检测、目标检测（DPM，YOLO，SSD，Faster R-CNN）等。 算法用途以目标检测为例：目标检测的过程中在同一目标的位置上会产生大">
+<meta property="og:description" content="非极大值抑制非极大值抑制，简称为NMS算法，英文为Non-Maximum Suppression。其思想是搜素局部最大值，抑制极大值。NMS算法在不同应用中的具体实现不太一样，但思想是一样的。非极大值抑制，在计算机视觉任务中得到了广泛的应用，例如边缘检测、人脸检测、目标检测（DPM，YOLO，SSD，Faster R-CNN）等。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://nicehuster.github.io/img/v2-f02be3c109f164d2b5ab202be1f6a933_hd.jpg">
-<meta property="og:updated_time" content="2020-09-13T06:54:12.000Z">
+<meta property="og:updated_time" content="2020-09-18T08:08:00.488Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="非极大值抑制(Non-Maximum Suppression)">
-<meta name="twitter:description" content="非极大值抑制非极大值抑制，简称为NMS算法，英文为Non-Maximum Suppression。其思想是搜素局部最大值，抑制极大值。NMS算法在不同应用中的具体实现不太一样，但思想是一样的。非极大值抑制，在计算机视觉任务中得到了广泛的应用，例如边缘检测、人脸检测、目标检测（DPM，YOLO，SSD，Faster R-CNN）等。 算法用途以目标检测为例：目标检测的过程中在同一目标的位置上会产生大">
+<meta name="twitter:description" content="非极大值抑制非极大值抑制，简称为NMS算法，英文为Non-Maximum Suppression。其思想是搜素局部最大值，抑制极大值。NMS算法在不同应用中的具体实现不太一样，但思想是一样的。非极大值抑制，在计算机视觉任务中得到了广泛的应用，例如边缘检测、人脸检测、目标检测（DPM，YOLO，SSD，Faster R-CNN）等。">
 <meta name="twitter:image" content="https://nicehuster.github.io/img/v2-f02be3c109f164d2b5ab202be1f6a933_hd.jpg">
 
 
@@ -381,6 +381,7 @@
 
       
         <h3 id="非极大值抑制"><a href="#非极大值抑制" class="headerlink" title="非极大值抑制"></a>非极大值抑制</h3><p>非极大值抑制，简称为NMS算法，英文为Non-Maximum Suppression。其思想是搜素局部最大值，抑制极大值。NMS算法在不同应用中的具体实现不太一样，但思想是一样的。非极大值抑制，在计算机视觉任务中得到了广泛的应用，例如边缘检测、人脸检测、目标检测（DPM，YOLO，SSD，Faster R-CNN）等。</p>
+<a id="more"></a>
 <h3 id="算法用途"><a href="#算法用途" class="headerlink" title="算法用途"></a>算法用途</h3><p>以目标检测为例：目标检测的过程中在同一目标的位置上会产生大量的候选框，这些候选框相互之间可能会有重叠，此时我们需要利用非极大值抑制找到最佳的目标边界框，消除冗余的边界框。<br><img src="/img/v2-f02be3c109f164d2b5ab202be1f6a933_hd.jpg" alt><br>左图是人脸检测的候选框结果，每个边界框有一个置信度得分(confidence score)，如果不使用非极大值抑制，就会有多个候选框出现。右图是使用非极大值抑制之后的结果，符合我们人脸检测的预期结果。</p>
 <h3 id="nms算法过程"><a href="#nms算法过程" class="headerlink" title="nms算法过程"></a>nms算法过程</h3><blockquote>
 <ul>

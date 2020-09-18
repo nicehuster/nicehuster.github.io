@@ -108,17 +108,19 @@
 <meta property="og:site_name" content="nicehuster&#39;s blog">
 <meta property="og:description" content="论文信息： Going Deeper with Nested U-Structure for Salient Object Detection代码链接：https://github.com/NathanUA/U-2-Net整体信息： 这是发表在PR2020上的一篇关于显著性检测的文章，作者是秦雪彬。从标题上可以看到本文的一个idea是设计了一个deeper的U型结构的网络解决显著性目标检测问题。作">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.github.io/img/image-20200918105536819.png">
 <meta property="og:image" content="https://nicehuster.github.io/img/v2-422783ab5d5d66fd0dbf5653166ddbd8_720w.jpg">
 <meta property="og:image" content="https://nicehuster.github.io/img/image-20200917201033485.png">
 <meta property="og:image" content="https://nicehuster.github.io/img/image-20200917201132725.png">
 <meta property="og:image" content="https://nicehuster.github.io/img/image-20200917201255253.png">
 <meta property="og:image" content="https://nicehuster.github.io/img/1*TXfEPqTbFBPCbXYh2bstlA.png">
+<meta property="og:image" content="https://nicehuster.github.io/img/image-20200918110749081.png">
 <meta property="og:image" content="https://nicehuster.github.io/img/image-20200917201523395.png">
-<meta property="og:updated_time" content="2020-09-18T02:47:32.540Z">
+<meta property="og:updated_time" content="2020-09-18T03:15:23.384Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="抠图神器U^2-Net">
 <meta name="twitter:description" content="论文信息： Going Deeper with Nested U-Structure for Salient Object Detection代码链接：https://github.com/NathanUA/U-2-Net整体信息： 这是发表在PR2020上的一篇关于显著性检测的文章，作者是秦雪彬。从标题上可以看到本文的一个idea是设计了一个deeper的U型结构的网络解决显著性目标检测问题。作">
-<meta name="twitter:image" content="https://nicehuster.github.io/img/v2-422783ab5d5d66fd0dbf5653166ddbd8_720w.jpg">
+<meta name="twitter:image" content="https://nicehuster.github.io/img/image-20200918105536819.png">
 
 
 
@@ -385,8 +387,9 @@
       
 
       
-        <p><strong>论文信息：</strong> Going Deeper with Nested U-Structure for Salient Object Detection<br><strong>代码链接：</strong><a href="https://github.com/NathanUA/U-2-Net" target="_blank" rel="noopener">https://github.com/NathanUA/U-2-Net</a><br><strong>整体信息：</strong> 这是发表在PR2020上的一篇关于显著性检测的文章，作者是秦雪彬。从标题上可以看到本文的一个idea是设计了一个deeper的U型结构的网络解决显著性目标检测问题。作者认为，目前显著性目标检测有两种主流思路，一为多层次深层特征集成multi-level deep feature integration，一为多尺度特征提取Multi-scale feature extraction。多层次深层特征集成方法主要集中在开发更好的多层次特征聚合策略上。而多尺度特征提取这一类方法旨在设计更新的模块，从主干网获取的特征中同时提取局部和全局信息。而几乎所有上述方法，都是为了更好地利用现有的图像分类的Backbones生成的特征映射。而作者另辟蹊径，提出了一种新颖而简单的结构，它直接逐级提取多尺度特征，用于显著目标检测，而不是利用这些主干的特征来开发和添加更复杂的模块和策略。</p>
+        <p><strong>论文信息：</strong> Going Deeper with Nested U-Structure for Salient Object Detection<br><strong>代码链接：</strong><a href="https://github.com/NathanUA/U-2-Net" target="_blank" rel="noopener">https://github.com/NathanUA/U-2-Net</a><br><strong>整体信息：</strong> 这是发表在PR2020上的一篇关于显著性检测的文章，作者是秦雪彬。从标题上可以看到本文的一个idea是设计了一个deeper的U型结构的网络解决显著性目标检测问题。作者认为，目前显著性目标检测有两种主流思路，一为多层次深层特征集成multi-level deep feature integration，一为多尺度特征提取Multi-scale feature extraction。多层次深层特征集成方法主要集中在开发更好的多层次特征聚合策略上。而多尺度特征提取这一类方法旨在设计更新的模块，从主干网获取的特征中同时提取局部和全局信息。而几乎所有上述方法，都是为了更好地利用现有的图像分类的Backbones生成的特征映射。而作者另辟蹊径，提出了一种新颖而简单的结构，它直接逐级提取多尺度特征，用于显著目标检测，而不是利用这些主干的特征来开发和添加更复杂的模块和策略。下图是该方法与其他方法的一个比较：</p>
 <a id="more"></a>
+<p><img src="/img/image-20200918105536819.png" alt="image-20200918105536819"></p>
 <h3 id="显著性检测"><a href="#显著性检测" class="headerlink" title="显著性检测"></a>显著性检测</h3><p>在讲这篇文章之前，有必要先了解显著性检测这个任务。</p>
 <blockquote>
 <p><a href="https://zhuanlan.zhihu.com/p/115002897" target="_blank" rel="noopener">显著性检测</a></p>
@@ -403,7 +406,7 @@
 </ul>
 </blockquote>
 <p>其实，说白了，显著性检测等同于是一个二分类的语义分割模型，此外，显著的区域 不一定就是 目标，目标很可能不是显著的；</p>
-<h3 id="方法设计"><a href="#方法设计" class="headerlink" title="方法设计"></a>方法设计</h3><h4 id="Residual-U-blocks"><a href="#Residual-U-blocks" class="headerlink" title="Residual U-blocks"></a>Residual U-blocks</h4><p>了解了显著性检测这个任务之后，来具体了解一下这篇文章的具体方法设计。作者设计一种Residual U-blocks，用于提取不同层级的特征。</p>
+<h3 id="方法设计"><a href="#方法设计" class="headerlink" title="方法设计"></a>方法设计</h3><h4 id="Residual-U-blocks"><a href="#Residual-U-blocks" class="headerlink" title="Residual U-blocks"></a>Residual U-blocks</h4><p>了解了显著性检测这个任务之后，来具体了解一下这篇文章的具体方法设计。作者设计一种Residual U-blocks，用于捕获 intra-stage 的 multi-scales 特征。</p>
 <p><img src="/img/image-20200917201033485.png" alt="image-20200917201033485"></p>
 <p>上图为普通卷积block，Res-like block，Inception-like block，Dense-like block和Residual U-blocks的对比图，明显可以看出Residual U-blocks是受了U-Net的启发。</p>
 <p>Residual U-blocks有以下三部分组成：</p>
@@ -421,9 +424,21 @@
 <p>与U-Net的网络结构做一个对比：</p>
 <p><img src="/img/1*TXfEPqTbFBPCbXYh2bstlA.png" alt="Learn How to Train U-Net On Your Dataset | by Sukriti Paul | Coinmonks |  Medium"></p>
 <p>直观上可以发现，U^2-Net的每一个Block都是一个U-Net结构的模块，即上述Residual U-blocks。当然，你也可以继续Going Deeper, 每个Block里面的U-Net的子Block仍然可以是一个U-Net结构，命名为U^3-Net。</p>
-<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p>所提出的模型是使用DUTS-TR数据集进行训练，该数据集包含大约10000个样本图像，并使用标准数据增强技术进行扩充。研究人员在6个用于突出目标检测的基准数据集上评估了该模型：DUT-OMRON、DUTS-TE、HKU-IS、ECSSD、PASCAL-S和SOD。评价结果表明，在这6个基准点上，新模型与现有方法具有相当好的性能。</p>
-<p>U^2-Net的实现是开源的，并为两种不同的方法提供了预训练的模型：U^2-Net(176.3M的较大模型，在GTX 1080Ti GPU上为30 FPS）和一个仅为4.7mb的较小的U^2-Net版本，最高可达到40 FPS。代码和预训练模型都可以在<a href="https://github.com/NathanUA/U-2-Net" target="_blank" rel="noopener">Github</a>。下面是我直接用作者开源的模型跑出来的结果，抠图效果很好，精细到发丝的那种。</p>
+<h3 id="损失函数设计"><a href="#损失函数设计" class="headerlink" title="损失函数设计"></a>损失函数设计</h3><p>类似于HED算法的deep supervision方式，作者设计了如下函数：</p>
+<script type="math/tex; mode=display">
+\mathcal{L}=\sum_{m=1}^{M} w_{\text {side}}^{(m)} \ell_{\text {side}}^{(m)}+w_{\text {fuse}} \ell_{\text {fuse}}</script><p>其中，M=6, 为U2Net 的 Sup1, Sup2, …, Sup6 stage.$w_{\text {side}}^{(m)}$  $l_{\text {side}}^{(m)}$ 为对应的损失函数输出和权重；$w_{f u s e} \ell_{f u s e}$ 为融合的损失函数和权重;对于每一个$l$使用的都是标准的BCE Loss：</p>
+<script type="math/tex; mode=display">
+\ell=-\sum_{(r, c)}^{(H, W)}\left[P_{G(r, c)} \log P_{S(r, c)}+\left(1-P_{G(r, c)}\right) \log \left(1-P_{S(r, c)}\right)\right]</script><h3 id="实验可视化"><a href="#实验可视化" class="headerlink" title="实验可视化"></a>实验可视化</h3><p>所提出的模型是使用DUTS-TR数据集进行训练，该数据集包含大约10000个样本图像，并使用标准数据增强技术进行扩充。研究人员在6个用于突出目标检测的基准数据集上评估了该模型：DUT-OMRON、DUTS-TE、HKU-IS、ECSSD、PASCAL-S和SOD。评价结果表明，在这6个基准点上，新模型与现有方法具有相当好的性能。</p>
+<p><img src="/img/image-20200918110749081.png" alt="image-20200918110749081"></p>
+<p>U^2-Net的实现是开源的，并提供了两种不同的预训练模型：U2Net(176.3M的较大模型，在GTX 1080Ti GPU上为30 FPS)，以及U2NetP(4.7M小模型，最高可达到40 FPS)。代码和预训练模型都可以在<a href="https://github.com/NathanUA/U-2-Net" target="_blank" rel="noopener">Github</a>。下面是我直接用作者开源的模型跑出来的结果，抠图效果很好，精细到发丝的那种。</p>
 <p><img src="/img/image-20200917201523395.png" alt="image-20200917201523395"></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>该论文的优势在于：</p>
+<blockquote>
+<ul>
+<li>提出RSU模块，融合不同尺度感受野的特征，来捕捉不同尺度的上下文信息；</li>
+<li>基于 RSU 模块的 池化(pooling) 操作，在不显著增加计算成本的前提下，增加了整个网络结构的深度(depth).</li>
+</ul>
+</blockquote>
 
       
     </div>
@@ -640,7 +655,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#显著性检测"><span class="nav-number">1.</span> <span class="nav-text">显著性检测</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#显著性检测和图像分割区别"><span class="nav-number">1.1.</span> <span class="nav-text">显著性检测和图像分割区别</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法设计"><span class="nav-number">2.</span> <span class="nav-text">方法设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Residual-U-blocks"><span class="nav-number">2.1.</span> <span class="nav-text">Residual U-blocks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#U-2-Net的结构"><span class="nav-number">2.2.</span> <span class="nav-text">U^2-Net的结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">3.</span> <span class="nav-text">实验结果</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#显著性检测"><span class="nav-number">1.</span> <span class="nav-text">显著性检测</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#显著性检测和图像分割区别"><span class="nav-number">1.1.</span> <span class="nav-text">显著性检测和图像分割区别</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法设计"><span class="nav-number">2.</span> <span class="nav-text">方法设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Residual-U-blocks"><span class="nav-number">2.1.</span> <span class="nav-text">Residual U-blocks</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#U-2-Net的结构"><span class="nav-number">2.2.</span> <span class="nav-text">U^2-Net的结构</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#损失函数设计"><span class="nav-number">3.</span> <span class="nav-text">损失函数设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验可视化"><span class="nav-number">4.</span> <span class="nav-text">实验可视化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>

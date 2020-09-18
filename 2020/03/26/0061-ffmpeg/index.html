@@ -108,7 +108,7 @@
 <meta property="og:site_name" content="nicehuster&#39;s blog">
 <meta property="og:description" content="平时使用ffmpeg对视频解码成图片比较多，就稍微简单的了解一些ffmpeg常用的相关指令。下面是一些相关指令的介绍笔记。 安装Debian/Ubuntu/Linux Mint 下安装 ffmpeg 很简单： 1apt-get install ffmpeg 其他操作系统安装方法，参考官网 如果想要手工编译 ffmpeg 可以参考官方 wiki。 Ubuntu/Debian/Mint 系手工编译 f">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-09-13T06:54:12.000Z">
+<meta property="og:updated_time" content="2020-09-18T06:45:55.183Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ffmpeg常用指令笔记">
 <meta name="twitter:description" content="平时使用ffmpeg对视频解码成图片比较多，就稍微简单的了解一些ffmpeg常用的相关指令。下面是一些相关指令的介绍笔记。 安装Debian/Ubuntu/Linux Mint 下安装 ffmpeg 很简单： 1apt-get install ffmpeg 其他操作系统安装方法，参考官网 如果想要手工编译 ffmpeg 可以参考官方 wiki。 Ubuntu/Debian/Mint 系手工编译 f">
@@ -383,10 +383,10 @@
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-<span class="builtin-name">get</span> install ffmpeg</span><br></pre></td></tr></table></figure>
 <p>其他操作系统安装方法，参考<a href="https://www.ffmpeg.org/download.html" target="_blank" rel="noopener">官网</a></p>
 <p>如果想要手工编译 ffmpeg 可以参考官方 <a href="https://trac.ffmpeg.org/wiki#CompilingFFmpeg" target="_blank" rel="noopener">wiki</a>。 Ubuntu/Debian/Mint 系手工编译 ffmpeg 参考 <a href="https://trac.ffmpeg.org/wiki/CompilationGuide/Ubuntu" target="_blank" rel="noopener">wiki</a>。</p>
+<a id="more"></a>
 <h3 id="常用指令"><a href="#常用指令" class="headerlink" title="常用指令"></a>常用指令</h3><h4 id="1-显示文件信息"><a href="#1-显示文件信息" class="headerlink" title="1.显示文件信息"></a>1.显示文件信息</h4><p>显示视频信息</p>
 <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -<span class="selector-tag">i</span> <span class="selector-tag">input</span>.avi</span><br></pre></td></tr></table></figure>
-<h4 id="2-将视频拆分图片-批量截图"><a href="#2-将视频拆分图片-批量截图" class="headerlink" title="2.将视频拆分图片 批量截图"></a>2.将视频拆分图片 批量截图</h4><a id="more"></a>
-<p>将视频拆分多张图片，每一帧图片，保存到 frames 文件夹下，命名 frame001.png 这种。可以加上 -r 参数以用来限制每秒的帧数，<code>-r 10</code> 就表示每秒 10 帧。</p>
+<h4 id="2-将视频拆分图片-批量截图"><a href="#2-将视频拆分图片-批量截图" class="headerlink" title="2.将视频拆分图片 批量截图"></a>2.将视频拆分图片 批量截图</h4><p>将视频拆分多张图片，每一帧图片，保存到 frames 文件夹下，命名 frame001.png 这种。可以加上 -r 参数以用来限制每秒的帧数，<code>-r 10</code> 就表示每秒 10 帧。</p>
 <figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -<span class="built_in">i</span> input.mp4 frames/frame<span class="comment">%03d.png</span></span><br></pre></td></tr></table></figure>
 <h4 id="3-图片合成视频"><a href="#3-图片合成视频" class="headerlink" title="3.图片合成视频"></a>3.图片合成视频</h4><p>将多张图片合成视频</p>
 <figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ffmpeg -<span class="built_in">i</span> frames/frame<span class="comment">%3d.png output.mp4</span></span><br></pre></td></tr></table></figure>
@@ -534,7 +534,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-count">72</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

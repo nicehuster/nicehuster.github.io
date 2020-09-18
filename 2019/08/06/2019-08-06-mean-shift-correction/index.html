@@ -82,7 +82,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="mean shift,">
 
 
 
@@ -100,16 +100,18 @@
 
 
 
-<meta name="description" content="欢迎来到 刘文龙（@nicehuster）的博客。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="nicehuster&#39;s blog">
-<meta property="og:url" content="https://nicehuster.github.io/tags/hexo/index.html">
+<meta name="description" content="上一篇文章主要介绍了mean-shift算法理论以及在cv领域的应用比如，聚类，分割，跟踪。这篇文章主要介绍我在实际项目中使用mean-shift算法解决颜色校正问题。">
+<meta name="keywords" content="mean shift">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mean-shift颜色校正">
+<meta property="og:url" content="https://nicehuster.github.io/2019/08/06/2019-08-06-mean-shift-correction/index.html">
 <meta property="og:site_name" content="nicehuster&#39;s blog">
-<meta property="og:description" content="欢迎来到 刘文龙（@nicehuster）的博客。">
+<meta property="og:description" content="上一篇文章主要介绍了mean-shift算法理论以及在cv领域的应用比如，聚类，分割，跟踪。这篇文章主要介绍我在实际项目中使用mean-shift算法解决颜色校正问题。">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-09-18T07:08:22.461Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="nicehuster&#39;s blog">
-<meta name="twitter:description" content="欢迎来到 刘文龙（@nicehuster）的博客。">
+<meta name="twitter:title" content="mean-shift颜色校正">
+<meta name="twitter:description" content="上一篇文章主要介绍了mean-shift算法理论以及在cv领域的应用比如，聚类，分割，跟踪。这篇文章主要介绍我在实际项目中使用mean-shift算法解决颜色校正问题。">
 
 
 
@@ -138,13 +140,13 @@
 
 
 
-  <link rel="canonical" href="https://nicehuster.github.io/tags/hexo/">
+  <link rel="canonical" href="https://nicehuster.github.io/2019/08/06/2019-08-06-mean-shift-correction/">
 
 
 
 
 
-  <title>标签: hexo | nicehuster's blog</title>
+  <title>mean-shift颜色校正 | nicehuster's blog</title>
   
 
 
@@ -169,7 +171,7 @@
     
   
 
-  <div class="container sidebar-position-left  ">
+  <div class="container sidebar-position-left page-post-detail ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -273,52 +275,173 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block tag">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>hexo<small>标签</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.github.io/2019/08/06/2019-08-06-mean-shift-correction/">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="nicehuster's blog">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2018/05/01/0014-blog/" itemprop="url">
-              
-                <span itemprop="name">hexo教程：将个人博客部署到GitHubPage过程记录</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">mean-shift颜色校正</h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-05-01T18:13:39+08:00" content="2018-05-01">
-          05-01
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-06T19:13:39+08:00">
+                2019-08-06
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/project/" itemprop="url" rel="index">
+                    <span itemprop="name">project</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
-    </div>
+      
 
+      
+        <p>上一篇文章主要介绍了mean-shift算法理论以及在cv领域的应用比如，聚类，分割，跟踪。这篇文章主要介绍我在实际项目中使用mean-shift算法解决颜色校正问题。</p>
+<a id="more"></a>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mean-shift/" rel="tag"># mean shift</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/05/mean-shift/" rel="next" title="mean-shift算法详解">
+                <i class="fa fa-chevron-left"></i> mean-shift算法详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/18/0060-bash-parallel/" rel="prev" title="bash命令并行">
+                bash命令并行 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -326,6 +449,10 @@
 
 
           
+  <div class="comments" id="comments">
+    
+  </div>
+
 
         </div>
         
@@ -562,10 +689,10 @@
   
 
   
-    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
 
-  
+
 
   
 

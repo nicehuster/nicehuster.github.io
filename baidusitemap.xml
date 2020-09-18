@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://nicehuster.github.io/2019/08/05/mean-shift/</loc>
+    <lastmod>2020-09-18</lastmod>
+  </url>
+  <url>
     <loc>https://nicehuster.github.io/2020/09/07/0064-U-2-Net/</loc>
     <lastmod>2020-09-18</lastmod>
   </url>
@@ -205,7 +209,7 @@
     <lastmod>2020-09-15</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2018/03/09/0002-dl_environ/</loc>
+    <loc>https://nicehuster.github.io/2018/03/19/0004-ARTNet/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
@@ -213,11 +217,7 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2018/03/19/0004-ARTNet/</loc>
-    <lastmod>2020-09-13</lastmod>
-  </url>
-  <url>
-    <loc>https://nicehuster.github.io/2018/07/08/0017-caffe/</loc>
+    <loc>https://nicehuster.github.io/2018/03/09/0002-dl_environ/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
@@ -225,11 +225,7 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2018/07/13/0022-leetcode_tree/</loc>
-    <lastmod>2020-09-13</lastmod>
-  </url>
-  <url>
-    <loc>https://nicehuster.github.io/2018/07/15/0023-leetcode_stack_and_queue/</loc>
+    <loc>https://nicehuster.github.io/2018/07/08/0017-caffe/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
@@ -237,7 +233,7 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2018/07/26/0026-tensorRT_introduce/</loc>
+    <loc>https://nicehuster.github.io/2018/07/15/0023-leetcode_stack_and_queue/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
@@ -245,11 +241,19 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
+    <loc>https://nicehuster.github.io/2018/07/13/0022-leetcode_tree/</loc>
+    <lastmod>2020-09-13</lastmod>
+  </url>
+  <url>
+    <loc>https://nicehuster.github.io/2018/07/26/0026-tensorRT_introduce/</loc>
+    <lastmod>2020-09-13</lastmod>
+  </url>
+  <url>
     <loc>https://nicehuster.github.io/2018/07/29/0028-tensorRT_customlayer/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2018/08/02/0029-leetcode_dynamic/</loc>
+    <loc>https://nicehuster.github.io/2018/07/27/0027-tensorRT_usage/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
@@ -257,7 +261,7 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2018/07/27/0027-tensorRT_usage/</loc>
+    <loc>https://nicehuster.github.io/2018/08/02/0029-leetcode_dynamic/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
@@ -273,11 +277,11 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2020/03/26/0061-ffmpeg/</loc>
+    <loc>https://nicehuster.github.io/2019/06/12/0058-fine-grain/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2019/06/12/0058-fine-grain/</loc>
+    <loc>https://nicehuster.github.io/2020/03/26/0061-ffmpeg/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
 </urlset> 

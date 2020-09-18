@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://nicehuster.github.io/2018/08/08/0032-neural_style2/</loc>
+    
+    <lastmod>2020-09-18T07:55:56.782Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://nicehuster.github.io/2018/08/07/0031-neural_style/</loc>
+    
+    <lastmod>2020-09-18T07:55:44.629Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://nicehuster.github.io/2018/08/23/0035-leetcode_island/</loc>
     
     <lastmod>2020-09-18T07:54:44.597Z</lastmod>
@@ -268,20 +282,6 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/08/08/0032-neural_style2/</loc>
-    
-    <lastmod>2020-09-18T02:33:29.250Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://nicehuster.github.io/2018/08/07/0031-neural_style/</loc>
-    
-    <lastmod>2020-09-18T02:32:51.050Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://nicehuster.github.io/2018/07/22/0024-mobilenet/</loc>
     
     <lastmod>2020-09-18T02:32:04.418Z</lastmod>
@@ -464,14 +464,14 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/07/29/0028-tensorRT_customlayer/</loc>
+    <loc>https://nicehuster.github.io/2018/07/27/0027-tensorRT_usage/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/07/27/0027-tensorRT_usage/</loc>
+    <loc>https://nicehuster.github.io/2018/07/29/0028-tensorRT_customlayer/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -513,14 +513,14 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/tags/index.html</loc>
+    <loc>https://nicehuster.github.io/categories/index.html</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/categories/index.html</loc>
+    <loc>https://nicehuster.github.io/tags/index.html</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     

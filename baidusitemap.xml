@@ -237,15 +237,19 @@
     <lastmod>2020-09-15</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2018/03/19/0004-ARTNet/</loc>
-    <lastmod>2020-09-13</lastmod>
-  </url>
-  <url>
     <loc>https://nicehuster.github.io/2018/03/09/0002-dl_environ/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
+    <loc>https://nicehuster.github.io/2018/03/19/0004-ARTNet/</loc>
+    <lastmod>2020-09-13</lastmod>
+  </url>
+  <url>
     <loc>https://nicehuster.github.io/2018/07/08/0017-caffe/</loc>
+    <lastmod>2020-09-13</lastmod>
+  </url>
+  <url>
+    <loc>https://nicehuster.github.io/2018/07/25/0025-tensorRT_install/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
@@ -254,10 +258,6 @@
   </url>
   <url>
     <loc>https://nicehuster.github.io/2018/07/27/0027-tensorRT_usage/</loc>
-    <lastmod>2020-09-13</lastmod>
-  </url>
-  <url>
-    <loc>https://nicehuster.github.io/2018/07/25/0025-tensorRT_install/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
@@ -273,11 +273,11 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2019/06/12/0058-fine-grain/</loc>
+    <loc>https://nicehuster.github.io/2019/05/16/0057-zero-game/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://nicehuster.github.io/2019/05/16/0057-zero-game/</loc>
+    <loc>https://nicehuster.github.io/2019/06/12/0058-fine-grain/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
 </urlset> 

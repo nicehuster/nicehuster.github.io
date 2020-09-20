@@ -457,13 +457,6 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.github.io/2018/07/26/0026-tensorRT_introduce/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://nicehuster.github.io/2018/07/27/0027-tensorRT_usage/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
@@ -472,6 +465,13 @@
   
   <url>
     <loc>https://nicehuster.github.io/2018/07/29/0028-tensorRT_customlayer/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://nicehuster.github.io/2018/07/26/0026-tensorRT_introduce/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     

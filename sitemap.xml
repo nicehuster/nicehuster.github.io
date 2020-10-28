@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://nicehuster.cn/2020/10/27/2020-10-27-detr/</loc>
+    
+    <lastmod>2020-10-28T08:49:02.649Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://nicehuster.cn/2018/08/03/0030-leetcode_dynamic2/</loc>
     
     <lastmod>2020-09-23T16:54:09.319Z</lastmod>
@@ -450,13 +457,6 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.cn/2018/07/26/0026-tensorRT_introduce/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://nicehuster.cn/2018/07/25/0025-tensorRT_install/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
@@ -464,7 +464,7 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.cn/2018/07/27/0027-tensorRT_usage/</loc>
+    <loc>https://nicehuster.cn/2018/07/26/0026-tensorRT_introduce/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -472,6 +472,13 @@
   
   <url>
     <loc>https://nicehuster.cn/2018/07/29/0028-tensorRT_customlayer/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://nicehuster.cn/2018/07/27/0027-tensorRT_usage/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -492,14 +499,14 @@
   </url>
   
   <url>
-    <loc>https://nicehuster.cn/2019/05/16/0057-zero-game/</loc>
+    <loc>https://nicehuster.cn/2019/06/12/0058-fine-grain/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://nicehuster.cn/2019/06/12/0058-fine-grain/</loc>
+    <loc>https://nicehuster.cn/2019/05/16/0057-zero-game/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     

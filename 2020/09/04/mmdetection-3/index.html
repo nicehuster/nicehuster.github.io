@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="mmdetection,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="数据处理数据处理可能是炼丹师接触最为密集的了，因为通常情况，除了数据的离线处理，写个数据类，就可以炼丹了。但本节主要涉及数据的在线处理，更进一步应该是检测分割数据的 pytorch 处理方式。虽然 mmdet 将常用的数据都实现了，而且也实现了中间通用数据格式，但，这和模型，损失函数，性能评估的实现也相关，比如你想把官网的 centernet 完整的改成 mmdet风格，就能看到 (看起来没必要)">
+<meta name="keywords" content="mmdetection">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mmdetection详解指北 (三)">
+<meta property="og:url" content="https://nicehuster.cn/2020/09/04/mmdetection-3/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="数据处理数据处理可能是炼丹师接触最为密集的了，因为通常情况，除了数据的离线处理，写个数据类，就可以炼丹了。但本节主要涉及数据的在线处理，更进一步应该是检测分割数据的 pytorch 处理方式。虽然 mmdet 将常用的数据都实现了，而且也实现了中间通用数据格式，但，这和模型，损失函数，性能评估的实现也相关，比如你想把官网的 centernet 完整的改成 mmdet风格，就能看到 (看起来没必要)">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2020-09-18T07:19:41.114Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mmdetection详解指北 (三)">
+<meta name="twitter:description" content="数据处理数据处理可能是炼丹师接触最为密集的了，因为通常情况，除了数据的离线处理，写个数据类，就可以炼丹了。但本节主要涉及数据的在线处理，更进一步应该是检测分割数据的 pytorch 处理方式。虽然 mmdet 将常用的数据都实现了，而且也实现了中间通用数据格式，但，这和模型，损失函数，性能评估的实现也相关，比如你想把官网的 centernet 完整的改成 mmdet风格，就能看到 (看起来没必要)">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.cn/2020/09/04/mmdetection-3/">
+
+
+
+
+
+  <title>mmdetection详解指北 (三) | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/04/mmdetection-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">mmdetection详解指北 (三)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-04T19:15:39+08:00">
+                2020-09-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mmdetection/" itemprop="url" rel="index">
+                    <span itemprop="name">mmdetection</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="数据处理"><a href="#数据处理" class="headerlink" title="数据处理"></a>数据处理</h3><p>数据处理可能是炼丹师接触最为密集的了，因为通常情况，除了数据的离线处理，写个数据类，就可以炼丹了。但本节主要涉及数据的在线处理，更进一步应该是检测分割数据的 pytorch 处理方式。虽然 mmdet 将常用的数据都实现了，而且也实现了中间通用数据格式，但，这和模型，损失函数，性能评估的实现也相关，比如你想把官网的 centernet 完整的改成 mmdet风格，就能看到 (看起来没必要)。</p>
+<a id="more"></a>
+<h4 id="CustomDataset"><a href="#CustomDataset" class="headerlink" title="CustomDataset"></a>CustomDataset</h4><p>看看配置文件，数据相关的有 data dict，里面包含了 train,val,test 的路径信息，用于数据类初始化, 有 pipeline，将各个函数及对应参数以字典形式放到列表里，是对 pytorch 原装的 transforms+compose，在检测，分割相关数据上的一次封装，使得形式更加统一。</p>
+<p>从 builder.py 中 build_dataset 函数能看到，构建数据有三种方式，ConcatDataset，RepeatDataset 和从注册器中提取。其中 dataset_wrappers.py中 ConcatDataset 和 RepeatDataset 意义自明，前者继承自 pytorch 原始的ConcatDataset，将多个数据集整合到一起，具体为把不同序列（ 可参考<a href="https://docs.python.org/zh-cn/3/library/collections.abc.html" target="_blank" rel="noopener">容器的抽象基类</a>) 的长度相加<strong>getitem</strong> 函数对应 index 替换一下。后者就是单个数据类 (序列) 的多次重复。就功能来说，前者提高数据丰富度，后者可解决数据太少使得 loading 时间长的问题 (见代码注释)。而被注册的数据类在 datasets 下一些熟知的数据名文件中。其中，基类为 custom.py 中的 CustomDataset，coco 继承自它，cityscapes 继承自 coco，xml_style 的XMLDataset 继承 CustomDataset，然后 wider_face，voc 均继承自 XMLDataset。因此这里先分析一下CustomDataset。</p>
+<p>CustomDataset 记录数据路径等信息，解析标注文件，将每一张图的所有信息以字典作为数据结构存在 results 中，然后进入pipeline: 数据增强相关操作，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@DATASETS.register_module()</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CustomDataset</span><span class="params">(Dataset)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(...)</span>:</span></span><br><span class="line">        ...</span><br><span class="line">        self.pipeline = Compose(pipeline)</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">pre_pipeline</span><span class="params">(self, results)</span>:</span></span><br><span class="line">        <span class="string">"""Prepare results dict for pipeline."""</span></span><br><span class="line">        results[<span class="string">'img_prefix'</span>] = self.img_prefix</span><br><span class="line">        results[<span class="string">'seg_prefix'</span>] = self.seg_prefix</span><br><span class="line">        results[<span class="string">'proposal_file'</span>] = self.proposal_file</span><br><span class="line">        results[<span class="string">'bbox_fields'</span>] = []</span><br><span class="line">        results[<span class="string">'mask_fields'</span>] = []</span><br><span class="line">        results[<span class="string">'seg_fields'</span>] = []</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">prepare_train_img</span><span class="params">(self, idx)</span>:</span></span><br><span class="line">        <span class="string">"""Get training data and annotations after pipeline.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        Args:</span></span><br><span class="line"><span class="string">            idx (int): Index of data.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        Returns:</span></span><br><span class="line"><span class="string">            dict: Training data and annotation after pipeline with new keys \</span></span><br><span class="line"><span class="string">                introduced by pipeline.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line"></span><br><span class="line">        img_info = self.data_infos[idx]</span><br><span class="line">        ann_info = self.get_ann_info(idx)</span><br><span class="line">        <span class="comment"># 基本信息，初始化字典</span></span><br><span class="line">        results = dict(img_info=img_info, ann_info=ann_info)</span><br><span class="line">        <span class="keyword">if</span> self.proposals <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">            results[<span class="string">'proposals'</span>] = self.proposals[idx]</span><br><span class="line">        self.pre_pipeline(results)</span><br><span class="line">        <span class="keyword">return</span> self.pipeline(results) <span class="comment"># 数据增强等</span></span><br></pre></td></tr></table></figure>
+<p>这里数据结构的选取需要注意一下，字典结构，在数据增强库 albu 中也是如此处理，因此可以快速替换为 albu 中的算法。另外每个数据类增加了各自的 evaluate 函数。evaluate 基础函数在 mmdet.core.evaluation 中，后做补充。</p>
+<p>mmdet 的数<strong>据处理，字典结构，pipeline，evaluate</strong> 是三个关键部分。其他所有类的文件解析部分，数据筛选等，看看即可。因为我们知道，pytorch读取数据，是将序列转化为迭代器后进行 io 操作，所以在 dataset 下除了pipelines 外还有 loader 文件夹，里面实现了分组，分布式分组采样方法，以及调用了 mmcv 中的 collate 函数 (此处为 1.x 版本，2.0 版本将 loader移植到了 builder.py 中)，且 build_dataloader 封装的 DataLoader 最后在train_detector 中被调用，这部分将在后面补充，这里说说 pipelines。</p>
+<h4 id="data-config"><a href="#data-config" class="headerlink" title="data_config"></a>data_config</h4><p>返回 maskrcnn 的配置文件 (1.x,2.0 看 base config)，可以看到训练和测试的不同之处：LoadAnnotations，MultiScaleFlipAug，DefaultFormatBundle 和 Collect。额外提示，虽然测试没有 LoadAnnotations，根据 CustomDataset 可知，它仍需标注文件，这和 inference 的 pipeline 不同，也即这里的 test 实为 evaluate。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 序列中的dict可以随意删减，增加，属于数据增强调参内容</span></span><br><span class="line">train_pipeline = [</span><br><span class="line">    dict(type=<span class="string">'LoadImageFromFile'</span>),</span><br><span class="line">    dict(type=<span class="string">'LoadAnnotations'</span>, with_bbox=<span class="keyword">True</span>),</span><br><span class="line">    dict(type=<span class="string">'Resize'</span>, img_scale=(<span class="number">1333</span>, <span class="number">800</span>), keep_ratio=<span class="keyword">True</span>),</span><br><span class="line">    dict(type=<span class="string">'RandomFlip'</span>, flip_ratio=<span class="number">0.5</span>),</span><br><span class="line">    dict(type=<span class="string">'Normalize'</span>, **img_norm_cfg),</span><br><span class="line">    dict(type=<span class="string">'Pad'</span>, size_divisor=<span class="number">32</span>),</span><br><span class="line">    dict(type=<span class="string">'DefaultFormatBundle'</span>),</span><br><span class="line">    dict(type=<span class="string">'Collect'</span>, keys=[<span class="string">'img'</span>, <span class="string">'gt_bboxes'</span>, <span class="string">'gt_labels'</span>]),</span><br><span class="line">]</span><br><span class="line">test_pipeline = [</span><br><span class="line">    dict(type=<span class="string">'LoadImageFromFile'</span>),</span><br><span class="line">    dict(</span><br><span class="line">        type=<span class="string">'MultiScaleFlipAug'</span>,</span><br><span class="line">        img_scale=(<span class="number">1333</span>, <span class="number">800</span>),</span><br><span class="line">        flip=<span class="keyword">False</span>,</span><br><span class="line">        transforms=[</span><br><span class="line">            dict(type=<span class="string">'Resize'</span>, keep_ratio=<span class="keyword">True</span>),</span><br><span class="line">            dict(type=<span class="string">'RandomFlip'</span>),</span><br><span class="line">            dict(type=<span class="string">'Normalize'</span>, **img_norm_cfg),</span><br><span class="line">            dict(type=<span class="string">'Pad'</span>, size_divisor=<span class="number">32</span>),</span><br><span class="line">            dict(type=<span class="string">'ImageToTensor'</span>, keys=[<span class="string">'img'</span>]),</span><br><span class="line">            dict(type=<span class="string">'Collect'</span>, keys=[<span class="string">'img'</span>]),</span><br><span class="line">        ])</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>最后这些所有操作被 Compose 串联起来，代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PIPELINES.register_module()</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Compose</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, transforms)</span>:</span></span><br><span class="line">        <span class="keyword">assert</span> isinstance(transforms, collections.abc.Sequence) <span class="comment">#列表是序列结构</span></span><br><span class="line">        self.transforms = []</span><br><span class="line">        <span class="keyword">for</span> transform <span class="keyword">in</span> transforms:</span><br><span class="line">            <span class="keyword">if</span> isinstance(transform, dict):</span><br><span class="line">                transform = build_from_cfg(transform, PIPELINES)</span><br><span class="line">                self.transforms.append(transform)</span><br><span class="line">            <span class="keyword">elif</span> callable(transform):</span><br><span class="line">                self.transforms.append(transform)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">raise</span> TypeError(<span class="string">'transform must be callable or a dict'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__call__</span><span class="params">(self, data)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> t <span class="keyword">in</span> self.transforms:</span><br><span class="line">            data = t(data)</span><br><span class="line">            <span class="keyword">if</span> data <span class="keyword">is</span> <span class="keyword">None</span>:</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">None</span></span><br><span class="line">        <span class="keyword">return</span> data</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__repr__</span><span class="params">(self)</span>:</span></span><br><span class="line">        format_string = self.__class__.__name__ + <span class="string">'('</span></span><br><span class="line">        <span class="keyword">for</span> t <span class="keyword">in</span> self.transforms:</span><br><span class="line">            format_string += <span class="string">'\n'</span></span><br><span class="line">            format_string += <span class="string">f'    <span class="subst">&#123;t&#125;</span>'</span></span><br><span class="line">        format_string += <span class="string">'\n)'</span></span><br><span class="line">        <span class="keyword">return</span> format_string</span><br></pre></td></tr></table></figure>
+<p>上面代码能看到，配置文件中 pipeline 中的字典传入 build_from_cfg 函数，逐一实现了各个增强类 (方法)。扩展的增强类均需实现 <strong>call</strong> 方法，这和 pytorch 原始方法是一致的。有了以上认识，重新梳理一下 pipelines 的逻辑，由三部分组成，load，transforms，和 format。load 相关的 LoadImageFromFile，LoadAnnotations都是字典 results 进去，字典 results 出来。具体代码看下便知，LoadImageFromFile 增加了’filename’，’img’，’img_shape’，’ori_shape’,’pad_shape’,’scale_factor’,’img_norm_cfg’ 字段。其中 img 是 numpy 格式。LoadAnnotations 从 results[’ann_info’] 中解析出 bboxs,masks,labels 等信息。注意 coco 格式的原始解析来自 pycocotools，包括其评估方法，这里关键是字典结构 (这个和模型损失函数，评估等相关，统一结构，使得代码统一)。transforms 中的类作用于字典的 values，也即数据增强。format 中的 DefaultFormatBundle 是将数据转成 mmcv 扩展的容器类格式 DataContainer。另外 Collect 会根据不同任务的不同配置，从 results 中选取只含 keys 的信息生成新的字典，具体看下该类帮助文档。</p>
+<h4 id="DataContainer"><a href="#DataContainer" class="headerlink" title="DataContainer"></a>DataContainer</h4><p>那么 DataContainer 是什么呢？它是对 tensor 的封装，将 results 中的 tensor 转成 DataContainer 格式，实际上只是增加了几个 property 函数，cpu_only，stack，padding_value，pad_dims，其含义自明，以及 size，dim用来获取数据的维度，形状信息。考虑到序列数据在进入 DataLoader 时，需要以 batch 方式进入模型，那么通常的 collate_fn 会要求 tensor 数据的形状一致。但是这样不是很方便，于是有了 DataContainer。它可以做到载入 GPU 的数据可以保持统一 shape，并被 stack，也可以不 stack，也可以保持原样，或者在非 batch 维度上做 pad。当然这个也要对 default_collate进行改造，mmcv 在 parallel.collate 中实现了这个。</p>
+<p>collate_fn 是 DataLoader 中将序列 dataset 组织成 batch 大小的函数，这里帖三个普通例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">collate_fn_1</span><span class="params">(batch)</span> :</span></span><br><span class="line">    <span class="comment"># 这 是 默 认 的， 明 显batch中 包 含 相 同 形 状 的img\_tensor和 label</span></span><br><span class="line">    <span class="keyword">return</span> tuple ( zip(*batch))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">coco_collate_2</span><span class="params">(batch)</span> :</span></span><br><span class="line">    <span class="comment"># 传 入 的batch数 据 是 被albu增 强 后 的(字 典 结 构)</span></span><br><span class="line">    imgs = [s [ ’image’ ] <span class="keyword">for</span> s <span class="keyword">in</span> batch] </span><br><span class="line">    annots = [s [ ’bboxes’ ] <span class="keyword">for</span> s <span class="keyword">in</span> batch]</span><br><span class="line">    labels = [s [ ’category_id’ ] <span class="keyword">for</span> s <span class="keyword">in</span> batch]</span><br><span class="line">    <span class="comment"># 以 当 前batch中 图 片annot数 量 的 最 大 值 作 为 标 记 数 据 的 第 二 维 度 值， 空 出 的 就补−1</span></span><br><span class="line">    max_num_annots = max( len (annot) <span class="keyword">for</span> annot <span class="keyword">in</span> annots)</span><br><span class="line">    annot_padded = np. ones (( len (annots) , max_num_annots, <span class="number">5</span>))*−<span class="number">1</span></span><br><span class="line">    <span class="keyword">if</span> max_num_annots &gt; <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">for</span> idx , (annot , lab) <span class="keyword">in</span> enumerate( zip (annots , labels )) :</span><br><span class="line">            <span class="keyword">if</span> len (annot) &gt; <span class="number">0</span>:</span><br><span class="line">                annot_padded[idx,:len(annot),:<span class="number">4</span>] = annot</span><br><span class="line">                annot_padded[idx,:len(annot),<span class="number">2</span>] += annot_padded[idx,:len(annot),<span class="number">0</span>]</span><br><span class="line">                annot_padded[idx,:len(annot),<span class="number">3</span>] += annot_padded[idx,:len(annot),<span class="number">1</span>]</span><br><span class="line">                annot_padded[idx,:len(annot),:] /= <span class="number">640</span></span><br><span class="line">    			annot_padded[idx,:len(annot),<span class="number">4</span>] = lab</span><br><span class="line">   <span class="keyword">return</span> torch.stack(imgs,<span class="number">0</span>), torch.FloatTensor(annot_padded)   </span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">detection_collate_3</span><span class="params">(batch)</span> :</span></span><br><span class="line">    targets = []</span><br><span class="line">    imgs = [ ]</span><br><span class="line">    <span class="keyword">for</span> _, sample <span class="keyword">in</span> enumerate(batch) :</span><br><span class="line">        <span class="keyword">for</span> _, img_anno <span class="keyword">in</span> enumerate(sample) :</span><br><span class="line">            <span class="keyword">if</span> torch.is_tensor(img_anno) :</span><br><span class="line">                imgs.append(img_anno)</span><br><span class="line">           	<span class="keyword">elif</span> isinstance(img_anno, np.ndarray) :  </span><br><span class="line">                annos = torch.from_numpy(img_anno).float()</span><br><span class="line">                targets.append(annos)</span><br><span class="line">   <span class="keyword">return</span> torch.stack(imgs,<span class="number">0</span>), targets <span class="comment"># 做了stack，DataContainer可以不做 stack</span></span><br></pre></td></tr></table></figure>
+<p>以上就是数据处理的相关内容。最后再用 DataLoader 封装拆成迭代器，其相关细节，sampler 等暂略。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">data_loader = DataLoader(</span><br><span class="line">        dataset,</span><br><span class="line">        batch_size=batch_size,</span><br><span class="line">        sampler=sampler,</span><br><span class="line">        num_workers=num_workers,</span><br><span class="line">        collate_fn=partial(collate, samples_per_gpu=samples_per_gpu),</span><br><span class="line">        pin_memory=<span class="keyword">False</span>,</span><br><span class="line">        worker_init_fn=init_fn,</span><br><span class="line">        **kwargs)</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mmdetection/" rel="tag"># mmdetection</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/09/03/mmdetection-2/" rel="next" title="mmdetection详解指北 (二)">
+                <i class="fa fa-chevron-left"></i> mmdetection详解指北 (二)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/09/05/minidelay-detection/" rel="prev" title="论文阅读：Minimum Delay Object Detection from Video">
+                论文阅读：Minimum Delay Object Detection from Video <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#数据处理"><span class="nav-number">1.</span> <span class="nav-text">数据处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CustomDataset"><span class="nav-number">1.1.</span> <span class="nav-text">CustomDataset</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#data-config"><span class="nav-number">1.2.</span> <span class="nav-text">data_config</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DataContainer"><span class="nav-number">1.3.</span> <span class="nav-text">DataContainer</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

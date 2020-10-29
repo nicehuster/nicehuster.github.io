@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="STL,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="这篇博客接着上一篇博客，继续记录的是关于STL的一些使实用操作函数。 全排列全排列这部分还是接着上面博客的最后一道题讲。 例题、LeetCode 60 Permutation Sequence给定n和k，返回第k个序列排列，n的取值为1到9之间。总共有(n)!中排列。同样通过举例分析比较容易理解。思路：假设n=4,k=17，这时所有的排列如下：">
+<meta name="keywords" content="STL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeetCode：STL中实用函数（二）">
+<meta property="og:url" content="https://nicehuster.cn/2018/08/17/leetcode_stl2/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="这篇博客接着上一篇博客，继续记录的是关于STL的一些使实用操作函数。 全排列全排列这部分还是接着上面博客的最后一道题讲。 例题、LeetCode 60 Permutation Sequence给定n和k，返回第k个序列排列，n的取值为1到9之间。总共有(n)!中排列。同样通过举例分析比较容易理解。思路：假设n=4,k=17，这时所有的排列如下：">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.cn/img/lower_bound.png">
+<meta property="og:image" content="https://nicehuster.cn/img/250px-Sudoku-by-L2G-20050714.svg.png">
+<meta property="og:image" content="https://nicehuster.cn/img/sudo1.png">
+<meta property="og:image" content="https://nicehuster.cn/img/sudo2.png">
+<meta property="og:updated_time" content="2020-09-18T11:43:30.066Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LeetCode：STL中实用函数（二）">
+<meta name="twitter:description" content="这篇博客接着上一篇博客，继续记录的是关于STL的一些使实用操作函数。 全排列全排列这部分还是接着上面博客的最后一道题讲。 例题、LeetCode 60 Permutation Sequence给定n和k，返回第k个序列排列，n的取值为1到9之间。总共有(n)!中排列。同样通过举例分析比较容易理解。思路：假设n=4,k=17，这时所有的排列如下：">
+<meta name="twitter:image" content="https://nicehuster.cn/img/lower_bound.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.cn/2018/08/17/leetcode_stl2/">
+
+
+
+
+
+  <title>LeetCode：STL中实用函数（二） | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2018/08/17/leetcode_stl2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">LeetCode：STL中实用函数（二）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-08-17T19:13:39+08:00">
+                2018-08-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/刷题/" itemprop="url" rel="index">
+                    <span itemprop="name">刷题</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>这篇博客接着上一篇博客，继续记录的是关于STL的一些使实用操作函数。</p>
+<h3 id="全排列"><a href="#全排列" class="headerlink" title="全排列"></a>全排列</h3><p>全排列这部分还是接着上面博客的最后一道题讲。</p>
+<h4 id="例题、LeetCode-60-Permutation-Sequence"><a href="#例题、LeetCode-60-Permutation-Sequence" class="headerlink" title="例题、LeetCode 60 Permutation Sequence"></a>例题、<a href="https://leetcode.com/problems/permutation-sequence/description/" target="_blank" rel="noopener">LeetCode 60 Permutation Sequence</a></h4><p>给定n和k，返回第k个序列排列，n的取值为1到9之间。总共有(n)!中排列。同样通过举例分析比较容易理解。<br>思路：假设n=4,k=17，这时所有的排列如下：</p>
+<a id="more"></a>
+<figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">1234</span></span><br><span class="line"><span class="number">1243</span></span><br><span class="line"><span class="number">1324</span></span><br><span class="line"><span class="number">1342</span></span><br><span class="line"><span class="number">1423</span></span><br><span class="line"><span class="number">1432</span></span><br><span class="line"><span class="number">2134</span></span><br><span class="line"><span class="number">2143</span></span><br><span class="line"><span class="number">2314</span> </span><br><span class="line"><span class="number">2341</span></span><br><span class="line"><span class="number">2413</span></span><br><span class="line"><span class="number">2431</span></span><br><span class="line"><span class="number">3124</span></span><br><span class="line"><span class="number">3142</span></span><br><span class="line"><span class="number">3214</span></span><br><span class="line"><span class="number">3241</span></span><br><span class="line"><span class="number">3412</span>	&lt;--- k = <span class="number">17</span></span><br><span class="line"><span class="number">3421</span></span><br><span class="line"><span class="number">4123</span></span><br><span class="line"><span class="number">4132</span></span><br><span class="line"><span class="number">4213</span></span><br><span class="line"><span class="number">4231</span></span><br><span class="line"><span class="number">4312</span></span><br><span class="line"><span class="number">4321</span></span><br></pre></td></tr></table></figure>
+<p>那么下面我们来看k = 17这种情况的每位数字如何确定，由于k = 17是转化为数组下标为16：<br>（1）最高位可取1,2,3,4中的一个，每个数字出现(4-1)！= 6次，所以k=16的第一位数字的下标为16 / (4-1)！ = 2，即3被取出，此时k1=k%(4-1)！=4;<br>（2）第二位此时从1,2,4中取一个，每个数字出现(3-1)!=2次，所以k=16的第二位数字的下标为k1/(3-1)!=2，即4被取出，此时k2=k1%(3-1)!=0；<br>（3）第三位此时从1,2中取出一个，每个数字出现(2-1)!=1次，所以k=16的第三位数字的下标为k2/(2-1)!=0,即1被取出，此时k3=k2%(2-1)!=0;<br>（4）剩下的数字只有2，即最后一位就是2。<br>假设有n和不重复的元素，第k个排列是$a_1a_2a_3…a_n$，那么总结规律如下：<br>$a_1=k/(n-1)!,k1=k\%(n-1)!$<br>$a_2=k1/(n-2)!,k2=k1\%(n-2)!$<br>$…$<br>$a_n=kn-1/0!$<br>需要注意几点的问题是，构造排列数从最高位开始，当选出一个数字后，就应当把这个数字erase掉，防止后面又出现。上面讲的很复杂，其实代码实现非常简单，参考代码如下：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="built_in">string</span> <span class="title">getPermutation</span><span class="params">(<span class="keyword">int</span> n, <span class="keyword">int</span> k)</span> </span>&#123;</span><br><span class="line">        <span class="built_in">string</span> res;</span><br><span class="line">        <span class="built_in">string</span> num = <span class="string">"123456789"</span>;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; f(n, <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; n; ++i) f[i] = f[i - <span class="number">1</span>] * i;</span><br><span class="line">        --k;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = n; i &gt;= <span class="number">1</span>; --i) &#123;</span><br><span class="line">            <span class="keyword">int</span> j = k / f[i - <span class="number">1</span>];</span><br><span class="line">            k %= f[i - <span class="number">1</span>];</span><br><span class="line">            res.push_back(num[j]);</span><br><span class="line">            num.erase(num.begin()+j);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> res;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h4 id="例题、LeetCode-46-permutations"><a href="#例题、LeetCode-46-permutations" class="headerlink" title="例题、LeetCode 46 permutations"></a>例题、<a href="https://leetcode.com/problems/permutations/description/" target="_blank" rel="noopener">LeetCode 46 permutations</a></h4><p>给定一个无重复元素的数组，输出数组的全排列。<br><figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Input: <span class="comment">[1,2,3]</span></span><br><span class="line">Output:</span><br><span class="line"><span class="comment">[</span></span><br><span class="line"><span class="comment">  <span class="comment">[1,2,3]</span>,</span></span><br><span class="line"><span class="comment">  <span class="comment">[1,3,2]</span>,</span></span><br><span class="line"><span class="comment">  <span class="comment">[2,1,3]</span>,</span></span><br><span class="line"><span class="comment">  <span class="comment">[2,3,1]</span>,</span></span><br><span class="line"><span class="comment">  <span class="comment">[3,1,2]</span>,</span></span><br><span class="line"><span class="comment">  <span class="comment">[3,2,1]</span></span></span><br><span class="line"><span class="comment">]</span></span><br></pre></td></tr></table></figure></p>
+<p>这道题比较简单。可以直接使用STL中的next_permutation函数就能得到。<br>代码如下：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&gt; permute(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums) &#123;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; orig = nums;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt; result;</span><br><span class="line">        <span class="keyword">do</span>&#123;</span><br><span class="line">            result.push_back(nums);</span><br><span class="line">            next_permutation(nums.begin(),nums.end());</span><br><span class="line">        &#125;<span class="keyword">while</span>(orig!=nums);</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h4 id="例题、LeetCode-47-permutations"><a href="#例题、LeetCode-47-permutations" class="headerlink" title="例题、LeetCode 47 permutations"></a>例题、<a href="https://leetcode.com/problems/permutations-ii/description/" target="_blank" rel="noopener">LeetCode 47 permutations</a></h4><p>和LeetCode 46 一样，也是求数组的全排列，只不过，题目要求是数组中元素可能存在重复元素。<br><figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Input: <span class="comment">[1,1,2]</span></span><br><span class="line">Output:</span><br><span class="line"><span class="comment">[</span></span><br><span class="line"><span class="comment">  <span class="comment">[1,1,2]</span>,</span></span><br><span class="line"><span class="comment">  <span class="comment">[1,2,1]</span>,</span></span><br><span class="line"><span class="comment">  <span class="comment">[2,1,1]</span></span></span><br><span class="line"><span class="comment">]</span></span><br></pre></td></tr></table></figure></p>
+<p>这道题使用上面同样的方法就可以得到结果。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&gt; permuteUnique(<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt;&amp; nums) &#123;</span><br><span class="line">     <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; orig = nums;</span><br><span class="line">        <span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; &gt; result;</span><br><span class="line">        <span class="keyword">do</span>&#123;</span><br><span class="line">            result.push_back(nums);</span><br><span class="line">            next_permutation(nums.begin(),nums.end());</span><br><span class="line">        &#125;<span class="keyword">while</span>(orig!=nums);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>是不是感觉和上面的代码一模一样啊，哈哈。可能有人在想你这是直接调用了STL中的next_premutations,有本事别用STL啊。“没有条件，那就创造条件”，实现出一个和STL一样功能的函数就行了。next_premutation函数的返回值是bool类型的。我们只需要将上一篇博客实现的NextPermutations稍微修改一下就行了。代码如下：<br><figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> nextPermutation(<span class="built_in">vector</span>&lt;int&gt;&amp; nums) &#123;</span><br><span class="line">    <span class="keyword">if</span>(nums.size()&lt;=<span class="number">1</span>)<span class="keyword">return</span> false;</span><br><span class="line">    int <span class="built_in">nextIndex</span>=nums.size()<span class="number">-2</span>;</span><br><span class="line">    <span class="keyword">bool</span> flag=false;</span><br><span class="line">    <span class="keyword">while</span>(<span class="built_in">nextIndex</span>&gt;=<span class="number">0</span>&amp;&amp;nums[<span class="built_in">nextIndex</span>]&gt;=nums[<span class="built_in">nextIndex</span>+<span class="number">1</span>])</span><br><span class="line">        <span class="built_in">nextIndex</span>--;</span><br><span class="line">    <span class="keyword">if</span>(<span class="built_in">nextIndex</span>&gt;=<span class="number">0</span>)&#123;</span><br><span class="line">        flag=true;</span><br><span class="line">    int changeIndex=nums.size()<span class="number">-1</span>;</span><br><span class="line">    <span class="keyword">while</span>(<span class="built_in">nextIndex</span>&lt;changeIndex&amp;&amp;nums[changeIndex]&lt;=nums[<span class="built_in">nextIndex</span>])</span><br><span class="line">        changeIndex--;</span><br><span class="line">    swap(nums[<span class="built_in">nextIndex</span>],nums[changeIndex]);</span><br><span class="line">    &#125;</span><br><span class="line">    reverse(nums.begin()+<span class="built_in">nextIndex</span>+<span class="number">1</span>,nums.<span class="keyword">end</span>());</span><br><span class="line">    <span class="keyword">return</span> flag;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<p>关于数组或字符串全排列的题目就这么多，只要熟悉了STL中全排列函数的调用都不是问题。</p>
+<h3 id="STL二分查找"><a href="#STL二分查找" class="headerlink" title="STL二分查找"></a>STL二分查找</h3><p>在STL中关于二分查找相关的函数有三个：lower_bound，upper_bound，binary_search。这三个函数都是表示在first和last中的<strong>前闭后开区间</strong>进行二分查找。</p>
+<ul>
+<li><strong>lower_bound</strong>(first,last,val)：在<strong>已排序</strong>区间[first,last）内查找<strong>第一个大于或等于val</strong>的元素的位置。如果所有元素都小于val,则返回last的位置，且<strong>last位置是越界的</strong>。</li>
+<li><strong>upper_bound</strong>(first,last,val)：在<strong>已排序</strong>区间[first,last）内查找<strong>第一个大于val</strong>的元素的位置。如果所有元素都小于val,则返回last的位置，且<strong>last位置是越界的</strong>。</li>
+<li><strong>binary_search</strong>(first,last,val)：试图在<strong>已排序</strong>的区间[first,last)中寻找元素val,若存在，则返回true,若不存在，则返回false。返回单纯的布尔值或许不能满足要求，因此需要使用上面两个函数提供额外的信息。</li>
+</ul>
+<p>上面三个函数的时间复杂度都是$O(log(last-first))$,下面用这个例子解释上面两个函数比较容易理解。<br><img src="/img/lower_bound.png" alt><br>此外，如果碰到不允许使用上面两个函数的情况下，该如何实现那两个函数呢。<br><figure class="highlight vbscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">int</span> upper_bound(<span class="built_in">int</span> l, <span class="built_in">int</span> r, <span class="built_in">int</span> val)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">while</span> (l&lt;r)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">int</span> <span class="built_in">mid</span> = (l + r) &gt;&gt; <span class="number">2</span>;</span><br><span class="line">		<span class="keyword">if</span> (a[<span class="built_in">mid</span>] &gt; val)r = <span class="built_in">mid</span>;</span><br><span class="line">		<span class="keyword">else</span></span><br><span class="line">			l = <span class="built_in">mid</span> + <span class="number">1</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	return l;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="built_in">int</span> lower_bound(<span class="built_in">int</span> l,<span class="built_in">int</span> r,<span class="built_in">int</span> x)</span><br><span class="line">&#123;  <span class="keyword">while</span>(l&lt;r)&#123;</span><br><span class="line">	<span class="built_in">int</span> <span class="built_in">mid</span> = (l + r) &gt;&gt; <span class="number">2</span>;</span><br><span class="line">	<span class="keyword">if</span>(a[<span class="built_in">mid</span>]&gt;=x)r=<span class="built_in">mid</span>;</span><br><span class="line">	<span class="keyword">else</span> l=<span class="built_in">mid</span>+<span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line">return l;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="例题、LeetCode-34-Find-First-and-Last-Position-of-Element-in-Sorted-Array"><a href="#例题、LeetCode-34-Find-First-and-Last-Position-of-Element-in-Sorted-Array" class="headerlink" title="例题、LeetCode 34  Find First and Last Position of Element in Sorted Array"></a>例题、<a href="https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/description/" target="_blank" rel="noopener">LeetCode 34  Find First and Last Position of Element in Sorted Array</a></h4><p>给定一个已排序数组，寻找给定值target在数组中的起始位置和终止位置。如果没找到返回[-1,-1]，算法时间复杂度要求为$O(log n)$。<br>分析：已经排好序了，而且时间复杂度已经给出，毫无疑问肯定得使用二分查找的方法。下面就使用上面介绍的函数来实现。<br><figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Example <span class="number">1</span>:</span><br><span class="line"></span><br><span class="line">Input: nums = <span class="string">[5,7,7,8,8,10]</span>, target = <span class="number">8</span></span><br><span class="line">Output: <span class="string">[3,4]</span></span><br><span class="line">Example <span class="number">2</span>:</span><br><span class="line"></span><br><span class="line">Input: nums = <span class="string">[5,7,7,8,8,10]</span>, target = <span class="number">6</span></span><br><span class="line">Output: <span class="string">[-1,-1]</span></span><br></pre></td></tr></table></figure></p>
+<p>实现代码如下：<br><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">vector&lt;<span class="keyword">int</span>&gt; searchRange(vector&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> target) &#123;</span><br><span class="line">	<span class="built_in">if</span> (!nums.<span class="built_in">size</span>())</span><br><span class="line">		<span class="built_in">return</span>&#123; <span class="number">-1</span>, <span class="number">-1</span> &#125;;</span><br><span class="line">	<span class="keyword">auto</span> x = lower_bound(nums.<span class="built_in">begin</span>(), nums.<span class="built_in">end</span>(), target);</span><br><span class="line">	<span class="built_in">if</span> (x == nums.<span class="built_in">end</span>())</span><br><span class="line">		<span class="built_in">return</span>&#123; <span class="number">-1</span>, <span class="number">-1</span> &#125;;</span><br><span class="line">	<span class="keyword">int</span> l = distance(nums.<span class="built_in">begin</span>(), x);</span><br><span class="line">	<span class="keyword">auto</span> y = upper_bound(nums.<span class="built_in">begin</span>(), nums.<span class="built_in">end</span>(), target);</span><br><span class="line">	<span class="keyword">int</span> r = distance(nums.<span class="built_in">begin</span>(), prev(y));</span><br><span class="line">	<span class="built_in">if</span> (nums[l] != target)<span class="comment">//not found</span></span><br><span class="line">		<span class="built_in">return</span>&#123; <span class="number">-1</span>, <span class="number">-1</span> &#125;;</span><br><span class="line">	<span class="built_in">else</span></span><br><span class="line">		<span class="built_in">return</span>&#123; l, r &#125;;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="LeetCode-35-Search-Insert-Position"><a href="#LeetCode-35-Search-Insert-Position" class="headerlink" title="LeetCode 35 Search Insert Position"></a><a href="https://leetcode.com/problems/search-insert-position/description/" target="_blank" rel="noopener">LeetCode 35 Search Insert Position</a></h4><p>给定一个已排序数组和给定值target,如果给定值在数组中则返回数组中位置，如果没有，返回在数组中顺序插入给定值得位置。<br><figure class="highlight avrasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Example <span class="number">1</span>:</span><br><span class="line"></span><br><span class="line"><span class="symbol">Input:</span> [<span class="number">1</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">6</span>], <span class="number">5</span></span><br><span class="line"><span class="symbol">Output:</span> <span class="number">2</span></span><br><span class="line">Example <span class="number">2</span>:</span><br><span class="line"></span><br><span class="line"><span class="symbol">Input:</span> [<span class="number">1</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">6</span>], <span class="number">2</span></span><br><span class="line"><span class="symbol">Output:</span> <span class="number">1</span></span><br><span class="line">Example <span class="number">3</span>:</span><br><span class="line"></span><br><span class="line"><span class="symbol">Input:</span> [<span class="number">1</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">6</span>], <span class="number">7</span></span><br><span class="line"><span class="symbol">Output:</span> <span class="number">4</span></span><br><span class="line">Example <span class="number">4</span>:</span><br><span class="line"></span><br><span class="line"><span class="symbol">Input:</span> [<span class="number">1</span>,<span class="number">3</span>,<span class="number">5</span>,<span class="number">6</span>], <span class="number">0</span></span><br><span class="line"><span class="symbol">Output:</span> <span class="number">0</span></span><br></pre></td></tr></table></figure></p>
+<p>这道题比上一道题还要简单一点，直接使用lower_bound就能得到结果。代码如下：<br><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> searchInsert(vector&lt;<span class="keyword">int</span>&gt;&amp; nums, <span class="keyword">int</span> target) &#123;</span><br><span class="line">        <span class="built_in">return</span> distance(nums.<span class="built_in">begin</span>(),lower_bound(nums.<span class="built_in">begin</span>(),nums.<span class="built_in">end</span>(),target));</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></p>
+<h3 id="加速C-输入输出流"><a href="#加速C-输入输出流" class="headerlink" title="加速C++输入输出流"></a>加速C++输入输出流</h3><p>在刷题时，输入输出，我们往往倾向于使用cin,cout来输入输出。对于复杂的输入时，使用cin相比scanf速度要更慢很多，这是因为cin会把需要输入/输出的东西先写入缓存中，再输出，导致效率降低。使用如下语句就能打消iostream的输入输出缓存，节省很多时间。不过实际上使用了using namespace std后面就可以添加如下代码了。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">auto</span> speedup = []()&#123;</span><br><span class="line">    ios::sync_with_stdio(<span class="literal">false</span>);</span><br><span class="line">    <span class="built_in">cin</span>.tie(<span class="literal">nullptr</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">&#125;();</span><br></pre></td></tr></table></figure></p>
+<p>下面举个相关的LeetCode题目去感受一下其加速效果。</p>
+<h4 id="例题、LeetCode-36-Valid-Sudoku"><a href="#例题、LeetCode-36-Valid-Sudoku" class="headerlink" title="例题、LeetCode 36 Valid Sudoku"></a>例题、<a href="https://leetcode.com/problems/valid-sudoku/description/" target="_blank" rel="noopener">LeetCode 36 Valid Sudoku</a></h4><p>给定一个9<em>9的表格。。如下表格所示。判断这个表格是否是一个数独表格<br><img src="/img/250px-Sudoku-by-L2G-20050714.svg.png" alt><br>判定规则：<br>（1）每行必须包含数字1-9，且不能出现重复；<br>（2）每列必须包含数字1-9，且不能出现重复；<br>（3）每个3</em>3的子方格中也必须包含数字1-且不能重复。<br>表格也可以是部分填充，空表格位置用“，”表示。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">Example <span class="number">1</span></span><br><span class="line">Input:</span><br><span class="line">[<span class="meta"></span></span><br><span class="line"><span class="meta">  [<span class="meta-string">"5"</span>,<span class="meta-string">"3"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"7"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"6"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"1"</span>,<span class="meta-string">"9"</span>,<span class="meta-string">"5"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"."</span>,<span class="meta-string">"9"</span>,<span class="meta-string">"8"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"6"</span>,<span class="meta-string">"."</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"8"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"6"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"3"</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"4"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"8"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"3"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"1"</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"7"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"2"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"6"</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"."</span>,<span class="meta-string">"6"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"2"</span>,<span class="meta-string">"8"</span>,<span class="meta-string">"."</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"4"</span>,<span class="meta-string">"1"</span>,<span class="meta-string">"9"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"5"</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"8"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"7"</span>,<span class="meta-string">"9"</span></span>]</span><br><span class="line">]</span><br><span class="line">Output: <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">Example <span class="number">2</span></span><br><span class="line">Input:</span><br><span class="line">[<span class="meta"></span></span><br><span class="line"><span class="meta">  [<span class="meta-string">"8"</span>,<span class="meta-string">"3"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"7"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"6"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"1"</span>,<span class="meta-string">"9"</span>,<span class="meta-string">"5"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"."</span>,<span class="meta-string">"9"</span>,<span class="meta-string">"8"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"6"</span>,<span class="meta-string">"."</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"8"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"6"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"3"</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"4"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"8"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"3"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"1"</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"7"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"2"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"6"</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"."</span>,<span class="meta-string">"6"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"2"</span>,<span class="meta-string">"8"</span>,<span class="meta-string">"."</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"4"</span>,<span class="meta-string">"1"</span>,<span class="meta-string">"9"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"5"</span></span>],</span><br><span class="line">  [<span class="meta"><span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"8"</span>,<span class="meta-string">"."</span>,<span class="meta-string">"."</span>,<span class="meta-string">"7"</span>,<span class="meta-string">"9"</span></span>]</span><br><span class="line">]</span><br><span class="line">Output: <span class="literal">false</span></span><br><span class="line">Explanation: Same <span class="keyword">as</span> Example <span class="number">1</span>, except with the <span class="number">5</span> <span class="keyword">in</span> the top left corner being </span><br><span class="line">    modified to <span class="number">8.</span> Since there are two <span class="number">8</span><span class="string">'s in the top left 3x3 sub-box, it is invalid.</span></span><br></pre></td></tr></table></figure></p>
+<p>看例题的意思，我们只需要判断每行每列是否存在重复元素以及3<em>3小方格是否存在重复元素即可。<br>先不去看怎么实现的这个算法，先看一下使用和不使用加速代码，通过所有case的耗时。很明显输入是9</em>9个字符。这就需要不断的使用cin进行数据的读取。下面是使用与不使用时的耗时比较。<br>使用后：<br><img src="/img/sudo1.png" alt><br>使用前：<br><img src="/img/sudo2.png" alt><br>同样的代码，只是使用与不使用加速代码的区别，一个是12ms，一个是4ms，加速效果非常明显。下面来看一下这道题具体大算法实现。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">auto</span> speedup = []()&#123;</span><br><span class="line">    ios::sync_with_stdio(<span class="literal">false</span>);</span><br><span class="line">    <span class="built_in">cin</span>.tie(<span class="literal">nullptr</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">nullptr</span>;</span><br><span class="line">&#125;();</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isValidSudoku</span><span class="params">(<span class="built_in">vector</span>&lt;<span class="built_in">vector</span>&lt;<span class="keyword">char</span>&gt;&gt;&amp; board)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt;used(<span class="number">10</span>, <span class="literal">false</span>);</span><br><span class="line">	<span class="comment">//判断每行每列是否存在重复</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">9</span>; ++i) &#123;</span><br><span class="line">		fill(used.begin(), used.end(), <span class="literal">false</span>);<span class="comment">//行</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">9</span>; ++j)</span><br><span class="line">			<span class="keyword">if</span> (!check(board[i][j], used))</span><br><span class="line">				<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">		fill(used.begin(), used.end(), <span class="literal">false</span>);<span class="comment">//列</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; <span class="number">9</span>; ++j)</span><br><span class="line">			<span class="keyword">if</span> (!check(board[j][i], used))</span><br><span class="line">				<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> r = <span class="number">0</span>; r &lt; <span class="number">3</span>; ++r)</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> c = <span class="number">0</span>; c &lt; <span class="number">3</span>; ++c) &#123;</span><br><span class="line">		fill(used.begin(), used.end(), <span class="literal">false</span>);<span class="comment">//3*3小方格</span></span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = r * <span class="number">3</span>; i &lt; r * <span class="number">3</span> + <span class="number">3</span>; ++i)</span><br><span class="line">			<span class="keyword">for</span> (<span class="keyword">int</span> j = c * <span class="number">3</span>; j &lt; c * <span class="number">3</span> + <span class="number">3</span>; ++j)</span><br><span class="line">				<span class="keyword">if</span> (!check(board[i][j], used))</span><br><span class="line">					<span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">check</span><span class="params">(<span class="keyword">char</span> ch, <span class="built_in">vector</span>&lt;<span class="keyword">bool</span>&gt;&amp;used)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (ch == <span class="string">'.'</span>) <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">	<span class="keyword">if</span> (used[ch - <span class="string">'1'</span>]) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">	<span class="keyword">return</span> used[ch - <span class="string">'1'</span>] = <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<h3 id="字符串大小写转换"><a href="#字符串大小写转换" class="headerlink" title="字符串大小写转换"></a>字符串大小写转换</h3><p>在c++中会经常碰到关于字符串字符大小写转换的操作。在alogrithm文件中包含了这样的一个transform函数。下面就举个例子来了解一下transoform 函数的使用。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;string&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"> </span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">string</span> str=<span class="string">"how are you"</span>;</span><br><span class="line">    transform(str.begin(),str.end(),str.begin(),::<span class="built_in">toupper</span>);<span class="comment">//转换为大写</span></span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; str &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注意一下，这里transform函数有四个参数，前两个表示字符串的起始位置，第三个参数表示转换之后，输出到原str字符串的起始地址；最后一个参数是转换操作，可以选择tolower,toupper。这里就举一道相关的题目。</p>
+<h4 id="例题、LeetCode-125-Valid-Palindrome"><a href="#例题、LeetCode-125-Valid-Palindrome" class="headerlink" title="例题、LeetCode 125 Valid Palindrome"></a>例题、<a href="https://leetcode.com/problems/valid-palindrome/description/" target="_blank" rel="noopener">LeetCode 125 Valid Palindrome</a></h4><p>判断字符串是否为回文字符串，只考虑字母数字字符，不考虑其他字符。<br><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">Example</span> <span class="number">1</span><span class="string">:</span></span><br><span class="line"></span><br><span class="line"><span class="attr">Input:</span> <span class="string">"A man, a plan, a canal: Panama"</span></span><br><span class="line"><span class="attr">Output:</span> <span class="literal">true</span></span><br><span class="line"><span class="string">Example</span> <span class="number">2</span><span class="string">:</span></span><br><span class="line"></span><br><span class="line"><span class="attr">Input:</span> <span class="string">"race a car"</span></span><br><span class="line"><span class="attr">Output:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure></p>
+<p>这道题基本上没啥难度，设置两个指针，遍历一遍就可以判断出该字符串是否为回文字符串。嗖嗖的就写了如下代码。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isPalindrome</span><span class="params">(<span class="built_in">string</span> s)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">if</span> (s.size() &lt;= <span class="number">1</span>)<span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">	 transform(s.begin(), s.end(), s.begin(), ::<span class="built_in">tolower</span>);</span><br><span class="line">	 <span class="built_in">cout</span> &lt;&lt; s &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">	 <span class="keyword">int</span> l = <span class="number">0</span>, r = s.size() - <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	 <span class="keyword">while</span> (l &lt; r)</span><br><span class="line">	 &#123;</span><br><span class="line">		 <span class="keyword">while</span> (l&lt;s.size()&amp;&amp;s[l]&lt;<span class="string">'a'</span> || s[l]&gt;<span class="string">'z'</span>)l++;</span><br><span class="line">		 <span class="keyword">while</span> (r&lt;s.size()&amp;&amp;s[r]&lt;<span class="string">'a'</span> || s[r]&gt;<span class="string">'z'</span>)r--;</span><br><span class="line">		 <span class="built_in">cout</span> &lt;&lt; s[l] &lt;&lt; <span class="string">"-"</span> &lt;&lt; s[r] &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">		 <span class="keyword">if</span> (s[l] != s[r])&#123; <span class="keyword">return</span> <span class="literal">false</span>; &#125;</span><br><span class="line">		 <span class="keyword">else</span>&#123; l++; r--; &#125;</span><br><span class="line">	 &#125;</span><br><span class="line">	 <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>代码的case通过率是451/476，始终达不到100%，需要考虑很多特殊的例子。改的头疼。于是参考网上的做法，修改代码如下：<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Solution</span> &#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">isPalindrome</span><span class="params">(<span class="built_in">string</span> s)</span> </span>&#123;</span><br><span class="line">   transform(s.begin(), s.end(), s.begin(), ::<span class="built_in">tolower</span>);</span><br><span class="line">	 <span class="keyword">int</span> l = <span class="number">0</span>, r = s.size()<span class="number">-1</span> ;</span><br><span class="line">	 <span class="keyword">while</span> (l&lt;r)</span><br><span class="line">	 &#123;</span><br><span class="line">		 <span class="keyword">if</span> (!<span class="built_in">isalnum</span>(s[l]))l++;</span><br><span class="line">		 <span class="keyword">else</span> <span class="keyword">if</span> (!<span class="built_in">isalnum</span>(s[r]))r--;</span><br><span class="line">		 <span class="keyword">else</span> <span class="keyword">if</span> (s[l] != s[r]) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">		 <span class="keyword">else</span>&#123; l++; r--; &#125;</span><br><span class="line">	 &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>这里顺便介绍几个c的函数。</p>
+<ul>
+<li>isalnum():判断字符是英文字母（大小写）或数字；</li>
+<li>isalpha():判断字符是英文字母；</li>
+<li>isdigit():判断字符是数字；</li>
+</ul>
+<p>关于STL常用函数这里先记录这么多，后续刷题碰到了会再来补充。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/STL/" rel="tag"># STL</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/08/15/leetcode_stl1/" rel="next" title="LeetCode：STL中实用函数（一）">
+                <i class="fa fa-chevron-left"></i> LeetCode：STL中实用函数（一）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/08/23/leetcode_island/" rel="prev" title="LeetCode：连通域">
+                LeetCode：连通域 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#全排列"><span class="nav-number">1.</span> <span class="nav-text">全排列</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#例题、LeetCode-60-Permutation-Sequence"><span class="nav-number">1.1.</span> <span class="nav-text">例题、LeetCode 60 Permutation Sequence</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#例题、LeetCode-46-permutations"><span class="nav-number">1.2.</span> <span class="nav-text">例题、LeetCode 46 permutations</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#例题、LeetCode-47-permutations"><span class="nav-number">1.3.</span> <span class="nav-text">例题、LeetCode 47 permutations</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#STL二分查找"><span class="nav-number">2.</span> <span class="nav-text">STL二分查找</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#例题、LeetCode-34-Find-First-and-Last-Position-of-Element-in-Sorted-Array"><span class="nav-number">2.1.</span> <span class="nav-text">例题、LeetCode 34  Find First and Last Position of Element in Sorted Array</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LeetCode-35-Search-Insert-Position"><span class="nav-number">2.2.</span> <span class="nav-text">LeetCode 35 Search Insert Position</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#加速C-输入输出流"><span class="nav-number">3.</span> <span class="nav-text">加速C++输入输出流</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#例题、LeetCode-36-Valid-Sudoku"><span class="nav-number">3.1.</span> <span class="nav-text">例题、LeetCode 36 Valid Sudoku</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#字符串大小写转换"><span class="nav-number">4.</span> <span class="nav-text">字符串大小写转换</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#例题、LeetCode-125-Valid-Palindrome"><span class="nav-number">4.1.</span> <span class="nav-text">例题、LeetCode 125 Valid Palindrome</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

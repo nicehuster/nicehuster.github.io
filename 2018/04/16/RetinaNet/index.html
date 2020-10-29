@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="detection,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="论文信息： Tsung-Yi Lin,Kaiming He, Best Student Paper Award at ICCV 2017代码链接： https://github.com/fizyr/keras-retinanet 整体框架： 目标检测方法有两大类：基于proposal的two-stage方法和基于regression的one-stage方法。后者虽然比前者速度快，但是单精度要低于前">
+<meta name="keywords" content="detection">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文阅读：Focal Loss for Dense Object Detection（RetinaNet）">
+<meta property="og:url" content="https://nicehuster.cn/2018/04/16/RetinaNet/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="论文信息： Tsung-Yi Lin,Kaiming He, Best Student Paper Award at ICCV 2017代码链接： https://github.com/fizyr/keras-retinanet 整体框架： 目标检测方法有两大类：基于proposal的two-stage方法和基于regression的one-stage方法。后者虽然比前者速度快，但是单精度要低于前">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.cn/img/retinanet_1.PNG">
+<meta property="og:image" content="https://nicehuster.cn/img/retinanet_2.png">
+<meta property="og:image" content="https://nicehuster.cn/img/retinanet_3.png">
+<meta property="og:image" content="https://nicehuster.cn/img/retinanet_4.png">
+<meta property="og:image" content="https://nicehuster.cn/img/retinanet_5.png">
+<meta property="og:image" content="https://nicehuster.cn/img/retinanet_6.png">
+<meta property="og:image" content="https://nicehuster.cn/img/retinanet_7.png">
+<meta property="og:image" content="https://nicehuster.cn/img/retinanet_8.png">
+<meta property="og:updated_time" content="2020-09-18T02:23:06.760Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="论文阅读：Focal Loss for Dense Object Detection（RetinaNet）">
+<meta name="twitter:description" content="论文信息： Tsung-Yi Lin,Kaiming He, Best Student Paper Award at ICCV 2017代码链接： https://github.com/fizyr/keras-retinanet 整体框架： 目标检测方法有两大类：基于proposal的two-stage方法和基于regression的one-stage方法。后者虽然比前者速度快，但是单精度要低于前">
+<meta name="twitter:image" content="https://nicehuster.cn/img/retinanet_1.PNG">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.cn/2018/04/16/RetinaNet/">
+
+
+
+
+
+  <title>论文阅读：Focal Loss for Dense Object Detection（RetinaNet） | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2018/04/16/RetinaNet/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">论文阅读：Focal Loss for Dense Object Detection（RetinaNet）</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-16T19:13:39+08:00">
+                2018-04-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>论文信息：</strong> Tsung-Yi Lin,Kaiming He, Best Student Paper Award at ICCV 2017<br><strong>代码链接：</strong> <a href="https://github.com/fizyr/keras-retinanet" target="_blank" rel="noopener">https://github.com/fizyr/keras-retinanet</a></p>
+<p><strong>整体框架：</strong> 目标检测方法有两大类：基于proposal的two-stage方法和基于regression的one-stage方法。后者虽然比前者速度快，但是单精度要低于前者，作者通过分析发现，造成这种情况的主要原因是训练正负样本存在类别不平衡问题。作者针对这个问题提出了一个focal loss，并在FPN网络基础是使用focal loss 实例化提出了一个one-stage 法的网络：RetinaNet。在不影响其速度的情况下，在精度上可以超越当前的SOAT。</p>
+<p><img src="/img/retinanet_1.PNG" alt><br><a id="more"></a></p>
+<p><strong>one-stage detector存在的问题:类别不平衡</strong></p>
+<p>这种方法的detector一般都是通过密集采样的方式从一张图片中密集采样出10\^4~10\^5个候选框，但这些候选框中只有少部分是包含有目标。即前景/背景之间存在严重的不平衡现象，这种不平衡会导致一个问题：负样本太多，占总的loss的大部分，而且都是easy负样本，这对网络训练来说没有任何帮助而且会降低网络泛化能力。针对这种情况一个普遍的做法是采用 hard negative mining：在训练时采样困难样本对网络训练或者训练时采用更复杂的采样策略。作者在文章中发现这种方法并不是那么的work，于是就提出了focal loss，这样不需要使用任何困难样本采样策略，可以对所有样本进行训练。</p>
+<p><strong>Focal loss：</strong> 用于处理 one-stage 目标检测场景在训练中出现的前景/背景类别极度不平衡问题（eg, 1:1000）。</p>
+<p>对于二分类交叉熵（cross entropy，CE）定义如下：</p>
+<p><img src="/img/retinanet_2.png" alt></p>
+<p>为方便起见，定义$\text{pt}$ ,</p>
+<p><img src="/img/retinanet_3.png" alt></p>
+<script type="math/tex; mode=display">\ CE(p,y)\  = \ CE(pt\ )\  = \  - log(pt\ )</script><p>从上左图的蓝线可以看出即使是容易分类样本($pt\ \gg 0.5)$，也能带来不小的损失。Focal loss 的目的是($p\ t\  \gg0.5)$的样本的loss更小。因此focal loss定义如下：</p>
+<p><img src="/img/retinanet_4.png" alt></p>
+<p>r取值[0,5]如上图。从上面的FL公式可以看出，FL具有两个性质：(1)样本分类错误时，$\text{pt}$很小，$(1</p>
+<ul>
+<li>pt)\hat{}r$趋近1，整个FL基本不变，当$pt \rightarrow 1$时，$(1 -pt)\hat{}r$趋近0，分类正确的样本就能被很好的down-weighted;(2)聚焦参数γ可以平滑地调节易分类样本被down-weighted的速率，当$\gamma =0$时，FL等于CE。总的来说，FL的目的还是在于减少易分类样本的权重，从而使模型在训练时更加专注于难分类的样本。<br>在具体实现时，作者还另外添加了一个超参数，FL如下：<br><img src="/img/retinanet_5.png" alt><br><img src="/img/retinanet_6.png" alt><br><strong>RetinaNet:</strong> 作者在FPN网络的基础上应用focal loss，来实例化RetinaNet.大致网络结构如上图所示，具体细节可以看原文。如果之前有了解过OHEM（online hard example mining）的话，可以看出FL和OHEM很像，不过两者还是存在区别：</li>
+</ul>
+<p><strong>1)</strong> OHEM是只取3:1负样本用于计算loss，之外的全部置零，也就是将easy的样本全部抛弃；<br><strong>2)</strong> Focal loss是取所有样本，根据难易程度给不同权重。<br>作者专门做了实验与OHEM进行对比发现，focal loss完全可以吊打OHEM。如下图左下角实验结果。<br><img src="/img/retinanet_7.png" alt><br>我也对自己的数据训练了一下效果还不错，不过针对一些密集目标还是会出现了一些bad case。下面是在coco和自己的数据上训练的结果<br><img src="/img/retinanet_8.png" alt></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/detection/" rel="tag"># detection</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/11/FPN/" rel="next" title="论文阅读：Feature Pyramid Networks for Object Detection（FPN）">
+                <i class="fa fa-chevron-left"></i> 论文阅读：Feature Pyramid Networks for Object Detection（FPN）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/17/Hierarchical Object Detection/" rel="prev" title="论文阅读：Hierarchical Object Detection with Deep Reinforcement Learning">
+                论文阅读：Hierarchical Object Detection with Deep Reinforcement Learning <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

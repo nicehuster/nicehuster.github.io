@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="pytorch,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="好记性不如烂笔头，主要是纪录一些Pytorch中常用函数用法以及自定义数据读取collate_fn()介绍。 常用数学类操作符torchTensor.transpose() &amp;amp; Tensor.permute()transpose只能操作矩阵的两个维度。只接受两个维度参数。若要对多个维度进行操作，使用permute更加灵活方便。12345a=torch.rand(2,3,4)  #torch">
+<meta name="keywords" content="pytorch">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pytorch常用API解析">
+<meta property="og:url" content="https://nicehuster.cn/2019/05/14/pytorch-api/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="好记性不如烂笔头，主要是纪录一些Pytorch中常用函数用法以及自定义数据读取collate_fn()介绍。 常用数学类操作符torchTensor.transpose() &amp;amp; Tensor.permute()transpose只能操作矩阵的两个维度。只接受两个维度参数。若要对多个维度进行操作，使用permute更加灵活方便。12345a=torch.rand(2,3,4)  #torch">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.cn/img/yolo2_result.png">
+<meta property="og:updated_time" content="2020-09-18T02:39:22.802Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Pytorch常用API解析">
+<meta name="twitter:description" content="好记性不如烂笔头，主要是纪录一些Pytorch中常用函数用法以及自定义数据读取collate_fn()介绍。 常用数学类操作符torchTensor.transpose() &amp;amp; Tensor.permute()transpose只能操作矩阵的两个维度。只接受两个维度参数。若要对多个维度进行操作，使用permute更加灵活方便。12345a=torch.rand(2,3,4)  #torch">
+<meta name="twitter:image" content="https://nicehuster.cn/img/yolo2_result.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.cn/2019/05/14/pytorch-api/">
+
+
+
+
+
+  <title>Pytorch常用API解析 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2019/05/14/pytorch-api/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Pytorch常用API解析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-14T19:13:39+08:00">
+                2019-05-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/project/" itemprop="url" rel="index">
+                    <span itemprop="name">project</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>好记性不如烂笔头，主要是纪录一些Pytorch中常用函数用法以及自定义数据读取collate_fn()介绍。</p>
+<h3 id="常用数学类操作符"><a href="#常用数学类操作符" class="headerlink" title="常用数学类操作符"></a>常用数学类操作符</h3><h4 id="torchTensor-transpose-amp-Tensor-permute"><a href="#torchTensor-transpose-amp-Tensor-permute" class="headerlink" title="torchTensor.transpose() &amp; Tensor.permute()"></a>torchTensor.transpose() &amp; Tensor.permute()</h4><p>transpose只能操作矩阵的两个维度。只接受两个维度参数。若要对多个维度进行操作，使用permute更加灵活方便。<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a=torch.rand(<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>)  #torch.Size([<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>])</span><br><span class="line">b=a.transpose(<span class="number">0</span>,<span class="number">1</span>)   #torch.Size([<span class="number">3</span>, <span class="number">2</span>, <span class="number">4</span>])</span><br><span class="line"></span><br><span class="line">c=a.transpose(<span class="number">0</span>,<span class="number">1</span>).transpose(<span class="number">1</span>,<span class="number">2</span>)  #torch.Size([<span class="number">3</span>, <span class="number">4</span>, <span class="number">2</span>])</span><br><span class="line">d=a.permute(<span class="number">1</span>,<span class="number">2</span>,<span class="number">0</span>)                 #torch.Size([<span class="number">3</span>, <span class="number">4</span>, <span class="number">2</span>])</span><br></pre></td></tr></table></figure></p>
+<p>同样是对三个维度进行变换，transpose需要操作三次，而是用permute只需要操作一次，因此对于高维度的矩阵变化，permute更加方便。<br><a id="more"></a></p>
+<h4 id="toch-cat-amp-torch-stack"><a href="#toch-cat-amp-torch-stack" class="headerlink" title="toch.cat() &amp; torch.stack()"></a>toch.cat() &amp; torch.stack()</h4><p>cat是对数据沿着某一维度进行拼接。cat后数据的总维数不变。二维的矩阵拼接后依旧是二维的矩阵。如下面代码对两个2维tensor（分别为2<em>3,4</em>3）进行拼接，拼接完后变为3*3还是2维的tensor。<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x=torch.rand(<span class="number">2</span>,<span class="number">3</span>)</span><br><span class="line">y=torch.rand(<span class="number">4</span>,<span class="number">3</span>)</span><br><span class="line">z=torch.cat((x,y),<span class="number">0</span>)  #torch.Size([<span class="number">6</span>, <span class="number">3</span>])</span><br></pre></td></tr></table></figure></p>
+<p><strong>注意</strong>：对维度进行拼接是必须满足维度一致的要求，除了指定拼接的维度除外，其他维度必须都相等。否则就会出现维度不匹配问题。<br>stack是增加新的维度进行堆叠。这个比较常见，比如在pytorch中对数据进行加载组成一个batch时常用到。比较好理解。<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a=torch.rand(<span class="number">3</span>,<span class="number">224</span>,<span class="number">224</span>)</span><br><span class="line">b=torch.rand(<span class="number">3</span>,<span class="number">224</span>,<span class="number">224</span>)</span><br><span class="line">c=torch.stack((a,b),<span class="number">0</span>)  # torch.Size([<span class="number">2</span>, <span class="number">3</span>, <span class="number">224</span>, <span class="number">224</span>])</span><br><span class="line">d=torch.stack((a,b),<span class="number">3</span>)  # torch.Size([<span class="number">3</span>, <span class="number">224</span>, <span class="number">224</span>, <span class="number">2</span>])</span><br></pre></td></tr></table></figure></p>
+<p>注意cat()和stack()两者区别就在于后者会增加维度。</p>
+<h4 id="torch-squeeze-amp-torch-unsqueeze"><a href="#torch-squeeze-amp-torch-unsqueeze" class="headerlink" title="torch.squeeze() &amp; torch.unsqueeze()"></a>torch.squeeze() &amp; torch.unsqueeze()</h4><p>squeeze(dim_n)压缩，即去掉元素数量为1的dim_n维度。同理unsqueeze(dim_n)，增加dim_n维度，元素数量为1。<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#减少维度</span><br><span class="line">a=torch.rand(<span class="number">2</span>,<span class="number">1</span>,<span class="number">4</span>)  #torch.Size([<span class="number">2</span>, <span class="number">1</span>, <span class="number">4</span>])</span><br><span class="line">a_=a.squeeze()       #torch.Size([<span class="number">2</span>, <span class="number">4</span>])，不加参数，去掉所有为元素个数为<span class="number">1</span>的维度</span><br><span class="line">a_=a.squeeze(<span class="number">0</span>)      #torch.Size([<span class="number">2</span>, <span class="number">1</span>, <span class="number">4</span>])加上参数，去掉第一维的元素为<span class="number">1</span>，不起作用，因为第一维有<span class="number">2</span>个元素</span><br><span class="line">a_=a.squeeze(<span class="number">1</span>)      #torch.Size([<span class="number">2</span>, <span class="number">4</span>])，这样就可以</span><br><span class="line"></span><br><span class="line">#增加维度</span><br><span class="line">a_=a.unsqueeze(<span class="number">0</span>)    #torch.Size([<span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">4</span>])</span><br></pre></td></tr></table></figure></p>
+<h4 id="Tensor-expand-as"><a href="#Tensor-expand-as" class="headerlink" title="Tensor.expand_as()"></a>Tensor.expand_as()</h4><p>expand_as()这是tensor变量的一个内置方法，如果使用b.expand_as(a)就是将b进行扩充，扩充到a的维度，需要说明的是a的低维度需要比b大，例如b的shape是3<em>1，如果a的shape是3</em>2不会出错，但是是2*2就会报错了<br><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">a=torch.Tensor(<span class="string">[[1],[2],[3]]</span>)</span><br><span class="line">b=torch.Tensor(<span class="string">[[4]]</span>)</span><br><span class="line">c=b.expand_as(a)</span><br><span class="line">#tensor(<span class="string">[[4.],</span></span><br><span class="line"><span class="string">        [4.],</span></span><br><span class="line"><span class="string">        [4.]]</span>)</span><br></pre></td></tr></table></figure></p>
+<h4 id="torch-contiguous"><a href="#torch-contiguous" class="headerlink" title="torch.contiguous()"></a>torch.contiguous()</h4><p>contiguous：view只能用在contiguous的variable上。如果在view之前用了transpose, permute等，需要用contiguous()来返回一个contiguous copy。 因为view需要tensor的内存是整块的。有些tensor并不是占用一整块内存，而是由不同的数据块组成，而tensor的view()操作依赖于内存是整块的，这时只需要执行contiguous()这个函数，把tensor变成在内存中连续分布的形式。判断是否contiguous用torch.Tensor.is_contiguous()函数<br><figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">x=torch.ones(<span class="number">10</span>,<span class="number">10</span>)</span><br><span class="line">x.is_contiguous()  #<span class="literal">True</span></span><br><span class="line">x.transpose(<span class="number">0</span>,<span class="number">1</span>).is_contiguous()  #<span class="literal">False</span></span><br><span class="line">x.transpose(<span class="number">0</span>, <span class="number">1</span>).contiguous().is_contiguous()  #<span class="literal">True</span></span><br></pre></td></tr></table></figure></p>
+<p><strong>因此，在调用view之前最好先contiguous一下，x.contiguous().view()</strong> 。</p>
+<h3 id="数据读取"><a href="#数据读取" class="headerlink" title="数据读取"></a>数据读取</h3><p>在pytorch中一个现有的数据读取方法就是torchvision.datasets.ImageFolder()，这个api主要用于做分类问题。将每一类数据放到同一个文件夹中，比如有10个类别，那么就在一个大的文件夹下面建立10个子文件夹，每个子文件夹里面放的是同一类的数据。从api的实现可以发现ImageFolder该类继承自torch.utils.data.Dataset。</p>
+<h4 id="Dataset"><a href="#Dataset" class="headerlink" title="Dataset"></a>Dataset</h4><p>Dataset的定义如下：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dataset</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="string">"""An abstract class representing a Dataset.</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">    All other datasets should subclass it. All subclasses should override</span></span><br><span class="line"><span class="string">    ``__len__``, that provides the size of the dataset, and ``__getitem__``,</span></span><br><span class="line"><span class="string">    supporting integer indexing in range from 0 to len(self) exclusive.</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__getitem__</span><span class="params">(self, index)</span>:</span></span><br><span class="line">        <span class="keyword">raise</span> NotImplementedError</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__len__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">raise</span> NotImplementedError</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__add__</span><span class="params">(self, other)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> ConcatDataset([self, other])</span><br></pre></td></tr></table></figure></p>
+<p>从上面的注释知道，这个是代表数据集的一个抽象类。有关于数据集的类都可以定义为其子类，只需要重写<strong>getitem</strong>和<strong>len</strong>就可以了。<br>那么定义好了数据集我们不可能将所有的数据集都放到内存，这样内存肯定就爆了，我们需要定义一个迭代器，每一步产生一个batch，这里PyTorch已经为我们实现好了，就是下面的torch.utils.data.DataLoader。</p>
+<h4 id="DataLoader"><a href="#DataLoader" class="headerlink" title="DataLoader"></a>DataLoader</h4><p>DataLoader能够为我们自动生成一个多线程的迭代器。DataLoader的函数定义如下：DataLoader(dataset, batch_size=1, shuffle=False, sampler=None, num_workers=0, collate_fn=default_collate, pin_memory=False, drop_last=False)</p>
+<ul>
+<li>dataset：加载的数据集(Dataset对象)</li>
+<li>batch_size：batch size</li>
+<li>shuffle:：是否将数据打乱</li>
+<li>sampler： 样本抽样，后续会详细介绍</li>
+<li>num_workers：使用多进程加载的进程数，0代表不使用多进程</li>
+<li>collate_fn： 如何将多个样本数据拼接成一个batch，一般使用默认的拼接方式即可</li>
+<li>pin_memory：是否将数据保存在pin memory区，pin memory中的数据转到GPU会快一些</li>
+<li>drop_last：dataset中的数据个数可能不是batch_size的整数倍，drop_last为True会将多出来不足一个batch的数据丢弃</li>
+</ul>
+<h4 id="collate-fn"><a href="#collate-fn" class="headerlink" title="collate_fn()"></a>collate_fn()</h4><p>到这里，我们可以发现pytorch数据载入很简单，基本上对于简单地任务都不会出啥问题，然而数据载入容易出错的地方往往在于collate_fn函数。尤其是对于batch大小不一致的情况，比如目标检测，需要检测出图片中所有的目标。如下：<br><img src="/img/yolo2_result.png" alt><br>问题就是，输入的是一张张图片，大小不同可以resize成一样大小组成一个batch，但是它的label是每个目标的boxes和categories。而且每张图片中的目标个数也不一样，怎么组成一个batch。这个时候我们就需要自定义实现一个collate_fn函数。这里可以使用任何名字，只要在DataLoader里面传入就可以了。<br><figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">def collate_fn(self, batch):</span><br><span class="line">    <span class="string">""</span><span class="comment">"</span></span><br><span class="line">    Since each image may have <span class="keyword">a</span> different <span class="keyword">number</span> of objects, we need <span class="keyword">a</span> collate <span class="function"><span class="keyword">function</span> <span class="params">(to be passed to the DataLoader)</span>.</span></span><br><span class="line"></span><br><span class="line">    This describes how <span class="keyword">to</span> combine these tensors of different sizes. We use lists.</span><br><span class="line"></span><br><span class="line">    Note: this need not <span class="keyword">be</span> defined in this Class, can <span class="keyword">be</span> standalone.</span><br><span class="line"></span><br><span class="line">    :param batch: <span class="keyword">an</span> iterable of <span class="keyword">N</span> sets from __getitem__()</span><br><span class="line">    :<span class="keyword">return</span>: <span class="keyword">a</span> tensor of images, lists of varying-size tensors of bounding boxes, labels, <span class="built_in">and</span> difficulties</span><br><span class="line">    <span class="string">""</span><span class="comment">"</span></span><br><span class="line">    </span><br><span class="line">    images = <span class="keyword">list</span>()</span><br><span class="line">    boxes = <span class="keyword">list</span>()</span><br><span class="line">    labels = <span class="keyword">list</span>()</span><br><span class="line">    difficulties = <span class="keyword">list</span>()</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> <span class="keyword">b</span> in batch:</span><br><span class="line">        images.<span class="keyword">append</span>(<span class="keyword">b</span>[<span class="number">0</span>])</span><br><span class="line">        boxes.<span class="keyword">append</span>(<span class="keyword">b</span>[<span class="number">1</span>])</span><br><span class="line">        labels.<span class="keyword">append</span>(<span class="keyword">b</span>[<span class="number">2</span>])</span><br><span class="line">        difficulties.<span class="keyword">append</span>(<span class="keyword">b</span>[<span class="number">3</span>])</span><br><span class="line"></span><br><span class="line">    images = torch.stack(images, dim=<span class="number">0</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> images, boxes, labels, difficulties  # tensor (<span class="keyword">N</span>, <span class="number">3</span>, <span class="number">300</span>, <span class="number">300</span>), <span class="number">3</span> lists of <span class="keyword">N</span> tensors each</span><br></pre></td></tr></table></figure></p>
+<h4 id="pin-memory"><a href="#pin-memory" class="headerlink" title="pin_memory()"></a>pin_memory()</h4><p>上面提到了pin_memory参数，pin_memory就是锁页内存，创建DataLoader时，设置pin_memory=True，则意味着生成的Tensor数据最开始是属于内存中的锁页内存，这样将内存的Tensor转义到GPU的显存就会更快一些。</p>
+<p>主机中的内存，有两种存在方式，一是锁页，二是不锁页，锁页内存存放的内容在任何情况下都不会与主机的虚拟内存进行交换（注：虚拟内存就是硬盘），而不锁页内存在主机内存不足时，数据会存放在虚拟内存中。</p>
+<p>而显卡中的显存全部是锁页内存！</p>
+<p>当计算机的内存充足的时候，可以设置pin_memory=True。当系统卡住，或者交换内存使用过多的时候，设置pin_memory=False。因为pin_memory与电脑硬件性能有关，pytorch开发者不能确保每一个炼丹玩家都有高端设备，因此pin_memory默认为False。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/pytorch/" rel="tag"># pytorch</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/11/ssd-dataaug/" rel="next" title="SSD中的数据增强细节">
+                <i class="fa fa-chevron-left"></i> SSD中的数据增强细节
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/15/HRNet/" rel="prev" title="HRNet详解">
+                HRNet详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#常用数学类操作符"><span class="nav-number">1.</span> <span class="nav-text">常用数学类操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#torchTensor-transpose-amp-Tensor-permute"><span class="nav-number">1.1.</span> <span class="nav-text">torchTensor.transpose() &amp; Tensor.permute()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#toch-cat-amp-torch-stack"><span class="nav-number">1.2.</span> <span class="nav-text">toch.cat() &amp; torch.stack()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#torch-squeeze-amp-torch-unsqueeze"><span class="nav-number">1.3.</span> <span class="nav-text">torch.squeeze() &amp; torch.unsqueeze()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Tensor-expand-as"><span class="nav-number">1.4.</span> <span class="nav-text">Tensor.expand_as()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#torch-contiguous"><span class="nav-number">1.5.</span> <span class="nav-text">torch.contiguous()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据读取"><span class="nav-number">2.</span> <span class="nav-text">数据读取</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Dataset"><span class="nav-number">2.1.</span> <span class="nav-text">Dataset</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DataLoader"><span class="nav-number">2.2.</span> <span class="nav-text">DataLoader</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#collate-fn"><span class="nav-number">2.3.</span> <span class="nav-text">collate_fn()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pin-memory"><span class="nav-number">2.4.</span> <span class="nav-text">pin_memory()</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

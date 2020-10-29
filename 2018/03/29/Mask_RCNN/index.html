@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="detection,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="论文信息：He Kaiming ,ICCV2017 best paper,2017 coco object detection,2017 coco instance segmentation winner. 整体框架：mask rcnn 在Faster RCNN的基础上，使用FCN来增加一个mask branch，从而解决instance segmentation问题，而且这个还能从一点程度上提高">
+<meta name="keywords" content="detection">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文阅读：Mask R-CNN">
+<meta property="og:url" content="https://nicehuster.cn/2018/03/29/Mask_RCNN/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="论文信息：He Kaiming ,ICCV2017 best paper,2017 coco object detection,2017 coco instance segmentation winner. 整体框架：mask rcnn 在Faster RCNN的基础上，使用FCN来增加一个mask branch，从而解决instance segmentation问题，而且这个还能从一点程度上提高">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.cn/img/294e4644643eb5f59bcef085a75166d0.png">
+<meta property="og:image" content="https://nicehuster.cn/img/cc70655b7f8ec0d5eb56ad9e54a644c3.png">
+<meta property="og:image" content="https://nicehuster.cn/img/48e85d1db346617827ab312e1e57507b.png">
+<meta property="og:image" content="https://nicehuster.cn/img/c67d0e601075a71da044ed037f006e01.png">
+<meta property="og:image" content="https://nicehuster.cn/img/7f5aa3c01dca26904469668457507b99.png">
+<meta property="og:image" content="https://nicehuster.cn/img/c86ab9ecb9809b59f244f2536e4933f8.png">
+<meta property="og:image" content="https://nicehuster.cn/img/7edea97659679babb3ff08a2ee11c9c6.png">
+<meta property="og:image" content="https://nicehuster.cn/img/95066fb4ecf22a3fd3ed8ef3625353e1.png">
+<meta property="og:image" content="https://nicehuster.cn/img/13e27af1ef0d21be00cd5c5d9c9d4d10.png">
+<meta property="og:image" content="https://nicehuster.cn/img/91a8ac2d8b5cd4da07010c82f52e30a3.png">
+<meta property="og:image" content="https://nicehuster.cn/img/66098381841a0120a3efd68686f0978a.png">
+<meta property="og:updated_time" content="2020-09-18T02:22:19.281Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="论文阅读：Mask R-CNN">
+<meta name="twitter:description" content="论文信息：He Kaiming ,ICCV2017 best paper,2017 coco object detection,2017 coco instance segmentation winner. 整体框架：mask rcnn 在Faster RCNN的基础上，使用FCN来增加一个mask branch，从而解决instance segmentation问题，而且这个还能从一点程度上提高">
+<meta name="twitter:image" content="https://nicehuster.cn/img/294e4644643eb5f59bcef085a75166d0.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.cn/2018/03/29/Mask_RCNN/">
+
+
+
+
+
+  <title>论文阅读：Mask R-CNN | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2018/03/29/Mask_RCNN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">论文阅读：Mask R-CNN</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-29T13:12:23+08:00">
+                2018-03-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>论文信息</strong>：He Kaiming ,ICCV2017 best paper,2017 coco object detection,2017 coco instance segmentation winner.</p>
+<p><strong>整体框架</strong>：mask rcnn 在Faster RCNN的基础上，使用FCN来增加一个mask branch，从而解决instance segmentation问题，而且这个还能从一点程度上提高object detection的检测效果。此外，该网络框架通用性强，使用灵活，通过关键点分支，还可以实现关键点检测。</p>
+<p><img src="/img/294e4644643eb5f59bcef085a75166d0.png" alt><br><a id="more"></a><br><strong>1.Instance segmentation难点</strong></p>
+<p>分割主要分为两种：Semantic segmentation和Instance segmentation。前者是语义分割，用于对不同种类的目标进行分割，区分的仅仅是不同种类之间的差异；后者是实例分割，是在前者的基础上，不仅仅要区分不同种类之前的差异，还要区分开同种类目标的不同个体。如下如所示</p>
+<p><img src="/img/cc70655b7f8ec0d5eb56ad9e54a644c3.png" alt></p>
+<p>如果认为instance segmentation=detection +semantic segmentation，就会产生一些错误，比如图中person3和person4的交集部分都是属于“人”，那么该如何区分交集部分的像素是属于person3还是person4？现有大多数instance segmentation 算法都很难完全解决这问题，无论是COCO2015（MNC）还是COCO2016（FCIS）实例分割的winner都是很难完全解决这个问题。而mask rcnn的提出就是解决instance segmentation的这个问题。</p>
+<p><strong>2.Faster RCNN与Mask RCNN的区别</strong></p>
+<p><img src="/img/48e85d1db346617827ab312e1e57507b.png" alt></p>
+<p>从上图可以看出有两个区别：(1)RoIPool layer 和RoIAlign layer；(2)RoI特征前者用于分类+回归，而后者用于分类+回归+mask分割；</p>
+<p>至于RoIPool和RoIAlign的区别，有时间再细讲。总之，RoIAlign的提出就是为了解决RoIPool的两次量化操作导致的不匹配问题(misalignment),而这个是直接影响分割的效果。</p>
+<p><strong>3.网络结构</strong></p>
+<p>从上图（2）可以看出，mask rcnn主要有两部分组成：backbone+head。</p>
+<p><img src="/img/c67d0e601075a71da044ed037f006e01.png" alt></p>
+<p>上图是作者给出的基于两个不同backbone的mask rcnn网络的head部分。前者是基于ResNet-C4，后者是基于FPN。Mask branch分支部分都是通过FCN实现的。之所以用FCN去实现，是因为使用FCN不会像FC层那样会丢失空间信息（spatial<br>layout），而且这样可以避免使用FC带来的参数的增加。</p>
+<p>注：14*14*80中，80指的是类别，因为在物体检测时已经得到类别，所以直接选择对应类别的那个14*14特征图，然后resize到检测box尺寸就是最终结果。</p>
+<p><strong>3.训练</strong></p>
+<p>Stage1 训练RPN：这个金额训练Faster RCNN是一样的；</p>
+<p>Loss function= binary loss+ box smooth L1 loss</p>
+<p>Stage2 训练Mask RCNN：</p>
+<p>Loss function= class loss + box loss + mask loss</p>
+<p>注：每个ROI都会预测K个m*m大小的mask输出。M通常等于14或28，K是类别个数。使用sigmoid作为激活函数，并没有使用sofmax，这需要注意。训练的时候，只把第k个m*m的预测的mask加入到loss中去。</p>
+<p>Mask loss中使用的是sigmoid(binary cross entropy loss),为什么不使用softmax?(像传统的FCN那样)</p>
+<p><img src="/img/7f5aa3c01dca26904469668457507b99.png" alt></p>
+<p>作者通过实验对比发现，sigmoid的结果比softmax结果大约高5.5AP。</p>
+<p><strong>4.实验结果</strong></p>
+<p><img src="/img/c86ab9ecb9809b59f244f2536e4933f8.png" alt></p>
+<p><strong>5.通用性</strong></p>
+<p>此外mask rcnn除了能产生mask之外，也可以用于检测人体关键点，只需要增加一个人体关键点的分支就OK。</p>
+<p><img src="/img/7edea97659679babb3ff08a2ee11c9c6.png" alt></p>
+<p>整个文章的大致内容就这些，上面只是蜻蜓点水的随便的介绍了mask rcnn的内容。具体细节可以去参考原文。</p>
+<p><strong>6.最后</strong></p>
+<p>这周使用自己的数据集训练，总的实验结果来说还是不错的。下面是我的实验结果和mask rcnn的实验结果。</p>
+<p>我的实验结果</p>
+<p><img src="/img/95066fb4ecf22a3fd3ed8ef3625353e1.png" alt></p>
+<p><img src="/img/13e27af1ef0d21be00cd5c5d9c9d4d10.png" alt></p>
+<p>从右图可以看出，最右边分割的时候漏掉了一个商品。也就是说在检测小目标时MNC还是存在一点的局限性的。</p>
+<p>Mask RCNN的结果</p>
+<p><img src="/img/91a8ac2d8b5cd4da07010c82f52e30a3.png" alt></p>
+<p><img src="/img/66098381841a0120a3efd68686f0978a.png" alt></p>
+<p>不得不说，mask rcnn太强大了。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/detection/" rel="tag"># detection</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/19/ARTNet/" rel="next" title="论文阅读：Appearance-and-Relation Networks for Video Classification(ARTNet)">
+                <i class="fa fa-chevron-left"></i> 论文阅读：Appearance-and-Relation Networks for Video Classification(ARTNet)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/10/yolo-paper/" rel="prev" title="YOLO 论文阅读">
+                YOLO 论文阅读 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

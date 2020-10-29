@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="tensorRT,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="NVIDIA TensorRT 作为一种高性能神经网络推理(Inference)引擎，可应用有图像分类、分割和目标检测等领域中，可提供最大的推理效率。下面将通过tensorRT给的几个示例来了解tensorRT的加速处理过程。">
+<meta name="keywords" content="tensorRT">
+<meta property="og:type" content="article">
+<meta property="og:title" content="tensorRT-caffe2tensorRT">
+<meta property="og:url" content="https://nicehuster.cn/2018/07/27/tensorRT_usage/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="NVIDIA TensorRT 作为一种高性能神经网络推理(Inference)引擎，可应用有图像分类、分割和目标检测等领域中，可提供最大的推理效率。下面将通过tensorRT给的几个示例来了解tensorRT的加速处理过程。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.cn/img/digits.png">
+<meta property="og:image" content="https://nicehuster.cn/img/caffe_digits.png">
+<meta property="og:image" content="https://nicehuster.cn/img/tensorRT6.png">
+<meta property="og:updated_time" content="2020-09-13T06:54:12.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="tensorRT-caffe2tensorRT">
+<meta name="twitter:description" content="NVIDIA TensorRT 作为一种高性能神经网络推理(Inference)引擎，可应用有图像分类、分割和目标检测等领域中，可提供最大的推理效率。下面将通过tensorRT给的几个示例来了解tensorRT的加速处理过程。">
+<meta name="twitter:image" content="https://nicehuster.cn/img/digits.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.cn/2018/07/27/tensorRT_usage/">
+
+
+
+
+
+  <title>tensorRT-caffe2tensorRT | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2018/07/27/tensorRT_usage/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">tensorRT-caffe2tensorRT</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-07-27T23:13:39+08:00">
+                2018-07-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/project/" itemprop="url" rel="index">
+                    <span itemprop="name">project</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>NVIDIA TensorRT 作为一种高性能神经网络推理(Inference)引擎，可应用有图像分类、分割和目标检测等领域中，可提供最大的推理效率。下面将通过tensorRT给的几个示例来了解tensorRT的加速处理过程。<br><a id="more"></a><br>在图像分类中，tensorRT给了两个示例，一个是mnist手写字体识别，以及一个GoogLeNet。这两个示例都是通过caffe载入模型文件和权重文件，然后进行加速。这里我就介绍一下第一个示例，以及在第一个示例上修改，使用tensorRT和caffe测试自己的图片,对比加速效果。</p>
+<h3 id="sampleMNIST"><a href="#sampleMNIST" class="headerlink" title="sampleMNIST"></a>sampleMNIST</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;assert.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cmath&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cuda_runtime_api.h&gt; //由于需要用到cuda，所以需要包含该头文件</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"NvInfer.h"</span>  <span class="comment">//主要的头文件</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"NvCaffeParser.h"</span><span class="comment">//主要的头文件</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"common.h"</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> nvinfer1;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> nvcaffeparser1;</span><br><span class="line"></span><br><span class="line"><span class="comment">// stuff we know about the network and the caffe input/output blobs</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> INPUT_H = <span class="number">28</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> INPUT_W = <span class="number">28</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> OUTPUT_SIZE = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">static</span> Logger gLogger;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span>* INPUT_BLOB_NAME = <span class="string">"data"</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span>* OUTPUT_BLOB_NAME = <span class="string">"prob"</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; directories&#123; <span class="string">"data/samples/mnist/"</span>, <span class="string">"data/mnist/"</span> &#125;;</span><br><span class="line"><span class="built_in">std</span>::<span class="function"><span class="built_in">string</span> <span class="title">locateFile</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; input)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> locateFile(input, directories);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// simple PGM (portable greyscale map) reader</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">readPGMFile</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; fileName, <span class="keyword">uint8_t</span> buffer[INPUT_H*INPUT_W])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    readPGMFile(fileName, buffer, INPUT_H, INPUT_W);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">caffeToGIEModel</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; deployFile,				<span class="comment">// name for caffe prototxt</span></span></span></span><br><span class="line"><span class="function"><span class="params">					 <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; modelFile,				<span class="comment">// name for model </span></span></span></span><br><span class="line"><span class="function"><span class="params">					 <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt;&amp; outputs,   <span class="comment">// network outputs</span></span></span></span><br><span class="line"><span class="function"><span class="params">					 <span class="keyword">unsigned</span> <span class="keyword">int</span> maxBatchSize,					<span class="comment">// batch size - NB must be at least as large as the batch we want to run with)</span></span></span></span><br><span class="line"><span class="function"><span class="params">					 IHostMemory *&amp;gieModelStream)</span>    <span class="comment">// output buffer for the GIE model</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">//  builder</span></span><br><span class="line">	IBuilder* builder = createInferBuilder(gLogger);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// parse the caffe model to populate the network, then set the outputs</span></span><br><span class="line">	INetworkDefinition* network = builder-&gt;createNetwork();</span><br><span class="line">	ICaffeParser* parser = createCaffeParser();</span><br><span class="line">	<span class="keyword">const</span> IBlobNameToTensor* blobNameToTensor = parser-&gt;parse(locateFile(deployFile, directories).c_str(),</span><br><span class="line">															  locateFile(modelFile, directories).c_str(),</span><br><span class="line">															  *network,</span><br><span class="line">															  DataType::kFLOAT);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// specify which tensors are outputs</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">auto</span>&amp; s : outputs)</span><br><span class="line">		network-&gt;markOutput(*blobNameToTensor-&gt;find(s.c_str()));</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Build the engine</span></span><br><span class="line">	builder-&gt;setMaxBatchSize(maxBatchSize);</span><br><span class="line">	builder-&gt;setMaxWorkspaceSize(<span class="number">1</span> &lt;&lt; <span class="number">20</span>);</span><br><span class="line"></span><br><span class="line">	ICudaEngine* engine = builder-&gt;buildCudaEngine(*network);</span><br><span class="line">	assert(engine);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// we don't need the network any more, and we can destroy the parser</span></span><br><span class="line">	network-&gt;destroy();</span><br><span class="line">	parser-&gt;destroy();</span><br><span class="line"></span><br><span class="line">	<span class="comment">// serialize the engine, then close everything down</span></span><br><span class="line">	gieModelStream = engine-&gt;serialize();</span><br><span class="line">	engine-&gt;destroy();</span><br><span class="line">	builder-&gt;destroy();</span><br><span class="line">	shutdownProtobufLibrary();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doInference</span><span class="params">(IExecutionContext&amp; context, <span class="keyword">float</span>* input, <span class="keyword">float</span>* output, <span class="keyword">int</span> batchSize)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">const</span> ICudaEngine&amp; engine = context.getEngine();</span><br><span class="line">	<span class="comment">// input and output buffer pointers that we pass to the engine - the engine requires exactly IEngine::getNbBindings(),</span></span><br><span class="line">	<span class="comment">// of these, but in this case we know that there is exactly one input and one output.</span></span><br><span class="line">	assert(engine.getNbBindings() == <span class="number">2</span>);</span><br><span class="line">	<span class="keyword">void</span>* buffers[<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">	<span class="comment">// In order to bind the buffers, we need to know the names of the input and output tensors.</span></span><br><span class="line">	<span class="comment">// note that indices are guaranteed to be less than IEngine::getNbBindings()</span></span><br><span class="line">	<span class="keyword">int</span> inputIndex = engine.getBindingIndex(INPUT_BLOB_NAME), </span><br><span class="line">		outputIndex = engine.getBindingIndex(OUTPUT_BLOB_NAME);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// create GPU buffers and a stream</span></span><br><span class="line">	CHECK(cudaMalloc(&amp;buffers[inputIndex], batchSize * INPUT_H * INPUT_W * <span class="keyword">sizeof</span>(<span class="keyword">float</span>)));</span><br><span class="line">	CHECK(cudaMalloc(&amp;buffers[outputIndex], batchSize * OUTPUT_SIZE * <span class="keyword">sizeof</span>(<span class="keyword">float</span>)));</span><br><span class="line"></span><br><span class="line">	cudaStream_t stream;</span><br><span class="line">	CHECK(cudaStreamCreate(&amp;stream));</span><br><span class="line"></span><br><span class="line">	<span class="comment">// DMA the input to the GPU,  execute the batch asynchronously, and DMA it back:</span></span><br><span class="line">	CHECK(cudaMemcpyAsync(buffers[inputIndex], input, batchSize * INPUT_H * INPUT_W * <span class="keyword">sizeof</span>(<span class="keyword">float</span>), cudaMemcpyHostToDevice, stream));</span><br><span class="line">	context.enqueue(batchSize, buffers, stream, <span class="literal">nullptr</span>);</span><br><span class="line">	CHECK(cudaMemcpyAsync(output, buffers[outputIndex], batchSize * OUTPUT_SIZE*<span class="keyword">sizeof</span>(<span class="keyword">float</span>), cudaMemcpyDeviceToHost, stream));</span><br><span class="line">	cudaStreamSynchronize(stream);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// release the stream and the buffers</span></span><br><span class="line">	cudaStreamDestroy(stream);</span><br><span class="line">	CHECK(cudaFree(buffers[inputIndex]));</span><br><span class="line">	CHECK(cudaFree(buffers[outputIndex]));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>** argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//caffe model 转化为GIE model，创建序列化engine</span></span><br><span class="line">    IHostMemory *gieModelStream&#123;<span class="literal">nullptr</span>&#125;;</span><br><span class="line">   	caffeToGIEModel(<span class="string">"mnist.prototxt"</span>, <span class="string">"mnist.caffemodel"</span>, <span class="built_in">std</span>::<span class="built_in">vector</span> &lt; <span class="built_in">std</span>::<span class="built_in">string</span> &gt; &#123; OUTPUT_BLOB_NAME &#125;, <span class="number">1</span>, gieModelStream);</span><br><span class="line">   	</span><br><span class="line">	<span class="comment">// 随机读入一张图像</span></span><br><span class="line">	srand(<span class="keyword">unsigned</span>(time(<span class="literal">nullptr</span>)));</span><br><span class="line">	<span class="keyword">uint8_t</span> fileData[INPUT_H*INPUT_W];</span><br><span class="line">    <span class="keyword">int</span> num = rand() % <span class="number">10</span>;</span><br><span class="line">	readPGMFile(locateFile(<span class="built_in">std</span>::to_string(num) + <span class="string">".pgm"</span>, directories), fileData);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// print an ascii representation</span></span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"\n\n\n---------------------------"</span> &lt;&lt; <span class="string">"\n\n\n"</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; INPUT_H*INPUT_W; i++)</span><br><span class="line">		<span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; (<span class="string">" .:-=+*#%@"</span>[fileData[i] / <span class="number">26</span>]) &lt;&lt; (((i + <span class="number">1</span>) % INPUT_W) ? <span class="string">""</span> : <span class="string">"\n"</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 使用caffe parser解析均值文件，与图像处理相减</span></span><br><span class="line">	ICaffeParser* parser = createCaffeParser();</span><br><span class="line">	IBinaryProtoBlob* meanBlob = parser-&gt;parseBinaryProto(locateFile(<span class="string">"mnist_mean.binaryproto"</span>, directories).c_str());</span><br><span class="line">	parser-&gt;destroy();</span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">float</span> *meanData = <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">const</span> <span class="keyword">float</span>*&gt;(meanBlob-&gt;getData());</span><br><span class="line"></span><br><span class="line">	<span class="keyword">float</span> data[INPUT_H*INPUT_W];</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; INPUT_H*INPUT_W; i++)</span><br><span class="line">		data[i] = <span class="keyword">float</span>(fileData[i])-meanData[i];</span><br><span class="line">	meanBlob-&gt;destroy();</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 反序列化gieModelStream到engine，创建引擎执行的环境（context ） </span></span><br><span class="line">	IRuntime* runtime = createInferRuntime(gLogger);</span><br><span class="line">	ICudaEngine* engine = runtime-&gt;deserializeCudaEngine(gieModelStream-&gt;data(), gieModelStream-&gt;size(), <span class="literal">nullptr</span>);</span><br><span class="line">    <span class="keyword">if</span> (gieModelStream) gieModelStream-&gt;destroy();</span><br><span class="line"></span><br><span class="line">	IExecutionContext *context = engine-&gt;createExecutionContext();</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 执行推理</span></span><br><span class="line">	<span class="keyword">float</span> prob[OUTPUT_SIZE];</span><br><span class="line">	doInference(*context, data, prob, <span class="number">1</span>);<span class="comment">//参数：环境，输入，输出，batch大小</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// destroy the engine</span></span><br><span class="line">	context-&gt;destroy();</span><br><span class="line">	engine-&gt;destroy();</span><br><span class="line">	runtime-&gt;destroy();</span><br><span class="line"></span><br><span class="line">	<span class="comment">// print a histogram of the output distribution</span></span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="string">"\n\n"</span>;</span><br><span class="line">    <span class="keyword">float</span> val&#123;<span class="number">0.0f</span>&#125;;</span><br><span class="line">    <span class="keyword">int</span> idx&#123;<span class="number">0</span>&#125;;</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        val = <span class="built_in">std</span>::max(val, prob[i]);</span><br><span class="line">        <span class="keyword">if</span> (val == prob[i]) idx = i;</span><br><span class="line">		<span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; i &lt;&lt; <span class="string">": "</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">string</span>(<span class="keyword">int</span>(<span class="built_in">std</span>::<span class="built_in">floor</span>(prob[i] * <span class="number">10</span> + <span class="number">0.5f</span>)), <span class="string">'*'</span>) &lt;&lt; <span class="string">"\n"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">cout</span> &lt;&lt; <span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> (idx == num &amp;&amp; val &gt; <span class="number">0.9f</span>) ? EXIT_SUCCESS : EXIT_FAILURE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>编译运行，就可以得到上一篇博文中的实验结果。<br>从上面可以看出主要有这么几个关键步骤：</p>
+<blockquote>
+<ul>
+<li><strong>步骤一</strong>：将caffe model转化为GIE model以便提供给cuda engine 进行推理计算（inference），主要函数：void caffeToGIEModel();</li>
+<li><strong>步骤二</strong>：对得到的Model的流反序列化到cuda引擎，并创建用于执行推理的上下文环境 context；</li>
+<li><strong>步骤三</strong>：推理计算（inference），主要函数：void doInference();</li>
+</ul>
+</blockquote>
+<p>可以看到，上面网络构建的部分是直接对caffe的.deploy文件进行解析，得到网络。在同级的文件夹中，tensorRT还给出了一个sampleMNISTAPI示例，这个例子直接通过tensorRT api来定义网络。</p>
+<p>此外，值得注意的是，这里数据的读入并没有依赖第三方库（比如OpenCV）,数据的格式也是.pgm。我们对这个程序进行稍微的修改，来测试我们自己的图片，看一下测试一张图片需要的时间。</p>
+<h3 id="sampleMNIST-OpenCV"><a href="#sampleMNIST-OpenCV" class="headerlink" title="sampleMNIST_OpenCV"></a>sampleMNIST_OpenCV</h3><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;assert.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cmath&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cuda_runtime_api.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;opencv2/opencv.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"NvInfer.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"NvCaffeParser.h"</span>  </span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"common.h"</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> nvinfer1;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> nvcaffeparser1;</span><br><span class="line"></span><br><span class="line"><span class="comment">// stuff we know about the network and the caffe input/output blobs</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> INPUT_H = <span class="number">28</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> INPUT_W = <span class="number">28</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> OUTPUT_SIZE = <span class="number">10</span>;</span><br><span class="line"><span class="keyword">static</span> Logger gLogger;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span>* INPUT_BLOB_NAME = <span class="string">"data"</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span>* OUTPUT_BLOB_NAME = <span class="string">"prob"</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; directories&#123; <span class="string">"data/samples/mnist/"</span>, <span class="string">"data/mnist/"</span> &#125;;</span><br><span class="line"><span class="built_in">std</span>::<span class="function"><span class="built_in">string</span> <span class="title">locateFile</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; input)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> locateFile(input, directories);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// simple PGM (portable greyscale map) reader</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">readPGMFile</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; fileName, <span class="keyword">uint8_t</span> buffer[INPUT_H*INPUT_W])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    readPGMFile(fileName, buffer, INPUT_H, INPUT_W);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">caffeToGIEModel</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; deployFile,				<span class="comment">// name for caffe prototxt</span></span></span></span><br><span class="line"><span class="function"><span class="params">					 <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; modelFile,				<span class="comment">// name for model </span></span></span></span><br><span class="line"><span class="function"><span class="params">					 <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt;&amp; outputs,   <span class="comment">// network outputs</span></span></span></span><br><span class="line"><span class="function"><span class="params">					 <span class="keyword">unsigned</span> <span class="keyword">int</span> maxBatchSize,					<span class="comment">// batch size - NB must be at least as large as the batch we want to run with)</span></span></span></span><br><span class="line"><span class="function"><span class="params">					 IHostMemory *&amp;gieModelStream)</span>    <span class="comment">// output buffer for the GIE model</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">// create the builder</span></span><br><span class="line">	IBuilder* builder = createInferBuilder(gLogger);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// parse the caffe model to populate the network, then set the outputs</span></span><br><span class="line">	INetworkDefinition* network = builder-&gt;createNetwork();</span><br><span class="line">	ICaffeParser* parser = createCaffeParser();</span><br><span class="line">	<span class="keyword">const</span> IBlobNameToTensor* blobNameToTensor = parser-&gt;parse(locateFile(deployFile, directories).c_str(),</span><br><span class="line">															  locateFile(modelFile, directories).c_str(),</span><br><span class="line">															  *network,</span><br><span class="line">															  DataType::kFLOAT);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// specify which tensors are outputs</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">auto</span>&amp; s : outputs)</span><br><span class="line">		network-&gt;markOutput(*blobNameToTensor-&gt;find(s.c_str()));</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Build the engine</span></span><br><span class="line">	builder-&gt;setMaxBatchSize(maxBatchSize);</span><br><span class="line">	builder-&gt;setMaxWorkspaceSize(<span class="number">1</span> &lt;&lt; <span class="number">20</span>);</span><br><span class="line"></span><br><span class="line">	ICudaEngine* engine = builder-&gt;buildCudaEngine(*network);</span><br><span class="line">	assert(engine);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// we don't need the network any more, and we can destroy the parser</span></span><br><span class="line">	network-&gt;destroy();</span><br><span class="line">	parser-&gt;destroy();</span><br><span class="line"></span><br><span class="line">	<span class="comment">// serialize the engine, then close everything down</span></span><br><span class="line">	gieModelStream = engine-&gt;serialize();</span><br><span class="line">	engine-&gt;destroy();</span><br><span class="line">	builder-&gt;destroy();</span><br><span class="line">	shutdownProtobufLibrary();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doInference</span><span class="params">(IExecutionContext&amp; context, <span class="keyword">float</span>* input, <span class="keyword">float</span>* output, <span class="keyword">int</span> batchSize)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">const</span> ICudaEngine&amp; engine = context.getEngine();</span><br><span class="line">	<span class="comment">// input and output buffer pointers that we pass to the engine - the engine requires exactly IEngine::getNbBindings(),</span></span><br><span class="line">	<span class="comment">// of these, but in this case we know that there is exactly one input and one output.</span></span><br><span class="line">	assert(engine.getNbBindings() == <span class="number">2</span>);</span><br><span class="line">	<span class="keyword">void</span>* buffers[<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">	<span class="comment">// In order to bind the buffers, we need to know the names of the input and output tensors.</span></span><br><span class="line">	<span class="comment">// note that indices are guaranteed to be less than IEngine::getNbBindings()</span></span><br><span class="line">	<span class="keyword">int</span> inputIndex = engine.getBindingIndex(INPUT_BLOB_NAME), </span><br><span class="line">		outputIndex = engine.getBindingIndex(OUTPUT_BLOB_NAME);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// create GPU buffers and a stream</span></span><br><span class="line">	CHECK(cudaMalloc(&amp;buffers[inputIndex], batchSize * INPUT_H * INPUT_W * <span class="keyword">sizeof</span>(<span class="keyword">float</span>)));</span><br><span class="line">	CHECK(cudaMalloc(&amp;buffers[outputIndex], batchSize * OUTPUT_SIZE * <span class="keyword">sizeof</span>(<span class="keyword">float</span>)));</span><br><span class="line"></span><br><span class="line">	cudaStream_t stream;</span><br><span class="line">	CHECK(cudaStreamCreate(&amp;stream));</span><br><span class="line"></span><br><span class="line">	<span class="comment">// DMA the input to the GPU,  execute the batch asynchronously, and DMA it back:</span></span><br><span class="line">	CHECK(cudaMemcpyAsync(buffers[inputIndex], input, batchSize * INPUT_H * INPUT_W * <span class="keyword">sizeof</span>(<span class="keyword">float</span>), cudaMemcpyHostToDevice, stream));</span><br><span class="line">	context.enqueue(batchSize, buffers, stream, <span class="literal">nullptr</span>);</span><br><span class="line">	CHECK(cudaMemcpyAsync(output, buffers[outputIndex], batchSize * OUTPUT_SIZE*<span class="keyword">sizeof</span>(<span class="keyword">float</span>), cudaMemcpyDeviceToHost, stream));</span><br><span class="line">	cudaStreamSynchronize(stream);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// release the stream and the buffers</span></span><br><span class="line">	cudaStreamDestroy(stream);</span><br><span class="line">	CHECK(cudaFree(buffers[inputIndex]));</span><br><span class="line">	CHECK(cudaFree(buffers[outputIndex]));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>** argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// create a GIE model from the caffe model and serialize it to a stream</span></span><br><span class="line">    IHostMemory *gieModelStream&#123;<span class="literal">nullptr</span>&#125;;</span><br><span class="line">   	caffeToGIEModel(<span class="string">"mnist.prototxt"</span>, <span class="string">"mnist.caffemodel"</span>, <span class="built_in">std</span>::<span class="built_in">vector</span> &lt; <span class="built_in">std</span>::<span class="built_in">string</span> &gt; &#123; OUTPUT_BLOB_NAME &#125;, <span class="number">1</span>, gieModelStream);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">// parse the mean file</span></span><br><span class="line">	ICaffeParser* parser = createCaffeParser();</span><br><span class="line">	IBinaryProtoBlob* meanBlob = parser-&gt;parseBinaryProto(locateFile(<span class="string">"mnist_mean.binaryproto"</span>, directories).c_str());</span><br><span class="line">	parser-&gt;destroy();</span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">float</span> *meanData = <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">const</span> <span class="keyword">float</span>*&gt;(meanBlob-&gt;getData());</span><br><span class="line"></span><br><span class="line">	<span class="comment">// deserialize the engine </span></span><br><span class="line">	IRuntime* runtime = createInferRuntime(gLogger);</span><br><span class="line">	ICudaEngine* engine = runtime-&gt;deserializeCudaEngine(gieModelStream-&gt;data(), gieModelStream-&gt;size(), <span class="literal">nullptr</span>);</span><br><span class="line">    <span class="keyword">if</span> (gieModelStream) gieModelStream-&gt;destroy();</span><br><span class="line"></span><br><span class="line">	IExecutionContext *context = engine-&gt;createExecutionContext();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> image_folder=argv[<span class="number">1</span>];</span><br><span class="line"></span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">		<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> image_name=image_folder+<span class="string">"/"</span>+<span class="built_in">std</span>::to_string(i)+<span class="string">".png"</span>;</span><br><span class="line">		cv::Mat mat=cv::imread(image_name,<span class="number">0</span>);</span><br><span class="line">		<span class="keyword">if</span>(!mat.data)&#123;<span class="built_in">std</span>::<span class="built_in">cerr</span>&lt;&lt;<span class="string">"image read failed: "</span>&lt;&lt;image_name;<span class="built_in">exit</span>(<span class="number">0</span>);&#125;</span><br><span class="line"></span><br><span class="line">		cv::resize(mat,mat,cv::Size(INPUT_W,INPUT_H));</span><br><span class="line">		mat.convertTo(mat,CV_32FC1);</span><br><span class="line">		<span class="keyword">const</span> <span class="keyword">float</span>*p=(<span class="keyword">float</span>*)mat.data;</span><br><span class="line"></span><br><span class="line">		<span class="comment">//subtract it from the image</span></span><br><span class="line">		<span class="keyword">float</span> data[INPUT_H*INPUT_W];</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; INPUT_H*INPUT_W; i++)</span><br><span class="line">			data[i] = p[i]-meanData[i];</span><br><span class="line">		<span class="comment">// run inference</span></span><br><span class="line">		<span class="keyword">float</span> prob[OUTPUT_SIZE];</span><br><span class="line">		<span class="keyword">long</span> t0=cv::getTickCount();</span><br><span class="line">		doInference(*context, data, prob, <span class="number">1</span>);</span><br><span class="line">		<span class="keyword">float</span> val&#123;<span class="number">0.0f</span>&#125;;</span><br><span class="line">    	<span class="keyword">int</span> idx&#123;<span class="number">0</span>&#125;;</span><br><span class="line">		<span class="keyword">for</span> (<span class="keyword">unsigned</span> <span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++)&#123;</span><br><span class="line">        val = <span class="built_in">std</span>::max(val, prob[i]);</span><br><span class="line">        <span class="keyword">if</span> (val == prob[i]) idx = i;</span><br><span class="line">    	&#125;</span><br><span class="line">    	<span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;image_name&lt;&lt;<span class="string">":,predicted value: "</span>&lt;&lt;idx&lt;&lt;<span class="string">", probability: "</span>&lt;&lt;val&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">		<span class="keyword">long</span> t1=cv::getTickCount();</span><br><span class="line">		<span class="keyword">double</span> secs=(t1-t0)/cv::getTickFrequency();</span><br><span class="line">		<span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"********tensorRT takes "</span>&lt;&lt;secs*<span class="number">1000</span>&lt;&lt;<span class="string">"ms  **********"</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	meanBlob-&gt;destroy();</span><br><span class="line">	<span class="comment">// destroy the engine</span></span><br><span class="line">	context-&gt;destroy();</span><br><span class="line">	engine-&gt;destroy();</span><br><span class="line">	runtime-&gt;destroy();</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们的测试图片如下：<br><img src="/img/digits.png" alt><br>实验结果如下：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">niceliu<span class="meta">@ise</span>:<span class="regexp">~/data/</span>TensorRT<span class="number">-3.0</span><span class="number">.4</span><span class="regexp">/tensorRT_MNIST_test/</span>build$ .<span class="regexp">/TensorRT_MNIST_test ../</span>digit/</span><br><span class="line">..<span class="regexp">/digit/</span>/<span class="number">0.</span><span class="string">png:</span>,predicted <span class="string">value:</span> <span class="number">2</span>, <span class="string">probability:</span> <span class="number">0.587642</span></span><br><span class="line">********tensorRT takes <span class="number">2.0737</span>ms  **********</span><br><span class="line">..<span class="regexp">/digit/</span>/<span class="number">1.</span><span class="string">png:</span>,predicted <span class="string">value:</span> <span class="number">1</span>, <span class="string">probability:</span> <span class="number">0.628665</span></span><br><span class="line">********tensorRT takes <span class="number">0.218604</span>ms  **********</span><br><span class="line">..<span class="regexp">/digit/</span>/<span class="number">2.</span><span class="string">png:</span>,predicted <span class="string">value:</span> <span class="number">2</span>, <span class="string">probability:</span> <span class="number">0.999764</span></span><br><span class="line">********tensorRT takes <span class="number">0.207929</span>ms  **********</span><br><span class="line">..<span class="regexp">/digit/</span>/<span class="number">3.</span><span class="string">png:</span>,predicted <span class="string">value:</span> <span class="number">3</span>, <span class="string">probability:</span> <span class="number">0.998379</span></span><br><span class="line">********tensorRT takes <span class="number">0.225971</span>ms  **********</span><br><span class="line">..<span class="regexp">/digit/</span>/<span class="number">4.</span><span class="string">png:</span>,predicted <span class="string">value:</span> <span class="number">8</span>, <span class="string">probability:</span> <span class="number">0.892509</span></span><br><span class="line">********tensorRT takes <span class="number">0.204932</span>ms  **********</span><br><span class="line">..<span class="regexp">/digit/</span>/<span class="number">5.</span><span class="string">png:</span>,predicted <span class="string">value:</span> <span class="number">5</span>, <span class="string">probability:</span> <span class="number">0.997321</span></span><br><span class="line">********tensorRT takes <span class="number">0.204456</span>ms  **********</span><br><span class="line">..<span class="regexp">/digit/</span>/<span class="number">6.</span><span class="string">png:</span>,predicted <span class="string">value:</span> <span class="number">5</span>, <span class="string">probability:</span> <span class="number">0.502507</span></span><br><span class="line">********tensorRT takes <span class="number">0.20411</span>ms  **********</span><br><span class="line">..<span class="regexp">/digit/</span>/<span class="number">7.</span><span class="string">png:</span>,predicted <span class="string">value:</span> <span class="number">7</span>, <span class="string">probability:</span> <span class="number">0.986206</span></span><br><span class="line">********tensorRT takes <span class="number">0.203225</span>ms  **********</span><br><span class="line">..<span class="regexp">/digit/</span>/<span class="number">8.</span><span class="string">png:</span>,predicted <span class="string">value:</span> <span class="number">2</span>, <span class="string">probability:</span> <span class="number">0.781859</span></span><br><span class="line">********tensorRT takes <span class="number">0.205882</span>ms  **********</span><br><span class="line">..<span class="regexp">/digit/</span>/<span class="number">9.</span><span class="string">png:</span>,predicted <span class="string">value:</span> <span class="number">1</span>, <span class="string">probability:</span> <span class="number">0.880363</span></span><br><span class="line">********tensorRT takes <span class="number">0.210459</span>ms  **********</span><br></pre></td></tr></table></figure></p>
+<p>可以看出使用tensorRT预测一张图片的平均时间0.2ms左右。同样的数据，同样的.caffemodel，.deploy文件，使用caffe运行后的实验结果如下：<br><img src="/img/caffe_digits.png" alt></p>
+<p>可以看出,tensorRT相比caffe，加速效果还是挺明显的,$0.37ms左右  vs 0.2ms左右$。相关的实验代码以及CMakeLists.txt文件可以看<a href="https://github.com/nicehuster/tensorRT_vs_caffe" target="_blank" rel="noopener">这里</a>。</p>
+<h3 id="tensorRT-classification"><a href="#tensorRT-classification" class="headerlink" title="tensorRT_classification"></a>tensorRT_classification</h3><p>下面使用tensorRT直接测试caffemodel在图片分类上的实验效果，依然是使用OpenCV来载入图片，然后转化为float*格式输入到tensorRT中。<br><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;assert.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sstream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cmath&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;cuda_runtime_api.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;opencv2/opencv.hpp&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"NvInfer.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"NvCaffeParser.h"</span>  </span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"common.h"</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> nvinfer1;</span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> nvcaffeparser1;</span><br><span class="line"></span><br><span class="line"><span class="comment">// stuff we know about the network and the caffe input/output blobs</span></span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> N=<span class="number">1</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> INPUT_C=<span class="number">3</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> INPUT_H = <span class="number">224</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> INPUT_W = <span class="number">224</span>;</span><br><span class="line"><span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> OUTPUT_SIZE = <span class="number">1000</span>;</span><br><span class="line"><span class="keyword">static</span> Logger gLogger;</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span>* INPUT_BLOB_NAME = <span class="string">"data"</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="keyword">char</span>* OUTPUT_BLOB_NAME = <span class="string">"prob"</span>;</span><br><span class="line"><span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; directories&#123; <span class="string">"/home/niceliu/data/mryx_retrieval/models/ResNet/"</span>, <span class="string">"data/mnist/"</span> &#125;;</span><br><span class="line"><span class="built_in">std</span>::<span class="function"><span class="built_in">string</span> <span class="title">locateFile</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; input)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> locateFile(input, directories);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// simple PGM (portable greyscale map) reader</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">readPGMFile</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; fileName, <span class="keyword">uint8_t</span> buffer[INPUT_H*INPUT_W])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    readPGMFile(fileName, buffer, INPUT_H, INPUT_W);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">caffeToGIEModel</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; deployFile,				<span class="comment">// name for caffe prototxt</span></span></span></span><br><span class="line"><span class="function"><span class="params">					 <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; modelFile,				<span class="comment">// name for model </span></span></span></span><br><span class="line"><span class="function"><span class="params">					 <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt;&amp; outputs,   <span class="comment">// network outputs</span></span></span></span><br><span class="line"><span class="function"><span class="params">					 <span class="keyword">unsigned</span> <span class="keyword">int</span> maxBatchSize,					<span class="comment">// batch size - NB must be at least as large as the batch we want to run with)</span></span></span></span><br><span class="line"><span class="function"><span class="params">					 IHostMemory *&amp;gieModelStream)</span>    <span class="comment">// output buffer for the GIE model</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">// create the builder</span></span><br><span class="line">	IBuilder* builder = createInferBuilder(gLogger);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// parse the caffe model to populate the network, then set the outputs</span></span><br><span class="line">	INetworkDefinition* network = builder-&gt;createNetwork();</span><br><span class="line">	ICaffeParser* parser = createCaffeParser();</span><br><span class="line">	<span class="keyword">const</span> IBlobNameToTensor* blobNameToTensor = parser-&gt;parse(locateFile(deployFile, directories).c_str(),</span><br><span class="line">															  locateFile(modelFile, directories).c_str(),</span><br><span class="line">															  *network,</span><br><span class="line">															  DataType::kFLOAT);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// specify which tensors are outputs</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">auto</span>&amp; s : outputs)</span><br><span class="line">		network-&gt;markOutput(*blobNameToTensor-&gt;find(s.c_str()));</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Build the engine</span></span><br><span class="line">	builder-&gt;setMaxBatchSize(maxBatchSize);</span><br><span class="line">	builder-&gt;setMaxWorkspaceSize(<span class="number">10</span> &lt;&lt; <span class="number">20</span>);</span><br><span class="line"></span><br><span class="line">	ICudaEngine* engine = builder-&gt;buildCudaEngine(*network);</span><br><span class="line">	assert(engine);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// we don't need the network any more, and we can destroy the parser</span></span><br><span class="line">	network-&gt;destroy();</span><br><span class="line">	parser-&gt;destroy();</span><br><span class="line"></span><br><span class="line">	<span class="comment">// serialize the engine, then close everything down</span></span><br><span class="line">	gieModelStream = engine-&gt;serialize();</span><br><span class="line">	engine-&gt;destroy();</span><br><span class="line">	builder-&gt;destroy();</span><br><span class="line">	shutdownProtobufLibrary();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">doInference</span><span class="params">(IExecutionContext&amp; context, <span class="keyword">float</span>* input, <span class="keyword">float</span>* output, <span class="keyword">int</span> batchSize)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">const</span> ICudaEngine&amp; engine = context.getEngine();</span><br><span class="line">	<span class="comment">// input and output buffer pointers that we pass to the engine - the engine requires exactly IEngine::getNbBindings(),</span></span><br><span class="line">	<span class="comment">// of these, but in this case we know that there is exactly one input and one output.</span></span><br><span class="line">	assert(engine.getNbBindings() == <span class="number">2</span>);</span><br><span class="line">	<span class="keyword">void</span>* buffers[<span class="number">2</span>];</span><br><span class="line"></span><br><span class="line">	<span class="comment">// In order to bind the buffers, we need to know the names of the input and output tensors.</span></span><br><span class="line">	<span class="comment">// note that indices are guaranteed to be less than IEngine::getNbBindings()</span></span><br><span class="line">	<span class="keyword">int</span> inputIndex = engine.getBindingIndex(INPUT_BLOB_NAME), </span><br><span class="line">		outputIndex = engine.getBindingIndex(OUTPUT_BLOB_NAME);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// create GPU buffers and a stream</span></span><br><span class="line">	CHECK(cudaMalloc(&amp;buffers[inputIndex], batchSize * INPUT_H * INPUT_W * <span class="keyword">sizeof</span>(<span class="keyword">float</span>)));</span><br><span class="line">	CHECK(cudaMalloc(&amp;buffers[outputIndex], batchSize * OUTPUT_SIZE * <span class="keyword">sizeof</span>(<span class="keyword">float</span>)));</span><br><span class="line"></span><br><span class="line">	cudaStream_t stream;</span><br><span class="line">	CHECK(cudaStreamCreate(&amp;stream));</span><br><span class="line"></span><br><span class="line">	<span class="comment">// DMA the input to the GPU,  execute the batch asynchronously, and DMA it back:</span></span><br><span class="line">	CHECK(cudaMemcpyAsync(buffers[inputIndex], input, batchSize * INPUT_H * INPUT_W * <span class="keyword">sizeof</span>(<span class="keyword">float</span>), cudaMemcpyHostToDevice, stream));</span><br><span class="line">	context.enqueue(batchSize, buffers, stream, <span class="literal">nullptr</span>);</span><br><span class="line">	CHECK(cudaMemcpyAsync(output, buffers[outputIndex], batchSize * OUTPUT_SIZE*<span class="keyword">sizeof</span>(<span class="keyword">float</span>), cudaMemcpyDeviceToHost, stream));</span><br><span class="line">	cudaStreamSynchronize(stream);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// release the stream and the buffers</span></span><br><span class="line">	cudaStreamDestroy(stream);</span><br><span class="line">	CHECK(cudaFree(buffers[inputIndex]));</span><br><span class="line">	CHECK(cudaFree(buffers[outputIndex]));</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">bool</span> <span class="title">PairCompare</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::pair&lt;<span class="keyword">float</span>, <span class="keyword">int</span>&gt;&amp; lhs,</span></span></span><br><span class="line"><span class="function"><span class="params">                        <span class="keyword">const</span> <span class="built_in">std</span>::pair&lt;<span class="keyword">float</span>, <span class="keyword">int</span>&gt;&amp; rhs)</span> </span>&#123;</span><br><span class="line">  <span class="keyword">return</span> lhs.first &gt; rhs.first;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* Return the indices of the top N values of vector v. */</span></span><br><span class="line"><span class="keyword">static</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; Argmax(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt;&amp; v, <span class="keyword">int</span> N) &#123;</span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::pair&lt;<span class="keyword">float</span>, <span class="keyword">int</span>&gt; &gt; pairs;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">size_t</span> i = <span class="number">0</span>; i &lt; v.size(); ++i)</span><br><span class="line">    pairs.push_back(<span class="built_in">std</span>::make_pair(v[i], i));</span><br><span class="line">  <span class="built_in">std</span>::partial_sort(pairs.begin(), pairs.begin() + N, pairs.end(), PairCompare);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; result;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; N; ++i)</span><br><span class="line">    result.push_back(pairs[i].second);</span><br><span class="line">  <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span>** argv)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// create a GIE model from the caffe model and serialize it to a stream</span></span><br><span class="line">    IHostMemory *gieModelStream&#123;<span class="literal">nullptr</span>&#125;;</span><br><span class="line">   	caffeToGIEModel(<span class="string">"ResNet-50-deploy.prototxt"</span>, <span class="string">"ResNet-50-model.caffemodel"</span>, <span class="built_in">std</span>::<span class="built_in">vector</span> &lt; <span class="built_in">std</span>::<span class="built_in">string</span> &gt; &#123; OUTPUT_BLOB_NAME &#125;, <span class="number">1</span>, gieModelStream);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="comment">// parse the mean file</span></span><br><span class="line">	ICaffeParser* parser = createCaffeParser();</span><br><span class="line">	IBinaryProtoBlob* meanBlob = parser-&gt;parseBinaryProto(locateFile(<span class="string">"ResNet_mean.binaryproto"</span>, directories).c_str());</span><br><span class="line">	parser-&gt;destroy();</span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">float</span> *meanData = <span class="keyword">reinterpret_cast</span>&lt;<span class="keyword">const</span> <span class="keyword">float</span>*&gt;(meanBlob-&gt;getData());</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// deserialize the engine </span></span><br><span class="line">	IRuntime* runtime = createInferRuntime(gLogger);</span><br><span class="line">	ICudaEngine* engine = runtime-&gt;deserializeCudaEngine(gieModelStream-&gt;data(), gieModelStream-&gt;size(), <span class="literal">nullptr</span>);</span><br><span class="line">    <span class="keyword">if</span> (gieModelStream) gieModelStream-&gt;destroy();</span><br><span class="line"></span><br><span class="line">	IExecutionContext *context = engine-&gt;createExecutionContext();</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span> image_name=argv[<span class="number">1</span>];</span><br><span class="line">	cv::Mat mat=cv::imread(image_name);</span><br><span class="line">	<span class="keyword">if</span>(!mat.data)&#123;<span class="built_in">std</span>::<span class="built_in">cerr</span>&lt;&lt;<span class="string">"image read failed: "</span>&lt;&lt;image_name;<span class="built_in">exit</span>(<span class="number">0</span>);&#125;</span><br><span class="line"></span><br><span class="line">	cv::resize(mat,mat,cv::Size(INPUT_W,INPUT_H));</span><br><span class="line"></span><br><span class="line">	<span class="keyword">float</span>* data = <span class="keyword">new</span> <span class="keyword">float</span>[N*INPUT_C*INPUT_H*INPUT_W];</span><br><span class="line">	<span class="comment">// pixel mean used by the Faster R-CNN's author</span></span><br><span class="line">	<span class="keyword">float</span> pixelMean[<span class="number">3</span>]&#123; <span class="number">104.0069879317889f</span>, <span class="number">116.66876761696767f</span>, <span class="number">122.6789143406786f</span> &#125;; <span class="comment">// also in BGR order</span></span><br><span class="line">	<span class="keyword">unsigned</span> volCh1=INPUT_H*INPUT_W;</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">int</span> c=<span class="number">0</span>;c&lt;INPUT_C;c++)</span><br><span class="line">	&#123;</span><br><span class="line">		cv::Mat_&lt;cv::Vec3b&gt;::iterator it=mat.begin&lt;cv::Vec3b&gt;();</span><br><span class="line">		<span class="comment">// the color image to input should be in BGR order</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;volCh1;j++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">//opencv read in image as BGRformat,by default,thus need only deduct the mean value</span></span><br><span class="line">			data[c*volCh1+j]=<span class="keyword">float</span>((*it)[c])-pixelMean[c];</span><br><span class="line">			it++;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;<span class="comment">//上面Mat转化为float*，感觉挺耗时间的，</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">// run inference</span></span><br><span class="line">	<span class="keyword">float</span> prob[OUTPUT_SIZE];</span><br><span class="line">	<span class="keyword">long</span> t0=cv::getTickCount();</span><br><span class="line">	doInference(*context, data, prob, <span class="number">1</span>);</span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">float</span>&gt; v_prob(prob,prob+<span class="keyword">sizeof</span>(prob)/<span class="keyword">sizeof</span>(<span class="keyword">float</span>));</span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; maxN = Argmax(v_prob, <span class="number">5</span>);<span class="comment">//取top5的测试结果</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5</span>; ++i) &#123;</span><br><span class="line">    <span class="keyword">int</span> idx = maxN[i];</span><br><span class="line">   <span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;image_name&lt;&lt;<span class="string">":,predicted value: "</span>&lt;&lt;idx&lt;&lt;<span class="string">", probability: "</span>&lt;&lt;prob[idx]&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">long</span> t1=cv::getTickCount();</span><br><span class="line">	<span class="keyword">double</span> secs=(t1-t0)/cv::getTickFrequency();</span><br><span class="line">	<span class="built_in">std</span>::<span class="built_in">cout</span>&lt;&lt;<span class="string">"********tensorRT takes "</span>&lt;&lt;secs*<span class="number">1000</span>&lt;&lt;<span class="string">"ms  **********"</span>&lt;&lt;<span class="built_in">std</span>::<span class="built_in">endl</span>;</span><br><span class="line">	meanBlob-&gt;destroy();</span><br><span class="line">	<span class="comment">// destroy the engine</span></span><br><span class="line">	context-&gt;destroy();</span><br><span class="line">	engine-&gt;destroy();</span><br><span class="line">	runtime-&gt;destroy();</span><br><span class="line">	<span class="keyword">delete</span>[] data;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>对程序编译测试，实验结果如下：<br><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">niceliu<span class="meta">@ise</span>:<span class="regexp">~/tensorRT/</span>tensor_cls<span class="regexp">/build$ ./</span>TensorRT_MNIST_test ..<span class="regexp">/../</span>..<span class="regexp">/data/</span>jetson-inference<span class="regexp">/build/</span>x86_64<span class="regexp">/bin/</span>orange_0.jpg</span><br><span class="line">..<span class="regexp">/../</span>..<span class="regexp">/data/</span>jetson-inference<span class="regexp">/build/</span>x86_64<span class="regexp">/bin/</span>orange_0.<span class="string">jpg:</span>,predicted <span class="string">value:</span> <span class="number">951</span>, <span class="string">probability:</span> <span class="number">0.593339</span></span><br><span class="line">..<span class="regexp">/../</span>..<span class="regexp">/data/</span>jetson-inference<span class="regexp">/build/</span>x86_64<span class="regexp">/bin/</span>orange_0.<span class="string">jpg:</span>,predicted <span class="string">value:</span> <span class="number">522</span>, <span class="string">probability:</span> <span class="number">0.206634</span></span><br><span class="line">..<span class="regexp">/../</span>..<span class="regexp">/data/</span>jetson-inference<span class="regexp">/build/</span>x86_64<span class="regexp">/bin/</span>orange_0.<span class="string">jpg:</span>,predicted <span class="string">value:</span> <span class="number">950</span>, <span class="string">probability:</span> <span class="number">0.182364</span></span><br><span class="line">..<span class="regexp">/../</span>..<span class="regexp">/data/</span>jetson-inference<span class="regexp">/build/</span>x86_64<span class="regexp">/bin/</span>orange_0.<span class="string">jpg:</span>,predicted <span class="string">value:</span> <span class="number">852</span>, <span class="string">probability:</span> <span class="number">0.0130069</span></span><br><span class="line">..<span class="regexp">/../</span>..<span class="regexp">/data/</span>jetson-inference<span class="regexp">/build/</span>x86_64<span class="regexp">/bin/</span>orange_0.<span class="string">jpg:</span>,predicted <span class="string">value:</span> <span class="number">722</span>, <span class="string">probability:</span> <span class="number">0.00191788</span></span><br><span class="line">********tensorRT takes <span class="number">6.93229</span>ms  **********</span><br></pre></td></tr></table></figure></p>
+<p>上面测试使用的是ResNet50,top1的预测结果为951，对比ImageNet标签文件synset_words.txt，可以发现第951行刚好是orange。tensorRT测试一张图片的时间7ms左右。和caffe原生的“examples/cpp_classification/classification.bin”对比测试结果如下：<br><img src="/img/tensorRT6.png" alt><br>从上面的实验对比可以发现，使用同样的模型ResNet50，在inference过程中，tensorRT明显要快于caffe。</p>
+<h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>（1）从测试结果lai来看，和caffe相比，tensorRT给出的分类置信度都很低，不知道是不是在cv::Mat转float*出了问题，还是tensorRT在某种程度上因为权重量化的问题；<br>（2）使用tensorRT测试图片时，反应时间要比caffe慢，可能在数据格式转换效率以及编译过程中CMakeLists文件编写有问题；<br>此外，昨天在GitHub偶然发现，NVIDIA团队，在tensorRT的基础上实现了图像识别，目标检测，图像分割等，代码在<a href="https://github.com/dusty-nv/jetson-inference" target="_blank" rel="noopener">这里</a>。<br>参考资料：<br><a href="https://github.com/radeonwu/TensorRT_TX2_20FPS" target="_blank" rel="noopener">TensorRT_TX2_20FPS</a><br><a href="https://github.com/LitLeo/TensorRT_Tutorial" target="_blank" rel="noopener">TensorRT_Tutorial</a><br><a href="https://github.com/dusty-nv/jetson-inference" target="_blank" rel="noopener">jetson-inference</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/tensorRT/" rel="tag"># tensorRT</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/07/26/tensorRT_introduce/" rel="next" title="tensorRT-介绍">
+                <i class="fa fa-chevron-left"></i> tensorRT-介绍
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/07/29/tensorRT_customlayer/" rel="prev" title="tensorRT-添加自定义层">
+                tensorRT-添加自定义层 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#sampleMNIST"><span class="nav-number">1.</span> <span class="nav-text">sampleMNIST</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sampleMNIST-OpenCV"><span class="nav-number">2.</span> <span class="nav-text">sampleMNIST_OpenCV</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tensorRT-classification"><span class="nav-number">3.</span> <span class="nav-text">tensorRT_classification</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题"><span class="nav-number">4.</span> <span class="nav-text">问题</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

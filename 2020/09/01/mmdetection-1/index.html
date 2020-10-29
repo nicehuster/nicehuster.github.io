@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="mmdetection,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="平时做的都些检测相关的项目，因此对于各类检测框架使用较多，以及一些不知名的repo都有用过，平时接触的都是业务项目，很少去认真的看一个repo中算法的框架设计，最近项目处于交付阶段，主要是客户和平台开发人员对界面的问题。趁有空mmdetection的代码重新看了一遍，顺便做了一些笔记。 组件设计  BackBone: 特征提取骨架网络,ResNet,ResneXt,ssd_vgg, hrnet 等">
+<meta name="keywords" content="mmdetection">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mmdetection详解指北 (一)">
+<meta property="og:url" content="https://nicehuster.cn/2020/09/01/mmdetection-1/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="平时做的都些检测相关的项目，因此对于各类检测框架使用较多，以及一些不知名的repo都有用过，平时接触的都是业务项目，很少去认真的看一个repo中算法的框架设计，最近项目处于交付阶段，主要是客户和平台开发人员对界面的问题。趁有空mmdetection的代码重新看了一遍，顺便做了一些笔记。 组件设计  BackBone: 特征提取骨架网络,ResNet,ResneXt,ssd_vgg, hrnet 等">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.cn/img/image-20200917202833058.png">
+<meta property="og:updated_time" content="2020-09-18T07:19:24.317Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="mmdetection详解指北 (一)">
+<meta name="twitter:description" content="平时做的都些检测相关的项目，因此对于各类检测框架使用较多，以及一些不知名的repo都有用过，平时接触的都是业务项目，很少去认真的看一个repo中算法的框架设计，最近项目处于交付阶段，主要是客户和平台开发人员对界面的问题。趁有空mmdetection的代码重新看了一遍，顺便做了一些笔记。 组件设计  BackBone: 特征提取骨架网络,ResNet,ResneXt,ssd_vgg, hrnet 等">
+<meta name="twitter:image" content="https://nicehuster.cn/img/image-20200917202833058.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.cn/2020/09/01/mmdetection-1/">
+
+
+
+
+
+  <title>mmdetection详解指北 (一) | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/01/mmdetection-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">mmdetection详解指北 (一)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-01T19:13:39+08:00">
+                2020-09-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mmdetection/" itemprop="url" rel="index">
+                    <span itemprop="name">mmdetection</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>平时做的都些检测相关的项目，因此对于各类检测框架使用较多，以及一些不知名的repo都有用过，平时接触的都是业务项目，很少去认真的看一个repo中算法的框架设计，最近项目处于交付阶段，主要是客户和平台开发人员对界面的问题。趁有空mmdetection的代码重新看了一遍，顺便做了一些笔记。</p>
+<h3 id="组件设计"><a href="#组件设计" class="headerlink" title="组件设计"></a>组件设计</h3><blockquote>
+<ul>
+<li>BackBone: 特征提取骨架网络,ResNet,ResneXt,ssd_vgg, hrnet 等。</li>
+<li>Neck: 连接骨架和头部. 多层级特征融合,FPN,BFP,PAFPN 等。</li>
+<li>DenseHead: 处理特征图上的密集框部分, 主要分 AnchorHead。AnchorFreeHead 两大类，分别有 RPNHead, SSDHead,RetinaHead 和 FCOSHead 等。</li>
+<li>RoIHead (BBoxHead/MaskHead): 在特征图上对 roi 做类别分类或位置回归等 (1.x)。</li>
+<li>ROIHead:bbox 或 mask 的 roi_extractor+head(2.0, 合并了 extractor 和 head)</li>
+<li>SingleStage: BackBone + Neck + DenseHead</li>
+<li>TwoStage: BackBone + Neck + DenseHead + RoIHead(2.0)</li>
+</ul>
+</blockquote>
+<a id="more"></a>
+<h3 id="结构设计"><a href="#结构设计" class="headerlink" title="结构设计"></a>结构设计</h3><h4 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h4><blockquote>
+<ul>
+<li><p>configs 网络组件结构等配置信息 </p>
+</li>
+<li><p>tools: 训练和测试的最终包装和一些实用脚本 </p>
+</li>
+<li><p>mmdet:</p>
+<blockquote>
+<ul>
+<li>apis: 分布式环境设定 (1.x,2.0 移植到 mmcv), 推断, 测试, 训练基础代码;</li>
+<li>core: anchor 生成,bbox,mask 编解码, 变换, 标签锚定, 采样等, 模型评估, 加速, 优化器，后处理;</li>
+<li>datasets:coco,voc 等数据类, 数据 pipelines 的统一格式, 数据增强，数据采样;</li>
+<li>models: 模型组件 (backbone,head,loss,neck)，采用注册和组合构建的形式完成模型搭建</li>
+<li>ops: 优化加速代码, 包括 nms,roialign,dcn,masked_conv，focal_loss 等</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+</blockquote>
+<p><img src="/img/image-20200917202833058.png" alt="image-20200917202833058"></p>
+<h4 id="总体逻辑"><a href="#总体逻辑" class="headerlink" title="总体逻辑"></a>总体逻辑</h4><p>从 tools/train.py 中能看到整体可分如下 4 个步骤:</p>
+<blockquote>
+<ul>
+<li><p>1.mmcv.Config.fromfile 从配置文件解析配置信息, 并做适当更新, 包括环境搜集，预加载模型文件, 分布式设置，日志记录等;</p>
+</li>
+<li><p>2.mmdet.models 中的 build_detector 根据配置信息构造模型 ;</p>
+<blockquote>
+<ul>
+<li>2.1 build 系列函数调用 build_from_cfg 函数, 按 type 关键字从注册表中获取相应的对象, 对象的具名参数在注册文件中赋值;</li>
+<li>2.2 registr.py 放置了模型的组件注册器。其中注册器的 register_module 成员函数是一个装饰器功能函数，在具体的类对象 <em>A</em> 头上装饰 @X.register _module，并同时在 <em>A</em> 对象所在包的初始化文件中调用 <em>A</em>，即可将 <em>A</em> 保存到 registry.module_dict 中, 完成注册;_</li>
+<li>2.3 目前包含 BACKBONES,NECKS,ROI_EXTRACTORS,SHARED_ HEADS,HEADS,LOSSES,DETECTORS 七个模型相关注册器，另外还有数据类，优化器等注册器;</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+<ul>
+<li><p>3.build_dataset 根据配置信息获取数据类;</p>
+<blockquote>
+<ul>
+<li>3.1 coco，cityscapes，voc，deepfasion，lvis，wider_face 等数据 (数据类扩展见后续例子)。</li>
+</ul>
+</blockquote>
+</li>
+<li><p>4.train_detector 模型训练流程:</p>
+<blockquote>
+<ul>
+<li>4.1数据 loader 化, 模型分布式化，优化器选取</li>
+<li>4.2 进入 runner 训练流程 (来自 mmcv 库，采用 hook 方式，整合了 pytorch 训练流程)</li>
+<li>4.3 训练 pipelines 具体细节见后续展开。</li>
+</ul>
+</blockquote>
+</li>
+</ul>
+</blockquote>
+<p>后续说说配置文件，注册机制和训练逻辑。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/mmdetection/" rel="tag"># mmdetection</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/06/PILrotate/" rel="next" title="解决PIL读取图片出现自动旋转的解决方案">
+                <i class="fa fa-chevron-left"></i> 解决PIL读取图片出现自动旋转的解决方案
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/09/03/mmdetection-2/" rel="prev" title="mmdetection详解指北 (二)">
+                mmdetection详解指北 (二) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#组件设计"><span class="nav-number">1.</span> <span class="nav-text">组件设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结构设计"><span class="nav-number">2.</span> <span class="nav-text">结构设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#代码结构"><span class="nav-number">2.1.</span> <span class="nav-text">代码结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总体逻辑"><span class="nav-number">2.2.</span> <span class="nav-text">总体逻辑</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="detection,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="论文信息： End to End Object Detection with Transformers代码链接： https://github.com/facebookresearch/detr整体信息： 这是FAIR最近新出了一篇用transformer做检测的文章。相比于以往所有的检测方法不同的是，没有使用先验知识比如anchor设计，以及后处理步骤比如nms等操作。而是使用transform">
+<meta name="keywords" content="detection">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DETR 基于transformer的目标检测方法">
+<meta property="og:url" content="https://nicehuster.cn/2020/10/27/detr/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="论文信息： End to End Object Detection with Transformers代码链接： https://github.com/facebookresearch/detr整体信息： 这是FAIR最近新出了一篇用transformer做检测的文章。相比于以往所有的检测方法不同的是，没有使用先验知识比如anchor设计，以及后处理步骤比如nms等操作。而是使用transform">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.cn/img/detr.png">
+<meta property="og:image" content="https://nicehuster.cn/img/detr-transformer.png">
+<meta property="og:image" content="https://nicehuster.cn/img/detr-ffn.png">
+<meta property="og:image" content="https://nicehuster.cn/img/detr-exp.png">
+<meta property="og:updated_time" content="2020-10-28T08:49:02.649Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DETR 基于transformer的目标检测方法">
+<meta name="twitter:description" content="论文信息： End to End Object Detection with Transformers代码链接： https://github.com/facebookresearch/detr整体信息： 这是FAIR最近新出了一篇用transformer做检测的文章。相比于以往所有的检测方法不同的是，没有使用先验知识比如anchor设计，以及后处理步骤比如nms等操作。而是使用transform">
+<meta name="twitter:image" content="https://nicehuster.cn/img/detr.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.cn/2020/10/27/detr/">
+
+
+
+
+
+  <title>DETR 基于transformer的目标检测方法 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/10/27/detr/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">DETR 基于transformer的目标检测方法</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-10-27T19:13:39+08:00">
+                2020-10-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>论文信息：</strong> <a href="https://arxiv.org/pdf/2005.12872.pdf" target="_blank" rel="noopener">End to End Object Detection with Transformers</a><br><strong>代码链接：</strong> <a href="https://github.com/facebookresearch/detr" target="_blank" rel="noopener">https://github.com/facebookresearch/detr</a><br><strong>整体信息：</strong> 这是FAIR最近新出了一篇用transformer做检测的文章。相比于以往所有的检测方法不同的是，没有使用先验知识比如anchor设计，以及后处理步骤比如nms等操作。而是使用transformer预测集合的形式，直接输出目标位置及类别信息。在object detection上DETR准确率和运行时间上和Faster RCNN相当；将模型generalize到panoptic segmentation任务上，DETR表现甚至还超过了其他的baseline.</p>
+<a id="more"></a>
+<h3 id="1-概览"><a href="#1-概览" class="headerlink" title="1.概览"></a>1.概览</h3><p><img src="/img/detr.png" alt="detr"></p>
+<p>上图展示的是DETR的整体结构图。如上图所示，可以看出两个关键的部分：</p>
+<blockquote>
+<ul>
+<li>使用transformer 的encoder-decoder结构生成N个 box predictions；其中N为事先设计的、远大于图像中object数的一个整数；</li>
+<li>设计了bipartite matching loss，基于预测的box和gt box的二分图匹配计算loss，从而使得预测的box更接近gt box；</li>
+</ul>
+</blockquote>
+<p>这篇文章的撰写风格比较诡异，不是按照正常的网络结构的先后顺序来介绍各个部分。而是先介绍了bipartite matching loss，再介绍transformer的encoder和decoder。为了便于理解，我这里还是按照网络结构的先后顺序来介绍各个模块。</p>
+<h3 id="2-Transformer"><a href="#2-Transformer" class="headerlink" title="2.Transformer"></a>2.Transformer</h3><p><img src="/img/detr-transformer.png" alt="detr-transformer"></p>
+<p>上图展示的是transformer的结构，其中包括encoder、decoder以及FFN三部分。</p>
+<h4 id="2-1-Transformer-Encoder"><a href="#2-1-Transformer-Encoder" class="headerlink" title="2.1 Transformer Encoder"></a>2.1 Transformer Encoder</h4><p>如上图左侧所示，在DETR中，首先输入图片 $x_{\mathrm{img}} \in \mathbb{R}^{3 \times H_{0} \times W_{0}}$ 经过CNN backbone处理后，输出feature map$f \in \mathbb{R}^{C \times H \times W}$ ，一般 $C=2048,H, W=\frac{H_{0}}{32}, \frac{W_{0}}{32}$ 。然后将backbone输出的feature map和position encoding相加，输入Transformer Encoder中处理，得到用于输入到Transformer Decoder的image embedding。由于Transformer的输入为序列化数据，因此会对backbone输出的feature map做进一步处理转化为序列化数据，具体处理包括如下：</p>
+<blockquote>
+<ul>
+<li><strong>维度压缩</strong>：使用1x1卷积将feature map 维度从C压缩为d,生成新的feature map $z_{0} \in \mathbb{R}^{d \times H \times W}$ ；</li>
+<li><strong>转化为序列化数据：</strong>将空间的维度（高和宽）压缩为一个维度，即把上一步得到的$d \times H \times W$维的feature map通过reshape成$d \times H W$维的feature map；</li>
+<li><strong>加上positoin encoding:</strong> 由于transformer模型是permutation-invariant（转置不变性，也可以理解为和位置无关），而显然图像中目标是具有空间信息的，与原图的位置有关，所以需要加上position encoding反映位置信息。具体生成的方法后续补充讲解。</li>
+</ul>
+</blockquote>
+<h4 id="2-2-Transformer-Decoder"><a href="#2-2-Transformer-Decoder" class="headerlink" title="2.2 Transformer Decoder"></a>2.2 Transformer Decoder</h4><p>这部分的话，有两个输入，一个是Transformer Encoder的输出，另一个是object queries。这里讲一下object queries，object queries有N个，N是一个事先设定的、比远远大于image中object个数的一个整数），输入Transformer Decoder后分别得到N个 output embedding，然后经过FFN处理之后，输出N个box的位置和类别信息。object queries具体是什么，论文阐述的很模糊。</p>
+<h4 id="2-3-FFN"><a href="#2-3-FFN" class="headerlink" title="2.3 FFN"></a>2.3 FFN</h4><p>这个是网络结构最后的输出部分，在DETR中，其实有两种FFN：一种预测bounding box的中心位置、高和宽，第二种预测class标签。下图是更细节的DETR Transformer结构，大家感兴趣可以仔细看一下。</p>
+<p><img src="/img/detr-ffn.png" alt="detr-ffn"></p>
+<h3 id="3-Loss设计"><a href="#3-Loss设计" class="headerlink" title="3. Loss设计"></a>3. Loss设计</h3><p>前面讲到transformer经过FFN之后会预测输出N个prediction boxes,其中，N是事先设计好的一个远大于image objects的正整数。通过得到这N个prediction boxes和image objects的最优二分图匹配，通过计算配对的box pair的loss来对模型进行优化。</p>
+<h4 id="3-1-最优二分图匹配"><a href="#3-1-最优二分图匹配" class="headerlink" title="3.1 最优二分图匹配"></a>3.1 最优二分图匹配</h4><p>假设对于一张图来说，image objects的个数为m，由于N是事先设计好的一个远大于m的正整数，所以 N&gt;&gt;m，即生成的prediction boxes的数量会远远大于image objects 数量。这样怎么做匹配？</p>
+<p>为了解决这个问题，作者人为构造了一个新的物体类别 $\varnothing$ (表示没有物体)并加入image objects中，上面所说到的多出来的N-m个个prediction embedding就会和类别 $\varnothing$ 配对。这样就可以将prediction boxes和image objects的配对看作两个等容量的集合的二分图匹配了。</p>
+<p>设计好匹配的cost，就可以使用<a href="https://www.cxyxiaowu.com/874.html" target="_blank" rel="noopener">匈牙利算法</a>快速地找到使cost最小的二分图匹配方案了。cost计算如下：</p>
+<script type="math/tex; mode=display">
+\hat{\sigma}=\underset{\sigma \in \widetilde{S}_{N}}{\arg \min } \sum_{i}^{N} \mathcal{L}_{\operatorname{match}}\left(y_{i}, \hat{y}_{\sigma(i)}\right)</script><p>对应单个prediction box和image object匹配cost $\mathcal{L}_{\operatorname{match}}\left(y_{i}, \hat{y}_{\sigma(i)}\right)$计算如下：</p>
+<script type="math/tex; mode=display">
+-\mathbb{1}_{\left\{c_{i} \neq \varnothing\right\}} \hat{p}_{\sigma(i)}\left(c_{i}\right)+\mathbb{1}_{\left\{c_{i} \neq \varnothing\right\}} \mathcal{L}_{\mathrm{box}}\left(b_{i}, \hat{b}_{\sigma(i)}\right)</script><p>其中，</p>
+<p>$c_i$ 第i个image object的class标签，$\sigma(i)$ 表示与第i个image object匹配的prediction box的index;</p>
+<p>$\mathbb{1}_{c_{i} \neq \varnothing}$ 是一个函数，当 $c_{i} \neq \phi$ 时为1，否则为0；</p>
+<p>$\hat{p}_{\sigma(i)}\left(c_{i}\right)$ 表示Transformer预测第$\sigma(i)$ 个prediction box为类别$c_i$ 的概率；</p>
+<p>$b_{i}, \hat{b}_{\sigma(i)}$ 分别为第i个image object和第$\sigma(i)$ 个prediction box的位置向量；</p>
+<p>$\mathcal{L}_{\mathrm{box}}\left(b_{i}, \hat{b}_{\sigma(i)}\right)$ 计算的是ground truth box和prediction box之间的距离；具体计算方式论文有提及：</p>
+<script type="math/tex; mode=display">
+\lambda_{\text {iou }} \mathcal{L}_{\text {iou }}\left(b_{i}, \hat{b}_{\sigma(i)}\right)+\lambda_{\mathrm{L} 1}\left\|b_{i}-\hat{b}_{\sigma(i)}\right\|_{1}</script><p>计算box的距离实验的IOU loss以及L1 loss。</p>
+<p>这样，我们就完全定义好了每对prediction box和 image object 配对时的cost。再利用匈牙利算法即可得到二分图最优匹配。</p>
+<h4 id="3-2-计算set-prediction-loss"><a href="#3-2-计算set-prediction-loss" class="headerlink" title="3.2 计算set prediction loss"></a>3.2 计算set prediction loss</h4><p>上面我们得到了prediction boxes和image objects之间的最优匹配。这里我们基于这个最优匹配，来计算set prediction loss，即评价Transformer生成这些prediction boxes的效果好坏。 set prediction loss的计算如下：</p>
+<script type="math/tex; mode=display">
+\mathcal{L}_{\text {Hungarian }}(y, \hat{y})=\sum^{N}\left[-\log \hat{p}_{\hat{\sigma}(i)}\left(c_{i}\right)+\mathbb{1}_{\left\{c_{i} \neq \varnothing\right\}} \mathcal{L}_{\text {box }}\left(b_{i}, \hat{b}_{\hat{\sigma}}(i)\right)\right]</script><p>其中，$\hat{\sigma}$ 为最优匹配。将第 i个image object匹配到第$\hat{\sigma}(i)$ 个prediction boxes。这里值得注意的是，和上面计算cost不太一样的地方是这里计算分类概率使用的是log对数的形式；将匹配到类别 $\varnothing$ 的概率考虑进去了，而前面cost的计算中则直接将其置为0了；</p>
+<h3 id="4-实验"><a href="#4-实验" class="headerlink" title="4.实验"></a>4.实验</h3><p>论文中实验细节较多，而且实验结果也比较solid，这里不细讲，有兴趣的可以直接看原文，这里贴一张在coco上实验结果对比：</p>
+<p><img src="/img/detr-exp.png" alt="detr-exp"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/detection/" rel="tag"># detection</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/09/14/U-2-Net/" rel="next" title="抠图神器U^2-Net">
+                <i class="fa fa-chevron-left"></i> 抠图神器U^2-Net
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-概览"><span class="nav-number">1.</span> <span class="nav-text">1.概览</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Transformer"><span class="nav-number">2.</span> <span class="nav-text">2.Transformer</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-Transformer-Encoder"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 Transformer Encoder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-Transformer-Decoder"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Transformer Decoder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-FFN"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 FFN</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Loss设计"><span class="nav-number">3.</span> <span class="nav-text">3. Loss设计</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-最优二分图匹配"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 最优二分图匹配</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-计算set-prediction-loss"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 计算set prediction loss</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-实验"><span class="nav-number">4.</span> <span class="nav-text">4.实验</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

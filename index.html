@@ -289,7 +289,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/10/27/2020-10-27-detr/">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/10/27/detr/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
@@ -308,7 +308,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/10/27/2020-10-27-detr/" itemprop="url">DETR 基于transformer的目标检测方法</a></h1>
+                <a class="post-title-link" href="/2020/10/27/detr/" itemprop="url">DETR 基于transformer的目标检测方法</a></h1>
         
 
         <div class="post-meta">
@@ -384,7 +384,7 @@
           <p><strong>论文信息：</strong> <a href="https://arxiv.org/pdf/2005.12872.pdf" target="_blank" rel="noopener">End to End Object Detection with Transformers</a><br><strong>代码链接：</strong> <a href="https://github.com/facebookresearch/detr" target="_blank" rel="noopener">https://github.com/facebookresearch/detr</a><br><strong>整体信息：</strong> 这是FAIR最近新出了一篇用transformer做检测的文章。相比于以往所有的检测方法不同的是，没有使用先验知识比如anchor设计，以及后处理步骤比如nms等操作。而是使用transformer预测集合的形式，直接输出目标位置及类别信息。在object detection上DETR准确率和运行时间上和Faster RCNN相当；将模型generalize到panoptic segmentation任务上，DETR表现甚至还超过了其他的baseline.</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2020/10/27/2020-10-27-detr/#more" rel="contents">
+            <a class="btn" href="/2020/10/27/detr/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -435,7 +435,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/14/0064-U-2-Net/">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/14/U-2-Net/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
@@ -454,7 +454,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/09/14/0064-U-2-Net/" itemprop="url">抠图神器U^2-Net</a></h1>
+                <a class="post-title-link" href="/2020/09/14/U-2-Net/" itemprop="url">抠图神器U^2-Net</a></h1>
         
 
         <div class="post-meta">
@@ -530,7 +530,7 @@
           <p><strong>论文信息：</strong> Going Deeper with Nested U-Structure for Salient Object Detection<br><strong>代码链接：</strong><a href="https://github.com/NathanUA/U-2-Net" target="_blank" rel="noopener">https://github.com/NathanUA/U-2-Net</a><br><strong>整体信息：</strong> 这是发表在PR2020上的一篇关于显著性检测的文章，作者是秦雪彬。从标题上可以看到本文的一个idea是设计了一个deeper的U型结构的网络解决显著性目标检测问题。作者认为，目前显著性目标检测有两种主流思路，一为多层次深层特征集成multi-level deep feature integration，一为多尺度特征提取Multi-scale feature extraction。多层次深层特征集成方法主要集中在开发更好的多层次特征聚合策略上。而多尺度特征提取这一类方法旨在设计更新的模块，从主干网获取的特征中同时提取局部和全局信息。而几乎所有上述方法，都是为了更好地利用现有的图像分类的Backbones生成的特征映射。而作者另辟蹊径，提出了一种新颖而简单的结构，它直接逐级提取多尺度特征，用于显著目标检测，而不是利用这些主干的特征来开发和添加更复杂的模块和策略。下图是该方法与其他方法的一个比较：</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2020/09/14/0064-U-2-Net/#more" rel="contents">
+            <a class="btn" href="/2020/09/14/U-2-Net/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -581,7 +581,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/08/2020-09-06-mmdetection-4/">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/08/mmdetection-4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
@@ -600,7 +600,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/09/08/2020-09-06-mmdetection-4/" itemprop="url">mmdetection详解指北 (四)</a></h1>
+                <a class="post-title-link" href="/2020/09/08/mmdetection-4/" itemprop="url">mmdetection详解指北 (四)</a></h1>
         
 
         <div class="post-meta">
@@ -676,7 +676,7 @@
           <h3 id="训练流程"><a href="#训练流程" class="headerlink" title="训练流程"></a>训练流程</h3><p>训练流程的包装过程大致如下:tools/train.py-&gt;apis/train.py-&gt;mmcv/runner.py-&gt;mmcv/hook.py(后面是分散的), 其中 runner 维护了数据信息,优化器, 日志系统, 训练 loop 中的各节点信息, 模型保存, 学习率等. 另外补充一点, 以上包装过程, 在 mmdet 中无处不在, 包括 mmcv 的代码也是对日常频繁使用的函数进行了统一封装。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2020/09/08/2020-09-06-mmdetection-4/#more" rel="contents">
+            <a class="btn" href="/2020/09/08/mmdetection-4/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -727,7 +727,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/06/0065-Adaptive-anti-Aliasing/">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/06/Adaptive-anti-Aliasing/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
@@ -746,7 +746,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/09/06/0065-Adaptive-anti-Aliasing/" itemprop="url">论文阅读：Delving Deeper into Anti-aliasing in ConvNets</a></h1>
+                <a class="post-title-link" href="/2020/09/06/Adaptive-anti-Aliasing/" itemprop="url">论文阅读：Delving Deeper into Anti-aliasing in ConvNets</a></h1>
         
 
         <div class="post-meta">
@@ -828,7 +828,7 @@
 \end{array}</script>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2020/09/06/0065-Adaptive-anti-Aliasing/#more" rel="contents">
+            <a class="btn" href="/2020/09/06/Adaptive-anti-Aliasing/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -879,7 +879,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/05/0063-minidelay-detection/">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/05/minidelay-detection/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
@@ -898,7 +898,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/09/05/0063-minidelay-detection/" itemprop="url">论文阅读：Minimum Delay Object Detection from Video</a></h1>
+                <a class="post-title-link" href="/2020/09/05/minidelay-detection/" itemprop="url">论文阅读：Minimum Delay Object Detection from Video</a></h1>
         
 
         <div class="post-meta">
@@ -976,7 +976,7 @@
 <p><img src="/img/v2-2c0d4736cf5fde58e2b58530d7643006_1440w.jpg" alt="img"></p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2020/09/05/0063-minidelay-detection/#more" rel="contents">
+            <a class="btn" href="/2020/09/05/minidelay-detection/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1027,7 +1027,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/04/2020-09-06-mmdetection-3/">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/04/mmdetection-3/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
@@ -1046,7 +1046,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/09/04/2020-09-06-mmdetection-3/" itemprop="url">mmdetection详解指北 (三)</a></h1>
+                <a class="post-title-link" href="/2020/09/04/mmdetection-3/" itemprop="url">mmdetection详解指北 (三)</a></h1>
         
 
         <div class="post-meta">
@@ -1122,7 +1122,7 @@
           <h3 id="数据处理"><a href="#数据处理" class="headerlink" title="数据处理"></a>数据处理</h3><p>数据处理可能是炼丹师接触最为密集的了，因为通常情况，除了数据的离线处理，写个数据类，就可以炼丹了。但本节主要涉及数据的在线处理，更进一步应该是检测分割数据的 pytorch 处理方式。虽然 mmdet 将常用的数据都实现了，而且也实现了中间通用数据格式，但，这和模型，损失函数，性能评估的实现也相关，比如你想把官网的 centernet 完整的改成 mmdet风格，就能看到 (看起来没必要)。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2020/09/04/2020-09-06-mmdetection-3/#more" rel="contents">
+            <a class="btn" href="/2020/09/04/mmdetection-3/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1173,7 +1173,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/03/2020-09-06-mmdetection-2/">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/03/mmdetection-2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
@@ -1192,7 +1192,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/09/03/2020-09-06-mmdetection-2/" itemprop="url">mmdetection详解指北 (二)</a></h1>
+                <a class="post-title-link" href="/2020/09/03/mmdetection-2/" itemprop="url">mmdetection详解指北 (二)</a></h1>
         
 
         <div class="post-meta">
@@ -1269,7 +1269,7 @@
 <h3 id="配置类"><a href="#配置类" class="headerlink" title="配置类"></a>配置类</h3><p>配置方式支持 python/json/yaml, 从 mmcv 的 Config 解析, 其功能同 maskrcnn-benchmark 的 yacs 类似, 将字典的取值方式属性化. 这里帖部分代码，以供学习。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2020/09/03/2020-09-06-mmdetection-2/#more" rel="contents">
+            <a class="btn" href="/2020/09/03/mmdetection-2/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1320,7 +1320,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/01/2020-09-06-mmdetection-1/">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/09/01/mmdetection-1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
@@ -1339,7 +1339,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/09/01/2020-09-06-mmdetection-1/" itemprop="url">mmdetection详解指北 (一)</a></h1>
+                <a class="post-title-link" href="/2020/09/01/mmdetection-1/" itemprop="url">mmdetection详解指北 (一)</a></h1>
         
 
         <div class="post-meta">
@@ -1426,7 +1426,7 @@
 </blockquote>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2020/09/01/2020-09-06-mmdetection-1/#more" rel="contents">
+            <a class="btn" href="/2020/09/01/mmdetection-1/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1477,7 +1477,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/08/06/0062-PILrotate/">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/08/06/PILrotate/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
@@ -1496,7 +1496,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/08/06/0062-PILrotate/" itemprop="url">解决PIL读取图片出现自动旋转的解决方案</a></h1>
+                <a class="post-title-link" href="/2020/08/06/PILrotate/" itemprop="url">解决PIL读取图片出现自动旋转的解决方案</a></h1>
         
 
         <div class="post-meta">
@@ -1573,7 +1573,7 @@
 <p>对此，需要在读取图片时，同时解析图片的 EXIF 中的方位信息，将图片转正，再进行后续的其他操作.实例如下：</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2020/08/06/0062-PILrotate/#more" rel="contents">
+            <a class="btn" href="/2020/08/06/PILrotate/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1624,7 +1624,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/06/05/0064-polygonArea/">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2020/06/05/polygonArea/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
@@ -1643,7 +1643,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2020/06/05/0064-polygonArea/" itemprop="url">python计算任意多边形的面积</a></h1>
+                <a class="post-title-link" href="/2020/06/05/polygonArea/" itemprop="url">python计算任意多边形的面积</a></h1>
         
 
         <div class="post-meta">
@@ -1725,7 +1725,7 @@
 \end{aligned}</script>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2020/06/05/0064-polygonArea/#more" rel="contents">
+            <a class="btn" href="/2020/06/05/polygonArea/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>

@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="detection,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="论文信息： Zhi Tian,Adelaide代码链接：https://github.com/tianzhi0549/FCOS整体框架：提出了一种全卷积one-stage目标检测算法（FCOS: Fully Convolutional One-Stage Object Detection）。通过逐像素的方式预测来解决目标检测问题。类似于语义分割。以往sota方法比如RetinaNet,Faster">
+<meta name="keywords" content="detection">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文阅读：Fully Convolutional One-Stage Object Detection(FCOS)">
+<meta property="og:url" content="https://nicehuster.cn/2019/04/15/FCOS/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="论文信息： Zhi Tian,Adelaide代码链接：https://github.com/tianzhi0549/FCOS整体框架：提出了一种全卷积one-stage目标检测算法（FCOS: Fully Convolutional One-Stage Object Detection）。通过逐像素的方式预测来解决目标检测问题。类似于语义分割。以往sota方法比如RetinaNet,Faster">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://nicehuster.cn/img/fcos.png">
+<meta property="og:image" content="https://nicehuster.cn/img/fcos_reg_.png">
+<meta property="og:image" content="https://nicehuster.cn/img/fcos_reg.png">
+<meta property="og:image" content="https://nicehuster.cn/img/fcos_reg_loss.png">
+<meta property="og:image" content="https://nicehuster.cn/img/fcos_fpn.png">
+<meta property="og:image" content="https://nicehuster.cn/img/fcos_centerness.png">
+<meta property="og:image" content="https://nicehuster.cn/img/fcos_centerness_loss.png">
+<meta property="og:image" content="https://nicehuster.cn/img/fcos_result.png">
+<meta property="og:updated_time" content="2020-09-18T02:37:49.503Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="论文阅读：Fully Convolutional One-Stage Object Detection(FCOS)">
+<meta name="twitter:description" content="论文信息： Zhi Tian,Adelaide代码链接：https://github.com/tianzhi0549/FCOS整体框架：提出了一种全卷积one-stage目标检测算法（FCOS: Fully Convolutional One-Stage Object Detection）。通过逐像素的方式预测来解决目标检测问题。类似于语义分割。以往sota方法比如RetinaNet,Faster">
+<meta name="twitter:image" content="https://nicehuster.cn/img/fcos.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://nicehuster.cn/2019/04/15/FCOS/">
+
+
+
+
+
+  <title>论文阅读：Fully Convolutional One-Stage Object Detection(FCOS) | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2019/04/15/FCOS/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">论文阅读：Fully Convolutional One-Stage Object Detection(FCOS)</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-04-15T19:13:39+08:00">
+                2019-04-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>论文信息：</strong> Zhi Tian,Adelaide<br><strong>代码链接：</strong><a href="https://github.com/tianzhi0549/FCOS" target="_blank" rel="noopener">https://github.com/tianzhi0549/FCOS</a><br><strong>整体框架：</strong>提出了一种全卷积one-stage目标检测算法（FCOS: Fully Convolutional One-Stage Object Detection）。通过逐像素的方式预测来解决目标检测问题。类似于语义分割。以往sota方法比如RetinaNet,Faster RCNN,SSD和YOLO等等都是属于一种anchor-based方法,都依赖与预定义的锚框（anchor boxes）。与之相比，FCOS则属于anchor-free方法，通过消除预定义的anchor,避免了大量与anchor相关的复杂计算。例如在训练过程做计算重叠且显著降低现存，更重要的是避免了对检测性能敏感的与anchor有关的超参数。<br><img src="/img/fcos.png" alt><br><a id="more"></a><br>上图表示的是FCOS的网络结构图，从上面的结构可以看出，FCOS由<strong>backbone</strong>+<strong>FPN</strong>+<strong>classification+Regression</strong>组成。整个网络结构比较简单，与RetinaNet比较相似，因为作者就是在RetinaNet的基础上进行改进的。在了解FCOS算法前，有必要了解一下作者的出发点，即anchor-based方法存在一些缺点：</p>
+<blockquote>
+<ul>
+<li>anchor超参数（比如base size,scale,aspect ratio等）影响检测性能；</li>
+<li>anchor预先定义的scale和aspect ratio无法很好的适应目标形状变化，尤其是小目标；</li>
+<li>为了实现高recall，会密集采样anchor，导致出现正负样本不平衡的问题；</li>
+<li>大量的anchor在计算IOU的时候极大地增加了计算量和计算显存；</li>
+</ul>
+</blockquote>
+<p>对于anchor-based方法，最著名的应属YOLOv1算法，这是该算法的recall太低，无太大实用价值，所以在其基础上提出了基于anchor的YOLOv2算法。本文提出的算法主要由包括三点：</p>
+<h3 id="逐像素回归"><a href="#逐像素回归" class="headerlink" title="逐像素回归"></a>逐像素回归</h3><p>在YOLOv1中虽然也是使用的anchor-free的策略，但是YOLOv1只预测目标中心点附近的框回归，预测的框少了，自然召回率低。与之不同的是，本文提出的FCOS则是对目标框中的所有点来预测bbox。<br><img src="/img/fcos_reg_.png" alt><br><img src="/img/fcos_reg.png" alt><br>如上图所示，FCOS在进行目标框回归的时候，是通过计算框中的点到四个边长之间的距离进行回归。当然，不可避免会出现一个点落在两个目标框中,如上图右边所示，这种样本作者称为ambiguous sample，作者在这里简单地选择小目标的框作为其回归目标。作者后面也提到了为了解决这种问题采用了基于FPN的多层次预测来解决中这个问题。训练损失函数如下：<br><img src="/img/fcos_reg_loss.png" alt><br>其中，第一项表示focal loss，第二项表示的IOU loss（这个不是很清楚，后续看代码了解）。<br>由于FCOS算法是基于目标物体框中的点进行逐像素回归的，因此执行回归的目标都是正样本，所以作者使用了exp()函数将回归目标进行拉伸，我个人认为此操作是为了最终的特征空间更大，辨识度更强。作者最后提及到，逐像素回归预测的方式除了能够带来更多的框以外，更重要的是利用了尽可能多的前景样本来训练回归器，而传统的基于anchor的检测器，只考虑具有足够高的IOU的anchor box作为正样本。作者认为，这可能是FCOS优于基于anchor的同类检测器的原因之一。</p>
+<h3 id="基于FPN多层次预测"><a href="#基于FPN多层次预测" class="headerlink" title="基于FPN多层次预测"></a>基于FPN多层次预测</h3><p>在CNN中，大的降采样（比如最后一层的feature map往往为16x）容易导致较低的recall。对于anchor-based方法来说，可以通过降低IOU阈值来获取更多的正样本进行弥补以提高recall。对于FCOS这种anchor-free方法而言，recall肯定比前者更低，因为，由于stride过大，在最后的feature map上很难找到目标的位置编码。然而作者发现，在没有使用FPN的情况下，FCOS依然可以达到95.55%的recall，一点也不逊色于RetinaNet。如上第一张网络结构图所示，作者使用了{$P_3$,$P_4$,$P_5$,$P_6$,$P_7$}六个尺度的feature map。对应的stride分别为8,32,64,128。<br>与anchor-based方法类似,FCOS也是采用分层级的方式来逐像素的预测回归。在<a href="https://arxiv.org/pdf/1904.01355v2.pdf" target="_blank" rel="noopener">论文</a>中介绍的比较清楚，这里直接截图如下所示：<br><img src="/img/fcos_fpn.png" alt><br>大致意思就是如果当前像素点的四个变量的回归值的最大值满足max(l<em>,t</em>,r<em>,b</em>)大于mi-1小于mi，才对该点进行回归。这样就实现了不同特征层回归不同的目标尺度范围。此外，作者认为在不同的特征层使用相同的输出激活函数是不合理的，因此作者没有使用标准的exp(x),而是使用了exp($xs_i$),其中s为可训练的标量。通过si来自动调整不同层级特征的指数函数的基数，提高检测性能。</p>
+<h3 id="center-ness"><a href="#center-ness" class="headerlink" title="center-ness"></a>center-ness</h3><p>作者发现，即使使用了FPN后，FCOS和RetinaNet相比，还是存在2%的差距。作者通过观察发现，这个主要是因为FCOS在远离目标中心预测了许多低质量的框。基于此，作者提出了一个简单而有效的策略center-ness来抑制这些低质量检测到的边界框，且该策略不引入任何超参数。<br><img src="/img/fcos_centerness.png" alt><br>如上图所示，center-ness策略在每一个层级预测中添加了一个分支，该分支与分类并行，相当于给网络添加了一个损失，而该损失保证了预测的边界框尽可能的靠近中心。该损失的公式如下，其中l，r，t，b表示的为如下图左图中所示的预测值。<br><img src="/img/fcos_centerness_loss.png" alt><br>而该策略之所以能够有效，主要是在训练的过程中我们会约束上述公式中的值，使得其接近于0，这就导致上图中蓝色框中的短边能够向黄边靠近，使得分布在目标位置边缘的低质量框能够尽可能的靠近中心。这样的话，在最终使用该网络的过程中，非极大值抑制(NMS)就可以滤除这些低质量的边界框，提高检测性能。</p>
+<h3 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h3><p>作者做了许多ablation的实验和RetinaNet进行对比。图表众多，这里主要列一下最终的实验对比。<br><img src="/img/fcos_result.png" alt><br>最后，作者开源了本文相关的代码以及训练模型，打算后期将代码阅读一遍。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/detection/" rel="tag"># detection</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/08/mmdetection/" rel="next" title="mmdetection使用以及源码解析">
+                <i class="fa fa-chevron-left"></i> mmdetection使用以及源码解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/23/CornerNet/" rel="prev" title="论文阅读：Detecting Objects as Paired Keypoints(CornerNet)">
+                论文阅读：Detecting Objects as Paired Keypoints(CornerNet) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">71</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#逐像素回归"><span class="nav-number">1.</span> <span class="nav-text">逐像素回归</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#基于FPN多层次预测"><span class="nav-number">2.</span> <span class="nav-text">基于FPN多层次预测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#center-ness"><span class="nav-number">3.</span> <span class="nav-text">center-ness</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验结果"><span class="nav-number">4.</span> <span class="nav-text">实验结果</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

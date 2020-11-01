@@ -104,18 +104,18 @@
 <meta name="keywords" content="hexo">
 <meta property="og:type" content="article">
 <meta property="og:title" content="hexo教程：将个人博客部署到GitHubPage过程记录">
-<meta property="og:url" content="https://nicehuster.cn/2018/05/01/blog/index.html">
+<meta property="og:url" content="https://blog.nicehuster.cn/2018/05/01/blog/index.html">
 <meta property="og:site_name" content="一起打怪升级呀">
 <meta property="og:description" content="下面仅仅是我个人记录一下博客配置好了之后，在更换机器之后如何再次将博文部署到GitHub Page上去。至于如何配置博客，并将其部署到GitHub Page 上去，各位可以参考这篇博客，这篇博客有详细记录。博客地址：在这里 按照博客上的步骤就能配置好个人博客。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://nicehuster.cn/img/blog.png">
-<meta property="og:image" content="https://nicehuster.cn/img/snipaste20161118_102609.png">
-<meta property="og:image" content="https://nicehuster.cn/img/snipaste20161118_104731.png">
-<meta property="og:updated_time" content="2020-09-18T11:42:05.583Z">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/blog.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/snipaste20161118_102609.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/snipaste20161118_104731.png">
+<meta property="og:updated_time" content="2020-11-01T01:50:27.527Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="hexo教程：将个人博客部署到GitHubPage过程记录">
 <meta name="twitter:description" content="下面仅仅是我个人记录一下博客配置好了之后，在更换机器之后如何再次将博文部署到GitHub Page上去。至于如何配置博客，并将其部署到GitHub Page 上去，各位可以参考这篇博客，这篇博客有详细记录。博客地址：在这里 按照博客上的步骤就能配置好个人博客。">
-<meta name="twitter:image" content="https://nicehuster.cn/img/blog.png">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/blog.png">
 
 
 
@@ -144,7 +144,7 @@
 
 
 
-  <link rel="canonical" href="https://nicehuster.cn/2018/05/01/blog/">
+  <link rel="canonical" href="https://blog.nicehuster.cn/2018/05/01/blog/">
 
 
 
@@ -293,7 +293,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://nicehuster.cn/2018/05/01/blog/">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2018/05/01/blog/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
@@ -412,6 +412,9 @@
 <pre><code>Hi your-github-username! You’ve successfully authenticated, but GitHub does not provide shell access.
 </code></pre><h4 id="发表博文"><a href="#发表博文" class="headerlink" title="发表博文"></a>发表博文</h4><p>使用markdown文档编辑器编写个人博文，并将编写好的博文放在\blog\source_posts文件夹下。至于博文的配图可以放在\blog\source\img文件夹下。然后使用如下命令部署到GitHub Page上去。<br><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">hexo</span> g  <span class="comment">#如果博文的格式有错误，这里会提示，记得要更正格式，不然无法部署到GitHub上去</span></span><br><span class="line">hexo d  <span class="comment">#这一步会要求你输入密码，和上面的密码是一致的。</span></span><br></pre></td></tr></table></figure></p>
 <p>上面记录的仅仅是我个人在更换电脑后，如何在其他机器上部署个人博客到GitHub上去。</p>
+<h3 id="Github-Page无法访问问题"><a href="#Github-Page无法访问问题" class="headerlink" title="Github Page无法访问问题"></a>Github Page无法访问问题</h3><p>有时博客在windows上存在无法访问的问题，可以自行在cmd窗口ping 一下自己的博客地址:</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">(base) NICELIU-MB0:hexo-blog_v2 niceliu-mac$<span class="built_in"> ping </span>nicehuster.github.io</span><br><span class="line">PING nicehuster.github.io (127.0.0.1): 56 data bytes</span><br></pre></td></tr></table></figure>
+<p>访问的是127.0.0.1地址。这是DNS的问题，只需要将DNS修改为：223.5.5.5或者223.6.6.6</p>
 <h3 id="公式渲染问题"><a href="#公式渲染问题" class="headerlink" title="公式渲染问题"></a>公式渲染问题</h3><p>用MathJax语法写的一些公式，在本地Markdown编译器上渲染是没问题的，到hexo博客上显示出现问题，hexo默认使用hexo-renderer-marked引擎去渲染网页，它会把利用Markdown语法写的文本去转换为相应的html标签。所以我们只需要卸载默认引擎，并安装这个新的渲染引擎即可<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">npm <span class="keyword">uninstall</span> hexo-renderer-marked <span class="comment">--save</span></span><br><span class="line">npm <span class="keyword">install</span> hexo-renderer-kramed <span class="comment">--save</span></span><br></pre></td></tr></table></figure></p>
 <p>如果上面的方法还没能解决公式渲染的问题，可以参考如下解决方案：</p>
 <p><a href="https://blog.csdn.net/yexiaohhjk/article/details/82526604" target="_blank" rel="noopener">hexo next 主题解决无法显示数学公式</a></p>
@@ -631,7 +634,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装前提"><span class="nav-number">1.</span> <span class="nav-text">安装前提</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Hexo"><span class="nav-number">2.</span> <span class="nav-text">安装Hexo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本地Git客户端配置"><span class="nav-number">3.</span> <span class="nav-text">本地Git客户端配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Git配置"><span class="nav-number">3.1.</span> <span class="nav-text">Git配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建SSH-Key-WIN"><span class="nav-number">3.2.</span> <span class="nav-text">创建SSH Key(WIN)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建SSH-Key-Mac"><span class="nav-number">3.3.</span> <span class="nav-text">创建SSH Key(Mac)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#远程GitHub"><span class="nav-number">4.</span> <span class="nav-text">远程GitHub</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-SSH-Key"><span class="nav-number">4.1.</span> <span class="nav-text">配置 SSH Key</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#本地Git与远程GitHub通信"><span class="nav-number">4.2.</span> <span class="nav-text">本地Git与远程GitHub通信</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发表博文"><span class="nav-number">4.3.</span> <span class="nav-text">发表博文</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#公式渲染问题"><span class="nav-number">5.</span> <span class="nav-text">公式渲染问题</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#安装前提"><span class="nav-number">1.</span> <span class="nav-text">安装前提</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#安装Hexo"><span class="nav-number">2.</span> <span class="nav-text">安装Hexo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本地Git客户端配置"><span class="nav-number">3.</span> <span class="nav-text">本地Git客户端配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Git配置"><span class="nav-number">3.1.</span> <span class="nav-text">Git配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建SSH-Key-WIN"><span class="nav-number">3.2.</span> <span class="nav-text">创建SSH Key(WIN)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#创建SSH-Key-Mac"><span class="nav-number">3.3.</span> <span class="nav-text">创建SSH Key(Mac)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#远程GitHub"><span class="nav-number">4.</span> <span class="nav-text">远程GitHub</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#配置-SSH-Key"><span class="nav-number">4.1.</span> <span class="nav-text">配置 SSH Key</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#本地Git与远程GitHub通信"><span class="nav-number">4.2.</span> <span class="nav-text">本地Git与远程GitHub通信</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#发表博文"><span class="nav-number">4.3.</span> <span class="nav-text">发表博文</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Github-Page无法访问问题"><span class="nav-number">5.</span> <span class="nav-text">Github Page无法访问问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#公式渲染问题"><span class="nav-number">6.</span> <span class="nav-text">公式渲染问题</span></a></li></ol></div>
             
 
           </div>

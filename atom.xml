@@ -5,9 +5,9 @@
   <subtitle>别整太大鸭力,多鸡立自己qaq</subtitle>
   <link href="/atom.xml" rel="self"/>
   
-  <link href="https://nicehuster.cn/"/>
+  <link href="https://blog.nicehuster.cn/"/>
   <updated>2020-10-28T08:49:02.649Z</updated>
-  <id>https://nicehuster.cn/</id>
+  <id>https://blog.nicehuster.cn/</id>
   
   <author>
     <name>nicehuster</name>
@@ -18,8 +18,8 @@
   
   <entry>
     <title>DETR 基于transformer的目标检测方法</title>
-    <link href="https://nicehuster.cn/2020/10/27/detr/"/>
-    <id>https://nicehuster.cn/2020/10/27/detr/</id>
+    <link href="https://blog.nicehuster.cn/2020/10/27/detr/"/>
+    <id>https://blog.nicehuster.cn/2020/10/27/detr/</id>
     <published>2020-10-27T11:13:39.000Z</published>
     <updated>2020-10-28T08:49:02.649Z</updated>
     
@@ -31,17 +31,17 @@
     
     </summary>
     
-      <category term="paper reading" scheme="https://nicehuster.cn/categories/paper-reading/"/>
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
     
     
-      <category term="detection" scheme="https://nicehuster.cn/tags/detection/"/>
+      <category term="detection" scheme="https://blog.nicehuster.cn/tags/detection/"/>
     
   </entry>
   
   <entry>
     <title>抠图神器U^2-Net</title>
-    <link href="https://nicehuster.cn/2020/09/14/U-2-Net/"/>
-    <id>https://nicehuster.cn/2020/09/14/U-2-Net/</id>
+    <link href="https://blog.nicehuster.cn/2020/09/14/U-2-Net/"/>
+    <id>https://blog.nicehuster.cn/2020/09/14/U-2-Net/</id>
     <published>2020-09-14T11:13:39.000Z</published>
     <updated>2020-09-18T07:17:55.130Z</updated>
     
@@ -53,17 +53,17 @@
     
     </summary>
     
-      <category term="paper reading" scheme="https://nicehuster.cn/categories/paper-reading/"/>
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
     
     
-      <category term="saliency detection" scheme="https://nicehuster.cn/tags/saliency-detection/"/>
+      <category term="saliency detection" scheme="https://blog.nicehuster.cn/tags/saliency-detection/"/>
     
   </entry>
   
   <entry>
     <title>mmdetection详解指北 (四)</title>
-    <link href="https://nicehuster.cn/2020/09/08/mmdetection-4/"/>
-    <id>https://nicehuster.cn/2020/09/08/mmdetection-4/</id>
+    <link href="https://blog.nicehuster.cn/2020/09/08/mmdetection-4/"/>
+    <id>https://blog.nicehuster.cn/2020/09/08/mmdetection-4/</id>
     <published>2020-09-08T11:16:39.000Z</published>
     <updated>2020-09-17T12:44:41.312Z</updated>
     
@@ -75,17 +75,17 @@
     
     </summary>
     
-      <category term="mmdetection" scheme="https://nicehuster.cn/categories/mmdetection/"/>
+      <category term="mmdetection" scheme="https://blog.nicehuster.cn/categories/mmdetection/"/>
     
     
-      <category term="mmdetection" scheme="https://nicehuster.cn/tags/mmdetection/"/>
+      <category term="mmdetection" scheme="https://blog.nicehuster.cn/tags/mmdetection/"/>
     
   </entry>
   
   <entry>
     <title>论文阅读：Delving Deeper into Anti-aliasing in ConvNets</title>
-    <link href="https://nicehuster.cn/2020/09/06/Adaptive-anti-Aliasing/"/>
-    <id>https://nicehuster.cn/2020/09/06/Adaptive-anti-Aliasing/</id>
+    <link href="https://blog.nicehuster.cn/2020/09/06/Adaptive-anti-Aliasing/"/>
+    <id>https://blog.nicehuster.cn/2020/09/06/Adaptive-anti-Aliasing/</id>
     <published>2020-09-06T11:13:39.000Z</published>
     <updated>2020-09-16T09:01:33.472Z</updated>
     
@@ -103,17 +103,17 @@
     
     </summary>
     
-      <category term="paper reading" scheme="https://nicehuster.cn/categories/paper-reading/"/>
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
     
     
-      <category term="classification" scheme="https://nicehuster.cn/tags/classification/"/>
+      <category term="classification" scheme="https://blog.nicehuster.cn/tags/classification/"/>
     
   </entry>
   
   <entry>
     <title>论文阅读：Minimum Delay Object Detection from Video</title>
-    <link href="https://nicehuster.cn/2020/09/05/minidelay-detection/"/>
-    <id>https://nicehuster.cn/2020/09/05/minidelay-detection/</id>
+    <link href="https://blog.nicehuster.cn/2020/09/05/minidelay-detection/"/>
+    <id>https://blog.nicehuster.cn/2020/09/05/minidelay-detection/</id>
     <published>2020-09-05T11:13:39.000Z</published>
     <updated>2020-09-15T06:28:52.040Z</updated>
     
@@ -127,17 +127,17 @@
     
     </summary>
     
-      <category term="paper reading" scheme="https://nicehuster.cn/categories/paper-reading/"/>
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
     
     
-      <category term="detection" scheme="https://nicehuster.cn/tags/detection/"/>
+      <category term="detection" scheme="https://blog.nicehuster.cn/tags/detection/"/>
     
   </entry>
   
   <entry>
     <title>mmdetection详解指北 (三)</title>
-    <link href="https://nicehuster.cn/2020/09/04/mmdetection-3/"/>
-    <id>https://nicehuster.cn/2020/09/04/mmdetection-3/</id>
+    <link href="https://blog.nicehuster.cn/2020/09/04/mmdetection-3/"/>
+    <id>https://blog.nicehuster.cn/2020/09/04/mmdetection-3/</id>
     <published>2020-09-04T11:15:39.000Z</published>
     <updated>2020-09-18T07:19:41.114Z</updated>
     
@@ -149,17 +149,17 @@
     
     </summary>
     
-      <category term="mmdetection" scheme="https://nicehuster.cn/categories/mmdetection/"/>
+      <category term="mmdetection" scheme="https://blog.nicehuster.cn/categories/mmdetection/"/>
     
     
-      <category term="mmdetection" scheme="https://nicehuster.cn/tags/mmdetection/"/>
+      <category term="mmdetection" scheme="https://blog.nicehuster.cn/tags/mmdetection/"/>
     
   </entry>
   
   <entry>
     <title>mmdetection详解指北 (二)</title>
-    <link href="https://nicehuster.cn/2020/09/03/mmdetection-2/"/>
-    <id>https://nicehuster.cn/2020/09/03/mmdetection-2/</id>
+    <link href="https://blog.nicehuster.cn/2020/09/03/mmdetection-2/"/>
+    <id>https://blog.nicehuster.cn/2020/09/03/mmdetection-2/</id>
     <published>2020-09-03T11:14:39.000Z</published>
     <updated>2020-09-18T07:19:34.051Z</updated>
     
@@ -172,17 +172,17 @@
     
     </summary>
     
-      <category term="mmdetection" scheme="https://nicehuster.cn/categories/mmdetection/"/>
+      <category term="mmdetection" scheme="https://blog.nicehuster.cn/categories/mmdetection/"/>
     
     
-      <category term="mmdetection" scheme="https://nicehuster.cn/tags/mmdetection/"/>
+      <category term="mmdetection" scheme="https://blog.nicehuster.cn/tags/mmdetection/"/>
     
   </entry>
   
   <entry>
     <title>mmdetection详解指北 (一)</title>
-    <link href="https://nicehuster.cn/2020/09/01/mmdetection-1/"/>
-    <id>https://nicehuster.cn/2020/09/01/mmdetection-1/</id>
+    <link href="https://blog.nicehuster.cn/2020/09/01/mmdetection-1/"/>
+    <id>https://blog.nicehuster.cn/2020/09/01/mmdetection-1/</id>
     <published>2020-09-01T11:13:39.000Z</published>
     <updated>2020-09-18T07:19:24.317Z</updated>
     
@@ -205,17 +205,17 @@
     
     </summary>
     
-      <category term="mmdetection" scheme="https://nicehuster.cn/categories/mmdetection/"/>
+      <category term="mmdetection" scheme="https://blog.nicehuster.cn/categories/mmdetection/"/>
     
     
-      <category term="mmdetection" scheme="https://nicehuster.cn/tags/mmdetection/"/>
+      <category term="mmdetection" scheme="https://blog.nicehuster.cn/tags/mmdetection/"/>
     
   </entry>
   
   <entry>
     <title>解决PIL读取图片出现自动旋转的解决方案</title>
-    <link href="https://nicehuster.cn/2020/08/06/PILrotate/"/>
-    <id>https://nicehuster.cn/2020/08/06/PILrotate/</id>
+    <link href="https://blog.nicehuster.cn/2020/08/06/PILrotate/"/>
+    <id>https://blog.nicehuster.cn/2020/08/06/PILrotate/</id>
     <published>2020-08-06T11:13:39.000Z</published>
     <updated>2020-09-18T02:40:56.930Z</updated>
     
@@ -228,19 +228,19 @@
     
     </summary>
     
-      <category term="project" scheme="https://nicehuster.cn/categories/project/"/>
+      <category term="project" scheme="https://blog.nicehuster.cn/categories/project/"/>
     
     
-      <category term="opencv" scheme="https://nicehuster.cn/tags/opencv/"/>
+      <category term="opencv" scheme="https://blog.nicehuster.cn/tags/opencv/"/>
     
-      <category term="python" scheme="https://nicehuster.cn/tags/python/"/>
+      <category term="python" scheme="https://blog.nicehuster.cn/tags/python/"/>
     
   </entry>
   
   <entry>
     <title>python计算任意多边形的面积</title>
-    <link href="https://nicehuster.cn/2020/06/05/polygonArea/"/>
-    <id>https://nicehuster.cn/2020/06/05/polygonArea/</id>
+    <link href="https://blog.nicehuster.cn/2020/06/05/polygonArea/"/>
+    <id>https://blog.nicehuster.cn/2020/06/05/polygonArea/</id>
     <published>2020-06-05T11:13:39.000Z</published>
     <updated>2020-09-18T11:41:00.458Z</updated>
     
@@ -258,17 +258,17 @@
     
     </summary>
     
-      <category term="project" scheme="https://nicehuster.cn/categories/project/"/>
+      <category term="project" scheme="https://blog.nicehuster.cn/categories/project/"/>
     
     
-      <category term="python" scheme="https://nicehuster.cn/tags/python/"/>
+      <category term="python" scheme="https://blog.nicehuster.cn/tags/python/"/>
     
   </entry>
   
   <entry>
     <title>ffmpeg常用指令笔记</title>
-    <link href="https://nicehuster.cn/2020/03/26/ffmpeg/"/>
-    <id>https://nicehuster.cn/2020/03/26/ffmpeg/</id>
+    <link href="https://blog.nicehuster.cn/2020/03/26/ffmpeg/"/>
+    <id>https://blog.nicehuster.cn/2020/03/26/ffmpeg/</id>
     <published>2020-03-26T11:13:39.000Z</published>
     <updated>2020-09-18T11:41:27.855Z</updated>
     
@@ -284,17 +284,17 @@
     
     </summary>
     
-      <category term="project" scheme="https://nicehuster.cn/categories/project/"/>
+      <category term="project" scheme="https://blog.nicehuster.cn/categories/project/"/>
     
     
-      <category term="ffmpeg" scheme="https://nicehuster.cn/tags/ffmpeg/"/>
+      <category term="ffmpeg" scheme="https://blog.nicehuster.cn/tags/ffmpeg/"/>
     
   </entry>
   
   <entry>
     <title>bash命令并行</title>
-    <link href="https://nicehuster.cn/2019/10/18/bash-parallel/"/>
-    <id>https://nicehuster.cn/2019/10/18/bash-parallel/</id>
+    <link href="https://blog.nicehuster.cn/2019/10/18/bash-parallel/"/>
+    <id>https://blog.nicehuster.cn/2019/10/18/bash-parallel/</id>
     <published>2019-10-18T11:13:39.000Z</published>
     <updated>2020-09-18T11:41:40.100Z</updated>
     
@@ -306,17 +306,17 @@
     
     </summary>
     
-      <category term="project" scheme="https://nicehuster.cn/categories/project/"/>
+      <category term="project" scheme="https://blog.nicehuster.cn/categories/project/"/>
     
     
-      <category term="-bash" scheme="https://nicehuster.cn/tags/bash/"/>
+      <category term="-bash" scheme="https://blog.nicehuster.cn/tags/bash/"/>
     
   </entry>
   
   <entry>
     <title>mean-shift颜色校正</title>
-    <link href="https://nicehuster.cn/2019/08/06/mean-shift-correction/"/>
-    <id>https://nicehuster.cn/2019/08/06/mean-shift-correction/</id>
+    <link href="https://blog.nicehuster.cn/2019/08/06/mean-shift-correction/"/>
+    <id>https://blog.nicehuster.cn/2019/08/06/mean-shift-correction/</id>
     <published>2019-08-06T11:13:39.000Z</published>
     <updated>2020-09-18T07:08:22.461Z</updated>
     
@@ -328,17 +328,17 @@
     
     </summary>
     
-      <category term="project" scheme="https://nicehuster.cn/categories/project/"/>
+      <category term="project" scheme="https://blog.nicehuster.cn/categories/project/"/>
     
     
-      <category term="mean shift" scheme="https://nicehuster.cn/tags/mean-shift/"/>
+      <category term="mean shift" scheme="https://blog.nicehuster.cn/tags/mean-shift/"/>
     
   </entry>
   
   <entry>
     <title>mean-shift算法详解</title>
-    <link href="https://nicehuster.cn/2019/08/05/shift/"/>
-    <id>https://nicehuster.cn/2019/08/05/shift/</id>
+    <link href="https://blog.nicehuster.cn/2019/08/05/shift/"/>
+    <id>https://blog.nicehuster.cn/2019/08/05/shift/</id>
     <published>2019-08-05T11:13:39.000Z</published>
     <updated>2020-09-18T06:42:42.507Z</updated>
     
@@ -350,17 +350,17 @@
     
     </summary>
     
-      <category term="paper reading" scheme="https://nicehuster.cn/categories/paper-reading/"/>
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
     
     
-      <category term="mean shift" scheme="https://nicehuster.cn/tags/mean-shift/"/>
+      <category term="mean shift" scheme="https://blog.nicehuster.cn/tags/mean-shift/"/>
     
   </entry>
   
   <entry>
     <title>图像分类算法优化技巧</title>
-    <link href="https://nicehuster.cn/2019/06/13/cnn_tricks/"/>
-    <id>https://nicehuster.cn/2019/06/13/cnn_tricks/</id>
+    <link href="https://blog.nicehuster.cn/2019/06/13/cnn_tricks/"/>
+    <id>https://blog.nicehuster.cn/2019/06/13/cnn_tricks/</id>
     <published>2019-06-13T11:13:39.000Z</published>
     <updated>2020-09-18T02:40:04.736Z</updated>
     
@@ -372,17 +372,17 @@
     
     </summary>
     
-      <category term="paper reading" scheme="https://nicehuster.cn/categories/paper-reading/"/>
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
     
     
-      <category term="tricks" scheme="https://nicehuster.cn/tags/tricks/"/>
+      <category term="tricks" scheme="https://blog.nicehuster.cn/tags/tricks/"/>
     
   </entry>
   
   <entry>
     <title>细粒度图像识别</title>
-    <link href="https://nicehuster.cn/2019/06/12/fine-grain/"/>
-    <id>https://nicehuster.cn/2019/06/12/fine-grain/</id>
+    <link href="https://blog.nicehuster.cn/2019/06/12/fine-grain/"/>
+    <id>https://blog.nicehuster.cn/2019/06/12/fine-grain/</id>
     <published>2019-06-12T11:13:39.000Z</published>
     <updated>2020-09-13T06:54:12.000Z</updated>
     
@@ -394,17 +394,17 @@
     
     </summary>
     
-      <category term="paper reading" scheme="https://nicehuster.cn/categories/paper-reading/"/>
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
     
     
-      <category term="fine-grain" scheme="https://nicehuster.cn/tags/fine-grain/"/>
+      <category term="fine-grain" scheme="https://blog.nicehuster.cn/tags/fine-grain/"/>
     
   </entry>
   
   <entry>
     <title>了解零和博弈/贸易顺差逆差</title>
-    <link href="https://nicehuster.cn/2019/05/16/zero-game/"/>
-    <id>https://nicehuster.cn/2019/05/16/zero-game/</id>
+    <link href="https://blog.nicehuster.cn/2019/05/16/zero-game/"/>
+    <id>https://blog.nicehuster.cn/2019/05/16/zero-game/</id>
     <published>2019-05-16T13:13:39.000Z</published>
     <updated>2020-09-13T06:54:12.000Z</updated>
     
@@ -417,17 +417,17 @@
     
     </summary>
     
-      <category term="杂谈" scheme="https://nicehuster.cn/categories/%E6%9D%82%E8%B0%88/"/>
+      <category term="杂谈" scheme="https://blog.nicehuster.cn/categories/%E6%9D%82%E8%B0%88/"/>
     
     
-      <category term="摘记" scheme="https://nicehuster.cn/tags/%E6%91%98%E8%AE%B0/"/>
+      <category term="摘记" scheme="https://blog.nicehuster.cn/tags/%E6%91%98%E8%AE%B0/"/>
     
   </entry>
   
   <entry>
     <title>HRNet详解</title>
-    <link href="https://nicehuster.cn/2019/05/15/HRNet/"/>
-    <id>https://nicehuster.cn/2019/05/15/HRNet/</id>
+    <link href="https://blog.nicehuster.cn/2019/05/15/HRNet/"/>
+    <id>https://blog.nicehuster.cn/2019/05/15/HRNet/</id>
     <published>2019-05-15T13:13:39.000Z</published>
     <updated>2020-09-13T06:54:12.000Z</updated>
     
@@ -439,17 +439,17 @@
     
     </summary>
     
-      <category term="paper reading" scheme="https://nicehuster.cn/categories/paper-reading/"/>
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
     
     
-      <category term="pose estimation" scheme="https://nicehuster.cn/tags/pose-estimation/"/>
+      <category term="pose estimation" scheme="https://blog.nicehuster.cn/tags/pose-estimation/"/>
     
   </entry>
   
   <entry>
     <title>Pytorch常用API解析</title>
-    <link href="https://nicehuster.cn/2019/05/14/pytorch-api/"/>
-    <id>https://nicehuster.cn/2019/05/14/pytorch-api/</id>
+    <link href="https://blog.nicehuster.cn/2019/05/14/pytorch-api/"/>
+    <id>https://blog.nicehuster.cn/2019/05/14/pytorch-api/</id>
     <published>2019-05-14T11:13:39.000Z</published>
     <updated>2020-09-18T02:39:22.802Z</updated>
     
@@ -463,17 +463,17 @@
     
     </summary>
     
-      <category term="project" scheme="https://nicehuster.cn/categories/project/"/>
+      <category term="project" scheme="https://blog.nicehuster.cn/categories/project/"/>
     
     
-      <category term="pytorch" scheme="https://nicehuster.cn/tags/pytorch/"/>
+      <category term="pytorch" scheme="https://blog.nicehuster.cn/tags/pytorch/"/>
     
   </entry>
   
   <entry>
     <title>SSD中的数据增强细节</title>
-    <link href="https://nicehuster.cn/2019/05/11/ssd-dataaug/"/>
-    <id>https://nicehuster.cn/2019/05/11/ssd-dataaug/</id>
+    <link href="https://blog.nicehuster.cn/2019/05/11/ssd-dataaug/"/>
+    <id>https://blog.nicehuster.cn/2019/05/11/ssd-dataaug/</id>
     <published>2019-05-11T11:13:39.000Z</published>
     <updated>2020-09-18T02:40:13.917Z</updated>
     
@@ -485,10 +485,10 @@
     
     </summary>
     
-      <category term="project" scheme="https://nicehuster.cn/categories/project/"/>
+      <category term="project" scheme="https://blog.nicehuster.cn/categories/project/"/>
     
     
-      <category term="tricks" scheme="https://nicehuster.cn/tags/tricks/"/>
+      <category term="tricks" scheme="https://blog.nicehuster.cn/tags/tricks/"/>
     
   </entry>
   

@@ -289,6 +289,153 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2018/04/25/LH_RCNN/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/04/25/LH_RCNN/" itemprop="url">论文阅读：In Defense of Two-Stage Object Detector(Light-Head R-CNN)</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-25T15:32:21+08:00">
+                2018-04-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p><strong>论文信息：</strong> Face++ &amp;&amp; Tsinghua，2017<br><strong>代码链接：</strong> <a href="https://github.com/zengarden/light_head_rcnn" target="_blank" rel="noopener">https://github.com/zengarden/light_head_rcnn</a><br><strong>论文背景：</strong> 这篇文章主要是基于faster rcnn 和 r-fcn 做的改进。这篇文章将two stage的检测模型分为了两个部分，body和head。body指的是roi pooling之前的网络部分，head指的是roi pooling和r-cnn子网络部分，r-cnn子网络是对roi进行分类和预测roi位置的那一部分。faster rcnn的roi pooling的channel数很大，有2048，这使得后面的两个fc层计算量很大， 而且faster rcnn的roi数目是很大的，针对每个roi都要调用一次r-cnn子网络，这个开销十分大。r-fcn在r-cnn子网络前设 了一个score map，试图共享roi的计算，以解决faster rcnn的这个问题，但是引入的score map的channel数很大，是 P*P（C+1），C为类别数，在COCO数据集上，这个值为3969（7*7*81），这使得r-fcn的计算量相比faster rcnn小了一些，但依然很大。综上，faster rcnn和r-fcn的head计算量都很大，即使body用了轻量化的网络，它们的速度依然比不上one stage的方法。这篇文章的主要目的就在于对head部分的结构重新设计，包括两个部分：R-CNN subnet + ROI warping ，减少head部分的计算量。模型的改进是在R-FCN上进行的。</p>
+<p><img src="/img/e0b09994ed71fb60f57512ed7415d345.png" alt><br>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2018/04/25/LH_RCNN/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </p></div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2018/04/23/R-FCN/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1609,156 +1756,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2018/03/15/MNC/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="nicehuster">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/avatar/weichat.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一起打怪升级呀">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/03/15/MNC/" itemprop="url">论文阅读：Instance-aware semantic segmentation via Multi-task Network Cascades (MNC)</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-15T19:13:39+08:00">
-                2018-03-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
-                    <span itemprop="name">paper reading</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p><strong>论文信息</strong>：CVPR2016, PASCAL VOC in VGG 63.5% mAP. COCO2015 in resnet101 won first prize</p>
-<p>这边最近在做一个关于instance segmentation的项目，所以这周的主要内容是看了一篇关于instance segmentation的文章，下面是文章的主要内容，自己也在相关数据集上训练了一下，并在这个基础上进行后续项目开发。</p>
-<p><strong>整体框架</strong>：对于传统的多任务方法，都是在共享特征的基础上，每个任务同时进行各不干扰，互相独立。这篇文章是在共享特征的基础上，上一个任务依赖于下一个任务，如此形成级联式的多任务结构(Multi-task Network Cascade,MNC)。</p>
-<p><img src="/img/70ff5318f27ff8221422726a677fa4b0.png" alt></p>
-<p><img src="/img/862b056d149a7012a05c5b066f47114b.png" alt><br>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2018/03/15/MNC/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </p></div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1807,7 +1804,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">72</span>
+                <span class="site-state-item-count">73</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>

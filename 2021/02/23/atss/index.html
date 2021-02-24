@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="detection,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="论文信息： Bridging the Gap Between Anchor-based and Anchor-free Detection via Adaptive Training Sample Selection代码链接：https://github.com/sfzhang15/ATSS整体信息：这篇论文是中科院张士峰发表在CVPR2020上的一篇文章，论文通过大量实验证明指出anchor-b">
+<meta name="keywords" content="detection">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ATSS自适应选择正负样本的目标检测方法">
+<meta property="og:url" content="https://blog.nicehuster.cn/2021/02/23/atss/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="论文信息： Bridging the Gap Between Anchor-based and Anchor-free Detection via Adaptive Training Sample Selection代码链接：https://github.com/sfzhang15/ATSS整体信息：这篇论文是中科院张士峰发表在CVPR2020上的一篇文章，论文通过大量实验证明指出anchor-b">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/atss_Inconsistency%20Removal.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/image-20210224115350117.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/image-20210224115743063.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/image-20210224143241390.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/image-20210224151209904.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/image-20210224154804455.png">
+<meta property="og:updated_time" content="2021-02-24T08:06:34.700Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ATSS自适应选择正负样本的目标检测方法">
+<meta name="twitter:description" content="论文信息： Bridging the Gap Between Anchor-based and Anchor-free Detection via Adaptive Training Sample Selection代码链接：https://github.com/sfzhang15/ATSS整体信息：这篇论文是中科院张士峰发表在CVPR2020上的一篇文章，论文通过大量实验证明指出anchor-b">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/atss_Inconsistency%20Removal.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2021/02/23/atss/">
+
+
+
+
+
+  <title>ATSS自适应选择正负样本的目标检测方法 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2021/02/23/atss/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ATSS自适应选择正负样本的目标检测方法</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-02-23T19:13:39+08:00">
+                2021-02-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>论文信息：</strong> <a href="https://arxiv.org/abs/1912.02424" target="_blank" rel="noopener">Bridging the Gap Between Anchor-based and Anchor-free Detection via Adaptive Training Sample Selection</a><br><strong>代码链接：</strong><a href="https://github.com/sfzhang15/ATSS" target="_blank" rel="noopener">https://github.com/sfzhang15/ATSS</a><br>整体信息：这篇论文是中科院张士峰发表在CVPR2020上的一篇文章，论文通过大量实验证明指出anchor-based方法和anchor-free方法的性能差异主要来自于正负样本的选取上，基于此提出ATSS(Adaptive Training Sample Selection)方法，该方法通过自动统计标注GT上的相关统计特征自适应的选择合适的anchor box作为正负样本，在不带来额外计算量和参数的情况下，能够大幅提升模型的性能。</p>
+<a id="more"></a>
+<h3 id="1-差异分析"><a href="#1-差异分析" class="headerlink" title="1.差异分析"></a>1.差异分析</h3><p>在不考虑各种trick的情况下，anchor-based方法RetinaNet和anchor-free方法FCOS主要存在两个差异：1）正负样本选取；2）回归起始状态；为公平比较，降低两者方法的差异性，在实验中将RetinaNet的anchor数改为1降低差异性，方便与FCOS比较，作者后续在实验中也验证不同anchor数对模型性能的影响。</p>
+<h4 id="1-Inconsistency-Removal"><a href="#1-Inconsistency-Removal" class="headerlink" title="1).Inconsistency Removal"></a>1).Inconsistency Removal</h4><p><img src="/img/atss_Inconsistency%20Removal.png" alt="atss_Inconsistency Removal"></p>
+<p>由于FCOS加入了很多trick，为了与RetinaNet进行公平比较，对FCOS上的trick进行对齐，包括GroupNorm、GIoU loss、限制正样本必须在GT内、Centerness branch以及添加可学习的标量控制FPN的各层的尺寸。具体结果如上面表格所示，最终的RetinaNet与FCOS相差无几，但仍然存在0.8个点的差异。</p>
+<h4 id="2-Essential-Difference"><a href="#2-Essential-Difference" class="headerlink" title="2).Essential Difference"></a>2).Essential Difference</h4><p>在经过上述实验对齐之后，RetinaNet和FCOS仅存在两个差异：1）正负样本选取；2）回归起始状态；针对这两个差异，论文通过实验做进一步分析。</p>
+<p><img src="/img/image-20210224115350117.png" alt="image-20210224115350117"></p>
+<ul>
+<li><p><strong>Classification</strong></p>
+<p>在RetinaNet中，通过划分IOU阈值区间来区分正负样本，$\mathrm{IoU}&gt;\theta_{p}$ 置为正样本，$\mathrm{IoU}&lt;\theta_{n}$ 置为负样本，至于区间内所有样本忽略；在FCOS使用空间尺寸和尺寸限制来区分正负anchor point，正样本首先必须在GT box内，其次需要是GT尺寸对应的层，其余均为负样本；</p>
+</li>
+</ul>
+<p><img src="/img/image-20210224115743063.png" alt="image-20210224115743063"></p>
+<ul>
+<li><p><strong>Regression</strong></p>
+<p>在RetinaNet中，模型预测的是相对anchor box的4个偏移量，通过4个偏移量对anchor box进行调整；而在FCOS则预测的是相对于anchor point的4个偏移量，基于anchor point和4个偏移量组成bbox；</p>
+<p><img src="/img/image-20210224143241390.png" alt="image-20210224143241390"></p>
+</li>
+<li><p><strong>Conclusion</strong></p>
+<p>基于上述两个差异，论文做了实验进行交叉对比，实验结果如上表格2所示，在相同正负样本定义下的RetinaNet和FCOS性能几乎一样，不同的定义方法性能差异较大，具体可以看下表格的纵向对比结果；而从横向对比结果上来看，无论是基于box或基于Point的形式，指标基本不发生变化，这也印证了回归初始状态的不同对模型性能影响不大。所以，基本可以确定正负样本的选取是影响模型性能的关键；</p>
+</li>
+</ul>
+<h3 id="2-自适应样本选取（Adaptive-Training-Sample-Selection）"><a href="#2-自适应样本选取（Adaptive-Training-Sample-Selection）" class="headerlink" title="2. 自适应样本选取（Adaptive Training Sample Selection）"></a>2. 自适应样本选取（Adaptive Training Sample Selection）</h3><p><img src="/img/image-20210224151209904.png" alt="image-20210224151209904"></p>
+<h4 id="1-算法流程"><a href="#1-算法流程" class="headerlink" title="1).算法流程"></a>1).算法流程</h4><p>论文提出基于统计特征自适应样本选取的方法具体流程如上图所示，具体来说，对于每个标注gt框g，首先针对每个FPN层级基于L2距离找到与目标中心点最近的k个anchor box，计算anchor box与gt box的IOU值，计算所有iou值的均值$m_{g}$和标准差$v_{g}$，基于均值和阈值的计算结果，得到IOU阈值 $t_{g}=m_{g}+v_{g}$ ，最后选择阈值大于等于$t_{g}$ 且中心点位于gt box内的box作为最后的输出。如果anchor box对应多个gt，则选择IoU最大的gt。</p>
+<h4 id="2-算法思想"><a href="#2-算法思想" class="headerlink" title="2).算法思想"></a>2).算法思想</h4><p>从思想上来看，自适应样本选取的方法遵循如下几点：</p>
+<blockquote>
+<ul>
+<li>基于目标中心距离远近程度来选择样本；在RetinaNet中，anchor box与gt中心点越近一般IoU越高，而在FCOS中，中心点越近一般预测的质量越高；</li>
+<li>使用使用iou的统计量均值和方差之和作为iou阈值；均反映的是预设的anchor box与gt的匹配程度，均值高则应当提高阈值来调整正样本，均值低则应当降低阈值来调整正样本。标准差反映的是适合GT的FPN层数，标准差高则表示高质量的anchor box集中在一个层中，应将阈值加上标准差来过滤其他层的anchor box，低则表示多个层都适合该gt，将阈值加上标准差来选择合适的层的anchor box，均值和标准差结合作为IoU阈值能够很好地自动选择对应的特征层上合适的anchor box；</li>
+<li>正样本的中心必须位于目标内；若anchor box的中心点不在gt区域内，则其会使用非gt区域的背景特征进行预测，影响模型性能，这种情况应予以剔除；</li>
+<li>几乎无超参数；从上面的算法流程可以看出，唯一的超参数就是k，论文后面也通过实验验证ATSS算法对于k值的选取不明感；</li>
+</ul>
+</blockquote>
+<h4 id="3-ATSS实验对比"><a href="#3-ATSS实验对比" class="headerlink" title="3).ATSS实验对比"></a>3).ATSS实验对比</h4><p><img src="/img/image-20210224154804455.png" alt="image-20210224154804455"></p>
+<p>将ATSS应用到RetinaNet和FCOS上测试效果：</p>
+<ul>
+<li>将RetinaNet中的正负样本替换为ATSS，AP提升了2.3%；</li>
+<li>在FCOS上的应用主要用两种：lite版本采用ATSS的思想，从选取GT内的anchor point改为选取每层离GT最近的topk个候选anchor point，提升了0.8%AP；full版本将FCOS的anchor point改为长宽为8S的anchor box来根据ATSS选择正负样本，但仍然使用原始的回归方法，提升了1.4%AP。两种方法找到的anchor point在空间位置上大致相同，但是在FPN层上的选择不太一样。从结果来看，自适应的选择方法比固定的方法更有效。至于与其他SOTA方法的对比，可以直接参考论文。</li>
+</ul>
+<h3 id="3-Discussion"><a href="#3-Discussion" class="headerlink" title="3.Discussion"></a>3.Discussion</h3><p>上面的实验对比可以看出RetinaNet实验中没有涉及任何关于anchor宽高比ratio和尺度scale相关的参数，而且在实验中仅使用了一个anchor,在原始RetinaNet中，一个目标选择的是9个预定义的不同尺度和宽高比的anchor box，因此论文补充实验测试了在不同尺度、不同宽高比以及不同anchors数量下的实验结果。具体实验结果，可以直接参考原文，从论文po出来的实验结果来看，ATSS对于anchor尺度和宽高比并不敏感，而且在每个位置设定多个anchor box是无用的操作，关键在于选择合适的正样本。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/detection/" rel="tag"># detection</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/02/22/FCOS_improv/" rel="next" title="论文阅读： A Simple and Strong Anchor-freeObject Detector(FCOS_imprv)">
+                <i class="fa fa-chevron-left"></i> 论文阅读： A Simple and Strong Anchor-freeObject Detector(FCOS_imprv)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">73</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">37</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-差异分析"><span class="nav-number">1.</span> <span class="nav-text">1.差异分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Inconsistency-Removal"><span class="nav-number">1.1.</span> <span class="nav-text">1).Inconsistency Removal</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Essential-Difference"><span class="nav-number">1.2.</span> <span class="nav-text">2).Essential Difference</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-自适应样本选取（Adaptive-Training-Sample-Selection）"><span class="nav-number">2.</span> <span class="nav-text">2. 自适应样本选取（Adaptive Training Sample Selection）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-算法流程"><span class="nav-number">2.1.</span> <span class="nav-text">1).算法流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-算法思想"><span class="nav-number">2.2.</span> <span class="nav-text">2).算法思想</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-ATSS实验对比"><span class="nav-number">2.3.</span> <span class="nav-text">3).ATSS实验对比</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Discussion"><span class="nav-number">3.</span> <span class="nav-text">3.Discussion</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

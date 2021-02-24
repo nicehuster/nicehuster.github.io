@@ -114,7 +114,7 @@
 <meta property="og:image" content="https://blog.nicehuster.cn/img/image-20210224143241390.png">
 <meta property="og:image" content="https://blog.nicehuster.cn/img/image-20210224151209904.png">
 <meta property="og:image" content="https://blog.nicehuster.cn/img/image-20210224154804455.png">
-<meta property="og:updated_time" content="2021-02-24T08:06:34.700Z">
+<meta property="og:updated_time" content="2021-02-24T08:09:44.536Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ATSS自适应选择正负样本的目标检测方法">
 <meta name="twitter:description" content="论文信息： Bridging the Gap Between Anchor-based and Anchor-free Detection via Adaptive Training Sample Selection代码链接：https://github.com/sfzhang15/ATSS整体信息：这篇论文是中科院张士峰发表在CVPR2020上的一篇文章，论文通过大量实验证明指出anchor-b">
@@ -385,7 +385,7 @@
       
 
       
-        <p><strong>论文信息：</strong> <a href="https://arxiv.org/abs/1912.02424" target="_blank" rel="noopener">Bridging the Gap Between Anchor-based and Anchor-free Detection via Adaptive Training Sample Selection</a><br><strong>代码链接：</strong><a href="https://github.com/sfzhang15/ATSS" target="_blank" rel="noopener">https://github.com/sfzhang15/ATSS</a><br>整体信息：这篇论文是中科院张士峰发表在CVPR2020上的一篇文章，论文通过大量实验证明指出anchor-based方法和anchor-free方法的性能差异主要来自于正负样本的选取上，基于此提出ATSS(Adaptive Training Sample Selection)方法，该方法通过自动统计标注GT上的相关统计特征自适应的选择合适的anchor box作为正负样本，在不带来额外计算量和参数的情况下，能够大幅提升模型的性能。</p>
+        <p><strong>论文信息：</strong> <a href="https://arxiv.org/abs/1912.02424" target="_blank" rel="noopener">Bridging the Gap Between Anchor-based and Anchor-free Detection via Adaptive Training Sample Selection</a><br><strong>代码链接：</strong><a href="https://github.com/sfzhang15/ATSS" target="_blank" rel="noopener">https://github.com/sfzhang15/ATSS</a><br><strong>整体信息：</strong>这篇论文是中科院张士峰发表在CVPR2020上的一篇文章，论文通过大量实验证明指出anchor-based方法和anchor-free方法的性能差异主要来自于正负样本的选取上，基于此提出ATSS(Adaptive Training Sample Selection)方法，该方法通过自动统计标注GT上的相关统计特征自适应的选择合适的anchor box作为正负样本，在不带来额外计算量和参数的情况下，能够大幅提升模型的性能。</p>
 <a id="more"></a>
 <h3 id="1-差异分析"><a href="#1-差异分析" class="headerlink" title="1.差异分析"></a>1.差异分析</h3><p>在不考虑各种trick的情况下，anchor-based方法RetinaNet和anchor-free方法FCOS主要存在两个差异：1）正负样本选取；2）回归起始状态；为公平比较，降低两者方法的差异性，在实验中将RetinaNet的anchor数改为1降低差异性，方便与FCOS比较，作者后续在实验中也验证不同anchor数对模型性能的影响。</p>
 <h4 id="1-Inconsistency-Removal"><a href="#1-Inconsistency-Removal" class="headerlink" title="1).Inconsistency Removal"></a>1).Inconsistency Removal</h4><p><img src="/img/atss_Inconsistency%20Removal.png" alt="atss_Inconsistency Removal"></p>

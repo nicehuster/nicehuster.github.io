@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="transformer,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="论文信息： Swin Transformer: Hierarchical Vision Transformer using Shifted Windows代码链接：https://github.com/microsoft/Swin-Transformer整体信息： Swin Transformer 提出了一种针对视觉任务的通用的 Transformer 架构，Transformer 架构在 NLP">
+<meta name="keywords" content="transformer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Swin-transformer">
+<meta property="og:url" content="https://blog.nicehuster.cn/2021/08/12/swin/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="论文信息： Swin Transformer: Hierarchical Vision Transformer using Shifted Windows代码链接：https://github.com/microsoft/Swin-Transformer整体信息： Swin Transformer 提出了一种针对视觉任务的通用的 Transformer 架构，Transformer 架构在 NLP">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/swin.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/swin-arch.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/patch_merging.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/shifted.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/partition.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/shift_opt.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/shift_index.jpg">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/att_mask.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/att_mask2.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/block.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/ink21.png">
+<meta property="og:updated_time" content="2022-04-12T04:14:34.226Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Swin-transformer">
+<meta name="twitter:description" content="论文信息： Swin Transformer: Hierarchical Vision Transformer using Shifted Windows代码链接：https://github.com/microsoft/Swin-Transformer整体信息： Swin Transformer 提出了一种针对视觉任务的通用的 Transformer 架构，Transformer 架构在 NLP">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/swin.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2021/08/12/swin/">
+
+
+
+
+
+  <title>Swin-transformer | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2021/08/12/swin/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Swin-transformer</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-08-12T19:13:39+08:00">
+                2021-08-12
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>论文信息：</strong> <a href="https://arxiv.org/pdf/2103.14030.pdf" target="_blank" rel="noopener">Swin Transformer: Hierarchical Vision Transformer using Shifted Windows</a><br><strong>代码链接：</strong><a href="https://github.com/microsoft/Swin-Transformer" target="_blank" rel="noopener">https://github.com/microsoft/Swin-Transformer</a><br><strong>整体信息：</strong> Swin Transformer 提出了一种针对视觉任务的通用的 Transformer 架构，Transformer 架构在 NLP 任务中已经算得上一种通用的架构，但是如果想迁移到视觉任务中有一个比较大的困难就是处理数据的尺寸不一样。作者分析表明，Transformer 从 NLP 迁移到 CV 上没有大放异彩主要有两点原因：(1)两个领域涉及的scale不同，NLP的scale是标准固定的，而CV的scale变化范围非常大。(2) CV比起NLP需要更大的分辨率，而且CV中使用Transformer的计算复杂度是图像尺度的平方，这会导致计算量过于庞大。为了解决这两个问题，Swin Transformer相比之前的ViT做了两个改进：1.引入CNN中常用的层次化构建方式构建层次化Transformer 2.引入locality思想，对无重合的window区域内进行self-attention计算。</p>
+<p><img src="/img/swin.png" alt="swin"></p>
+<a id="more"></a>
+<p>相比于ViT，Swin Transfomer计算复杂度大幅度降低，具有输入图像大小线性计算复杂度。Swin Transformer随着深度加深，逐渐合并图像块来构建层次化Transformer，可以作为通用的视觉骨干网络，应用于图像分类、目标检测、语义分割等任务。</p>
+<h3 id="1-整体结构"><a href="#1-整体结构" class="headerlink" title="1. 整体结构"></a>1. 整体结构</h3><p>我们先看下Swin Transformer的整体架构:</p>
+<p><img src="/img/swin-arch.png" alt="swin"></p>
+<p>整个模型采取层次化的设计，一共包含4个Stage，每个stage都会缩小输入特征图的分辨率，像CNN一样逐层扩大感受野。</p>
+<ul>
+<li>在输入开始的时候，做了一个<code>Patch Embedding</code>，将图片切成一个个图块，并嵌入到<code>Embedding</code>。</li>
+<li>在每个Stage里，由<code>Patch Merging</code>和多个Block组成。</li>
+<li>其中<code>Patch Merging</code>模块主要在每个Stage一开始降低图片分辨率。</li>
+<li>而Block具体结构如右图所示，主要是<code>LayerNorm</code>，<code>MLP</code>，<code>Window Attention</code> 和 <code>Shifted Window Attention</code>组成 (为了方便讲解，我会省略掉一些参数)</li>
+</ul>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SwinTransformer</span>(<span class="title">nn</span>.<span class="title">Module</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(...)</span></span><span class="symbol">:</span></span><br><span class="line">        <span class="keyword">super</span>().__init_<span class="number">_</span>()</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment"># absolute position embedding</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">self</span>.<span class="symbol">ape:</span></span><br><span class="line">            <span class="keyword">self</span>.absolute_pos_embed = nn.Parameter(torch.zeros(<span class="number">1</span>, num_patches, embed_dim))</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">self</span>.pos_drop = nn.Dropout(p=drop_rate)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># build layers</span></span><br><span class="line">        <span class="keyword">self</span>.layers = nn.ModuleList()</span><br><span class="line">        <span class="keyword">for</span> i_layer <span class="keyword">in</span> range(<span class="keyword">self</span>.num_layers)<span class="symbol">:</span></span><br><span class="line">            layer = BasicLayer(...)</span><br><span class="line">            <span class="keyword">self</span>.layers.append(layer)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">self</span>.norm = norm_layer(<span class="keyword">self</span>.num_features)</span><br><span class="line">        <span class="keyword">self</span>.avgpool = nn.AdaptiveAvgPool1d(<span class="number">1</span>)</span><br><span class="line">        <span class="keyword">self</span>.head = nn.Linear(<span class="keyword">self</span>.num_features, num_classes) <span class="keyword">if</span> num_classes &gt; <span class="number">0</span> <span class="keyword">else</span> nn.Identity()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward_features</span><span class="params">(<span class="keyword">self</span>, x)</span></span><span class="symbol">:</span></span><br><span class="line">        x = <span class="keyword">self</span>.patch_embed(x)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">self</span>.<span class="symbol">ape:</span></span><br><span class="line">            x = x + <span class="keyword">self</span>.absolute_pos_embed</span><br><span class="line">        x = <span class="keyword">self</span>.pos_drop(x)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> layer <span class="keyword">in</span> <span class="keyword">self</span>.<span class="symbol">layers:</span></span><br><span class="line">            x = layer(x)</span><br><span class="line"></span><br><span class="line">        x = <span class="keyword">self</span>.norm(x)  <span class="comment"># B L C</span></span><br><span class="line">        x = <span class="keyword">self</span>.avgpool(x.transpose(<span class="number">1</span>, <span class="number">2</span>))  <span class="comment"># B C 1</span></span><br><span class="line">        x = torch.flatten(x, <span class="number">1</span>)</span><br><span class="line">        <span class="keyword">return</span> x</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(<span class="keyword">self</span>, x)</span></span><span class="symbol">:</span></span><br><span class="line">        x = <span class="keyword">self</span>.forward_features(x)</span><br><span class="line">        x = <span class="keyword">self</span>.head(x)</span><br><span class="line">        <span class="keyword">return</span> x</span><br></pre></td></tr></table></figure>
+<p>其中有几个地方处理方法与ViT不同：</p>
+<blockquote>
+<ul>
+<li>ViT在输入会给embedding进行位置编码。而Swin-T这里则是作为一个<strong>可选项</strong>（<code>self.ape</code>），Swin-T是在计算Attention的时候做了一个<code>相对位置编码</code>;</li>
+<li>ViT会单独加上一个可学习参数，作为分类的token。而Swin-T则是<strong>直接做平均</strong>，输出分类，有点类似CNN最后的全局平均池化层;</li>
+</ul>
+</blockquote>
+<h3 id="2-Patch-Embedding"><a href="#2-Patch-Embedding" class="headerlink" title="2. Patch Embedding"></a>2. Patch Embedding</h3><p>在输入进Block前，我们需要将图片切成一个个patch，然后嵌入向量。具体做法是对原始图片裁成一个个 <code>window_size * window_size</code>的窗口大小，然后进行嵌入。这里可以通过二维卷积层，<strong>将stride，kernelsize设置为window_size大小</strong>。设定输出通道来确定嵌入向量的大小。最后将H,W维度展开，并移动到第一维度:</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">import</span> torch</span><br><span class="line"><span class="built_in">import</span> torch.nn as nn</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class PatchEmbed(nn.Module):</span><br><span class="line">    def __init__(self, <span class="attr">img_size=224,</span> <span class="attr">patch_size=4,</span> <span class="attr">in_chans=3,</span> <span class="attr">embed_dim=96,</span> <span class="attr">norm_layer=None):</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        <span class="attr">img_size</span> = to_2tuple(img_size) <span class="comment"># -&gt; (img_size, img_size)</span></span><br><span class="line">        <span class="attr">patch_size</span> = to_2tuple(patch_size) <span class="comment"># -&gt; (patch_size, patch_size)</span></span><br><span class="line">        <span class="attr">patches_resolution</span> = [img_size[<span class="number">0</span>] // patch_size[<span class="number">0</span>], img_size[<span class="number">1</span>] // patch_size[<span class="number">1</span>]]</span><br><span class="line">        self.<span class="attr">img_size</span> = img_size</span><br><span class="line">        self.<span class="attr">patch_size</span> = patch_size</span><br><span class="line">        self.<span class="attr">patches_resolution</span> = patches_resolution</span><br><span class="line">        self.<span class="attr">num_patches</span> = patches_resolution[<span class="number">0</span>] * patches_resolution[<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">        self.<span class="attr">in_chans</span> = in_chans</span><br><span class="line">        self.<span class="attr">embed_dim</span> = embed_dim</span><br><span class="line"></span><br><span class="line">        self.<span class="attr">proj</span> = nn.Conv2d(in_chans, embed_dim, <span class="attr">kernel_size=patch_size,</span> <span class="attr">stride=patch_size)</span></span><br><span class="line">        <span class="keyword">if</span> norm_layer is not None:</span><br><span class="line">            self.<span class="attr">norm</span> = norm_layer(embed_dim)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.<span class="attr">norm</span> = None</span><br><span class="line"></span><br><span class="line">    def forward(self, x):</span><br><span class="line">        <span class="comment"># 假设采取默认参数</span></span><br><span class="line">        <span class="attr">x</span> = self.proj(x) <span class="comment"># 出来的是(N, 96, 224/4, 224/4) </span></span><br><span class="line">        <span class="attr">x</span> = torch.flatten(x, <span class="number">2</span>) <span class="comment"># 把HW维展开，(N, 96, 56*56)</span></span><br><span class="line">        <span class="attr">x</span> = torch.transpose(x, <span class="number">1</span>, <span class="number">2</span>)  <span class="comment"># 把通道维放到最后 (N, 56*56, 96)</span></span><br><span class="line">        <span class="keyword">if</span> self.norm is not None:</span><br><span class="line">            <span class="attr">x</span> = self.norm(x)</span><br><span class="line">        return x</span><br></pre></td></tr></table></figure>
+<h3 id="3-Patch-Merging"><a href="#3-Patch-Merging" class="headerlink" title="3.Patch Merging"></a>3.Patch Merging</h3><p>该模块的作用是在每个Stage开始前做降采样，用于缩小分辨率，调整通道数 进而形成层次化的设计，同时也能节省一定运算量。在CNN中，则是在每个Stage开始前用<code>stride=2</code>的卷积/池化层来降低分辨率。每次降采样是两倍，因此<strong>在行方向和列方向上，间隔2选取元素</strong>。然后拼接在一起作为一整个张量，最后展开。<strong>此时通道维度会变成原先的4倍</strong>（因为H,W各缩小2倍），此时再通过一个<strong>全连接层再调整通道维度为原来的两倍</strong>.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PatchMerging</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, input_resolution, dim, norm_layer=nn.LayerNorm)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.input_resolution = input_resolution</span><br><span class="line">        self.dim = dim</span><br><span class="line">        self.reduction = nn.Linear(<span class="number">4</span> * dim, <span class="number">2</span> * dim, bias=<span class="keyword">False</span>)</span><br><span class="line">        self.norm = norm_layer(<span class="number">4</span> * dim)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        x: B, H*W, C</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        H, W = self.input_resolution</span><br><span class="line">        B, L, C = x.shape</span><br><span class="line">        <span class="keyword">assert</span> L == H * W, <span class="string">"input feature has wrong size"</span></span><br><span class="line">        <span class="keyword">assert</span> H % <span class="number">2</span> == <span class="number">0</span> <span class="keyword">and</span> W % <span class="number">2</span> == <span class="number">0</span>, <span class="string">f"x size (<span class="subst">&#123;H&#125;</span>*<span class="subst">&#123;W&#125;</span>) are not even."</span></span><br><span class="line"></span><br><span class="line">        x = x.view(B, H, W, C)</span><br><span class="line"></span><br><span class="line">        x0 = x[:, <span class="number">0</span>::<span class="number">2</span>, <span class="number">0</span>::<span class="number">2</span>, :]  <span class="comment"># B H/2 W/2 C</span></span><br><span class="line">        x1 = x[:, <span class="number">1</span>::<span class="number">2</span>, <span class="number">0</span>::<span class="number">2</span>, :]  <span class="comment"># B H/2 W/2 C</span></span><br><span class="line">        x2 = x[:, <span class="number">0</span>::<span class="number">2</span>, <span class="number">1</span>::<span class="number">2</span>, :]  <span class="comment"># B H/2 W/2 C</span></span><br><span class="line">        x3 = x[:, <span class="number">1</span>::<span class="number">2</span>, <span class="number">1</span>::<span class="number">2</span>, :]  <span class="comment"># B H/2 W/2 C</span></span><br><span class="line">        x = torch.cat([x0, x1, x2, x3], <span class="number">-1</span>)  <span class="comment"># B H/2 W/2 4*C</span></span><br><span class="line">        x = x.view(B, <span class="number">-1</span>, <span class="number">4</span> * C)  <span class="comment"># B H/2*W/2 4*C</span></span><br><span class="line"></span><br><span class="line">        x = self.norm(x)</span><br><span class="line">        x = self.reduction(x)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> x</span><br></pre></td></tr></table></figure>
+<p>下面是一个示意图（输入张量N=1, H=W=8, C=1，不包含最后的全连接层调整）</p>
+<p><img src="/img/patch_merging.png" alt="swin"></p>
+<h3 id="3-Window-Attention"><a href="#3-Window-Attention" class="headerlink" title="3. Window Attention"></a>3. Window Attention</h3><p>这是这篇文章的关键。传统的Transformer都是<strong>基于全局来计算注意力的</strong>，因此计算复杂度十分高。而Swin Transformer则将<strong>注意力的计算限制在每个窗口内</strong>，进而减少了计算量。我们先简单看下公式：</p>
+<script type="math/tex; mode=display">
+\operatorname{Attention}(Q, K, V)=\operatorname{SoftMax}\left(Q K^{T} / \sqrt{d}+B\right) V</script><p>主要区别是在原始计算Attention的公式中的Q,K时<strong>加入了相对位置编码</strong>。后续实验有证明相对位置编码的加入提升了模型性能。</p>
+<h3 id="4-Shifted-Window-Attention"><a href="#4-Shifted-Window-Attention" class="headerlink" title="4. Shifted Window Attention"></a>4. Shifted Window Attention</h3><p>前面的Window Attention是在每个窗口下计算注意力的，为了更好的和其他window进行信息交互，Swin Transformer还引入了shifted window操作。</p>
+<p><img src="/img/shifted.png" alt="swin"></p>
+<p>左边是没有重叠的Window Attention，而右边则是将窗口进行移位的Shift Window Attention。可以看到移位后的窗口包含了原本相邻窗口的元素。但这也引入了一个新问题，即<strong>window的个数翻倍了</strong>，由原本四个窗口变成了9个窗口。在实际代码里，我们是<strong>通过对特征图移位，并给Attention设置mask来间接实现的</strong>。能在<strong>保持原有的window个数下</strong>，最后的计算结果等价。</p>
+<p><img src="/img/partition.png" alt="swin"></p>
+<h4 id="4-1-特征图移位操作"><a href="#4-1-特征图移位操作" class="headerlink" title="4.1 特征图移位操作"></a>4.1 特征图移位操作</h4><p>代码里对特征图移位是通过<code>torch.roll</code>来实现的，下面是示意图</p>
+<p><img src="/img/shift_opt.png" alt="swin"></p>
+<blockquote>
+<p>第一位操作是针对行进行移位，第二位操作时针对列进行移位操作。如果需要<code>reverse cyclic shift</code>的话只需把参数<code>shifts</code>设置为对应的正数值。</p>
+</blockquote>
+<h4 id="4-2-attention-mask"><a href="#4-2-attention-mask" class="headerlink" title="4.2 attention mask"></a>4.2 attention mask</h4><p>我认为这是Swin Transformer的精华，通过设置合理的mask，让<code>Shifted Window Attention</code>在与<code>Window Attention</code>相同的窗口个数下，达到等价的计算结果。首先我们对Shift Window后的每个窗口都给上index，并且做一个<code>roll</code>操作（window_size=2, shift_size=1）</p>
+<p><img src="/img/shift_index.jpg" alt="swin"></p>
+<p>我们希望在计算Attention的时候，<strong>让具有相同index QK进行计算，而忽略不同index QK计算结果</strong>。最后正确的结果如下图所示.</p>
+<p><strong>例1：</strong>比如右上角这个 window，如下图所示。它由4个 patch 组成，所以应该计算出的 attention map是4×4的。但是6和4是2个不同的 sub-window，我们又不想让它们的 attention 发生交叠。所以我们希望的 attention map 和attention  mask如下图所示。</p>
+<p><img src="/img/att_mask.png" alt="swin"></p>
+<p><strong>例2：</strong>比如右下角这个 window，对应的 attention map 和attention  mask是下面这个样子。</p>
+<p><img src="/img/att_mask2.png" alt="swin"></p>
+<h3 id="5-transformer-block-整体结构"><a href="#5-transformer-block-整体结构" class="headerlink" title="5. transformer block 整体结构"></a>5. transformer block 整体结构</h3><p><img src="/img/block.png" alt="swin"></p>
+<p>两个连续的Block架构如上图所示，需要注意的是一个Stage包含的Block个数必须是偶数，因为需要交替包含一个含有<code>Window Attention</code>的Layer和含有<code>Shifted Window Attention</code>的Layer。我们看下Block的前向代码：</p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line">def forward(self, x):</span><br><span class="line">    H, <span class="attr">W</span> = self.input_resolution</span><br><span class="line">    B, L, <span class="attr">C</span> = x.shape</span><br><span class="line">    <span class="keyword">assert</span> <span class="attr">L</span> == H * W, <span class="string">"input feature has wrong size"</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">shortcut</span> = x</span><br><span class="line">    <span class="attr">x</span> = self.norm1(x)</span><br><span class="line">    <span class="attr">x</span> = x.view(B, H, W, C)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># cyclic shift</span></span><br><span class="line">    <span class="keyword">if</span> self.shift_size &gt; <span class="number">0</span>:</span><br><span class="line">        <span class="attr">shifted_x</span> = torch.roll(x, <span class="attr">shifts=(-self.shift_size,</span> -self.shift_size), <span class="attr">dims=(1,</span> <span class="number">2</span>))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="attr">shifted_x</span> = x</span><br><span class="line"></span><br><span class="line">    <span class="comment"># partition windows</span></span><br><span class="line">    <span class="attr">x_windows</span> = window_partition(shifted_x, self.window_size)  <span class="comment"># nW*B, window_size, window_size, C</span></span><br><span class="line">    <span class="attr">x_windows</span> = x_windows.view(-<span class="number">1</span>, self.window_size * self.window_size, C)  <span class="comment"># nW*B, window_size*window_size, C</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># W-MSA/SW-MSA</span></span><br><span class="line">    <span class="attr">attn_windows</span> = self.attn(x_windows, <span class="attr">mask=self.attn_mask)</span>  <span class="comment"># nW*B, window_size*window_size, C</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># merge windows</span></span><br><span class="line">    <span class="attr">attn_windows</span> = attn_windows.view(-<span class="number">1</span>, self.window_size, self.window_size, C)</span><br><span class="line">    <span class="attr">shifted_x</span> = window_reverse(attn_windows, self.window_size, H, W)  <span class="comment"># B H' W' C</span></span><br><span class="line"></span><br><span class="line">    <span class="comment"># reverse cyclic shift</span></span><br><span class="line">    <span class="keyword">if</span> self.shift_size &gt; <span class="number">0</span>:</span><br><span class="line">        <span class="attr">x</span> = torch.roll(shifted_x, <span class="attr">shifts=(self.shift_size,</span> self.shift_size), <span class="attr">dims=(1,</span> <span class="number">2</span>))</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="attr">x</span> = shifted_x</span><br><span class="line">    <span class="attr">x</span> = x.view(B, H * W, C)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># FFN</span></span><br><span class="line">    <span class="attr">x</span> = shortcut + self.drop_path(x)</span><br><span class="line">    <span class="attr">x</span> = x + self.drop_path(self.mlp(self.norm2(x)))</span><br><span class="line"></span><br><span class="line">    return x</span><br></pre></td></tr></table></figure>
+<p>整体流程如下：</p>
+<ul>
+<li>先对特征图进行LayerNorm</li>
+<li>通过<code>self.shift_size</code>决定是否需要对特征图进行shift</li>
+<li>然后将特征图切成一个个窗口</li>
+<li>计算Attention，通过<code>self.attn_mask</code>来区分<code>Window Attention</code>还是<code>Shift Window Attention</code></li>
+<li>将各个窗口合并回来</li>
+<li>如果之前有做shift操作，此时进行<code>reverse shift</code>，把之前的shift操作恢复</li>
+<li>做dropout和残差连接</li>
+<li>再通过一层LayerNorm+全连接层，以及dropout和残差连接</li>
+</ul>
+<h3 id="6-experiments"><a href="#6-experiments" class="headerlink" title="6. experiments"></a>6. experiments</h3><p><img src="/img/ink21.png" alt="swin"></p>
+<p>在ImageNet22K数据集上，准确率能达到惊人的86.4%。另外在检测，分割等任务上表现也很优异，感兴趣的可以翻看论文最后的实验部分。</p>
+<h3 id="7-conclusion"><a href="#7-conclusion" class="headerlink" title="7. conclusion"></a>7. conclusion</h3><p>这篇文章创新点很棒，引入window这一个概念，将CNN的局部性引入，还能控制模型整体计算量。在Shift Window Attention部分，用一个mask和移位操作，很巧妙的实现计算等价。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/transformer/" rel="tag"># transformer</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/07/21/vit/" rel="next" title="Transformer 在图像领域应用的开拓者VIT">
+                <i class="fa fa-chevron-left"></i> Transformer 在图像领域应用的开拓者VIT
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/12/05/transformer-soup/" rel="prev" title="Transformer 杂记">
+                Transformer 杂记 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">39</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-整体结构"><span class="nav-number">1.</span> <span class="nav-text">1. 整体结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Patch-Embedding"><span class="nav-number">2.</span> <span class="nav-text">2. Patch Embedding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Patch-Merging"><span class="nav-number">3.</span> <span class="nav-text">3.Patch Merging</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Window-Attention"><span class="nav-number">4.</span> <span class="nav-text">3. Window Attention</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Shifted-Window-Attention"><span class="nav-number">5.</span> <span class="nav-text">4. Shifted Window Attention</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-特征图移位操作"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 特征图移位操作</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-attention-mask"><span class="nav-number">5.2.</span> <span class="nav-text">4.2 attention mask</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-transformer-block-整体结构"><span class="nav-number">6.</span> <span class="nav-text">5. transformer block 整体结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-experiments"><span class="nav-number">7.</span> <span class="nav-text">6. experiments</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-conclusion"><span class="nav-number">8.</span> <span class="nav-text">7. conclusion</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="transformer,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="最近在知乎上频繁地刷到有关Mask2Former地帖子，这么多人吹捧地必是精品，就跟一波风看了一下Mask2Former，顺带地也了解一下Panoptic Segmentation这个任务。众所周知，图像分割主要有两个方向：  语义分割（semantic segmentation），常用来识别天空、草地、道路等没有固定形状的不可数事物（stuff）。语义分割的标记方法通常是给每个像素加上标签。 实">
+<meta name="keywords" content="transformer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Panoptic Segmentation详解">
+<meta property="og:url" content="https://blog.nicehuster.cn/2022/01/07/PSeg/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="最近在知乎上频繁地刷到有关Mask2Former地帖子，这么多人吹捧地必是精品，就跟一波风看了一下Mask2Former，顺带地也了解一下Panoptic Segmentation这个任务。众所周知，图像分割主要有两个方向：  语义分割（semantic segmentation），常用来识别天空、草地、道路等没有固定形状的不可数事物（stuff）。语义分割的标记方法通常是给每个像素加上标签。 实">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/ps.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/metric.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/mask_cls.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/maskformer.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/mask2former.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/pointRend.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/point_select_train.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/subdivision.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/pointRend-ppl.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/pointRend-res.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/PSFormer-ppl.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/mask-wise-merge.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/knet-simple.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/kernel-update-head.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/knet-ppl.png">
+<meta property="og:updated_time" content="2022-04-12T04:35:47.174Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Panoptic Segmentation详解">
+<meta name="twitter:description" content="最近在知乎上频繁地刷到有关Mask2Former地帖子，这么多人吹捧地必是精品，就跟一波风看了一下Mask2Former，顺带地也了解一下Panoptic Segmentation这个任务。众所周知，图像分割主要有两个方向：  语义分割（semantic segmentation），常用来识别天空、草地、道路等没有固定形状的不可数事物（stuff）。语义分割的标记方法通常是给每个像素加上标签。 实">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/ps.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2022/01/07/PSeg/">
+
+
+
+
+
+  <title>Panoptic Segmentation详解 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2022/01/07/PSeg/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Panoptic Segmentation详解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-01-07T19:13:39+08:00">
+                2022-01-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近在知乎上频繁地刷到有关Mask2Former地帖子，这么多人吹捧地必是精品，就跟一波风看了一下Mask2Former，顺带地也了解一下Panoptic Segmentation这个任务。众所周知，图像分割主要有两个方向：</p>
+<ul>
+<li><strong>语义分割（semantic segmentation）</strong>，常用来识别天空、草地、道路等没有固定形状的不可数<strong>事物（stuff）</strong>。语义分割的标记方法通常是给每个像素加上标签。</li>
+<li><strong>实例分割（instance segmentation）</strong>，人、动物或工具等可数的、独立的明显物体<strong>（things）</strong>。实例分割通常用包围盒或分割掩码标记目标。</li>
+</ul>
+<p><strong>全景分割（Panoptic Segmentation）</strong>其实就是把这两个方向结合起来，生成统一的、全局的分割图像，既识别事物，也识别物体。</p>
+<p><img src="/img/ps.png" alt="img"></p>
+<a id="more"></a>
+<p><strong>标记方法</strong></p>
+<p>全景分割的标记方法结合了语义分割和实例分割，给每个像素加上标签$\left(l_{i}, z_{i}\right)$,其中i表示第i个像素，l表示语义类别，z表示实例ID。语义类别由两部分组成，事物类别$L^{ST}$和$L^{TH}$分别为stuff和thing的简写）。当$l_{i} \in L^{S T}$，忽略$z_i$（事物类别）；</p>
+<p><strong>评估标准</strong></p>
+<p>首先是常规的IoU &gt; 0.5，然后结合TF、FN、FP搞出了一个PQ标准。（PQ是Panoptic Quality，即全景质量的简称。)</p>
+<p><img src="/img/metric.png" alt="img"></p>
+<p>PQ的具体公式为：</p>
+<script type="math/tex; mode=display">
+\mathrm{PQ}=\frac{\sum_{(p, g) \in T P} \operatorname{IoU}(p, g)}{|T P|+\frac{1}{2}|F P|+\frac{1}{2}|F N|}</script><p>另外，PQ可以分解为<strong>分割质量（segmentation quality，SQ）</strong>和<strong>识别质量（recognition quality，RQ）</strong>的乘积，便于进一步评估分割和识别环节的表现。</p>
+<script type="math/tex; mode=display">
+\mathrm{PQ}=\underbrace{\frac{\sum_{(p, g) \in T P} \operatorname{IoU}(p, g)}{|T P|}}_{\text {segmentation quality }(\mathrm{SQ})} \times \underbrace{\frac{|T P|}{|T P|+\frac{1}{2}|F P|+\frac{1}{2}|F N|}}_{\text {recognition quality }(\mathrm{RQ})}</script><p><strong>数据集</strong></p>
+<p>全景分割数据集需要既有语义分割标注，也有实例分割标注。</p>
+<ul>
+<li>Cityscapes(19classes)：5000张街景图片，97%的图片有像素标注，共有19个类别，其中8个类别符合语义分割的特征；</li>
+<li>ADE20k(150classes)：图像总量超过25000张，并经过公开标注。其中包括100种物体和59种事物。</li>
+<li>Mapillary Vistas(65classes)：25000张分辨率不同的街景照片。其中98%的图片都经过了像素标注，涵盖28种事物与37种物体。</li>
+<li>COCO：知名数据集COCO最近加入了全景分割标注。</li>
+</ul>
+<h3 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h3><h4 id="1-MaskFormer"><a href="#1-MaskFormer" class="headerlink" title="1.MaskFormer"></a>1.<strong>MaskFormer</strong></h4><p>Per-Pixel Classification is Not All You Need for Semantic Segmentation</p>
+<p>篇文章提出了一个新的分割输出端范式，传统方法会将每个像素点预测成一种类别来完成分割任务，而本文则是会输出很多个二分类分割图，如下图所示：</p>
+<p><img src="/img/mask_cls.png" alt="img"></p>
+<p>上图左侧为传统方法，右侧为本文方法，不是只输出 K 个类别二值分类图，而是提前设定一个较大值，同时与分类图一同预测的还有一个预测类别，这个类别可以为空，即该二值分类图没有用。因此损失函数由两个组成，一个是预测分类图与真值图的损失，另一个是预测类别的交叉熵损失.</p>
+<script type="math/tex; mode=display">
+\mathcal{L}_{\text {mask-cls }}\left(z, z^{\mathrm{gt}}\right)=\sum_{j=1}^{N}\left[-\log p_{\sigma(j)}\left(c_{j}^{\mathrm{gt}}\right)+\mathbb{1}_{c_{j}^{\mathrm{gt}} \neq \varnothing} \mathcal{L}_{\text {mask }}\left(m_{\sigma(j)}, m_{j}^{\mathrm{gt}}\right)\right]</script><p>匹配策略上依旧采用匈牙利匹配，匹配成本：</p>
+<script type="math/tex; mode=display">
+-p_{i}\left(c_{j}^{\mathrm{gt}}\right)+\mathcal{L}_{\text {mask }}\left(m_{i}, m_{j}^{\mathrm{gt}}\right)</script><p>其中，$L_{mask}$为二类交叉熵损失。MaskFormer具体结构如下：</p>
+<p><img src="/img/maskformer.png" alt="img"></p>
+<h4 id="2-Mask2Former"><a href="#2-Mask2Former" class="headerlink" title="2.Mask2Former"></a>2.Mask2Former</h4><p>Masked-attention Mask Transformer for Universal Image Segmentation</p>
+<p>一个model去建模所有的分割任务：语义分割，实例分割和以及全景分割。一个模型取得三个不同分割任务STOA.。具体而言本文方法沿用了上一篇的分割图分别产生方式，另外有两个主要创新点，包括每个transformer decoder层都会使用pixel-decoder的金字塔对应结构，以及 Mask Attention 形式。可参考下图：</p>
+<p><img src="/img/mask2former.png" alt="img"></p>
+<p>因此，作者基于上述的问题和最初的motivation(一个模型取得三个不同分割任务STOA)，提出了几个改进，节省训练的时间(MaskFormer训练需要300epoch)和cost的同时能够提升性能。</p>
+<p><strong>第一个改进</strong>：Mask Attention加速收敛,相比于之前的cross attention，这个里面的attention affinity是一种稀疏的attention，其实就是将上一层预测的分割图使用阈值0.5转换成[0,1]mask图，将转换后的mask进一步转换成[-inf,0]，然后和原始att相加，过softmax得到att_mask，相当于不计算原始分割图中为0的区域att.</p>
+<p>standard cross-attention:  $\mathbf{X}_{l}=\operatorname{softmax}\left(\mathbf{Q}_{l} \mathbf{K}_{l}^{\mathrm{T}}\right) \mathbf{V}_{l}+\mathbf{X}_{l-1}$</p>
+<p> masked cross-attention: </p>
+<script type="math/tex; mode=display">
+\mathbf{X}_{l}=\operatorname{softmax}\left(\mathcal{M}_{l-1}+\mathbf{Q}_{l} \mathbf{K}_{l}^{\mathrm{T}}\right) \mathbf{V}_{l}+\mathbf{X}_{l-1}</script><script type="math/tex; mode=display">
+\mathcal{M}_{l-1}(x, y)=\left\{\begin{array}{ll}
+0 & \text { if } \mathbf{M}_{l-1}(x, y)=1 \\
+-\infty & \text { otherwise }
+\end{array} .\right.</script><p>具体代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MultiScaleMaskedTransformerDecoder</span><span class="params">(nn.Module)</span>:</span> </span><br><span class="line">       ...</span><br><span class="line">   <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x, mask_features, mask = None)</span>:</span></span><br><span class="line">       ...</span><br><span class="line">       outputs_class, outputs_mask, attn_mask = self.forward_prediction_heads(output, mask_features, attn_mask_target_size=size_list[<span class="number">0</span>])</span><br><span class="line">       <span class="comment">#print(outputs_class.shape,outputs_mask.shape,attn_mask.shape)</span></span><br><span class="line">       predictions_class.append(outputs_class)</span><br><span class="line">       predictions_mask.append(outputs_mask)</span><br><span class="line"></span><br><span class="line">       <span class="keyword">for</span> i <span class="keyword">in</span> range(self.num_layers):</span><br><span class="line">           level_index = i % self.num_feature_levels</span><br><span class="line">           attn_mask[torch.where(attn_mask.sum(<span class="number">-1</span>) == attn_mask.shape[<span class="number">-1</span>])] = <span class="keyword">False</span></span><br><span class="line">           <span class="comment"># attention: cross-attention first</span></span><br><span class="line">           output = self.transformer_cross_attention_layers[i](</span><br><span class="line">               output, src[level_index],</span><br><span class="line">               memory_mask=attn_mask,</span><br><span class="line">               memory_key_padding_mask=<span class="keyword">None</span>,  <span class="comment"># here we do not apply masking on padded region</span></span><br><span class="line">               pos=pos[level_index], query_pos=query_embed</span><br><span class="line">           )</span><br><span class="line"></span><br><span class="line">           output = self.transformer_self_attention_layers[i](</span><br><span class="line">               output, tgt_mask=<span class="keyword">None</span>,</span><br><span class="line">               tgt_key_padding_mask=<span class="keyword">None</span>,</span><br><span class="line">               query_pos=query_embed</span><br><span class="line">           )</span><br><span class="line"></span><br><span class="line">           <span class="comment"># FFN</span></span><br><span class="line">           output = self.transformer_ffn_layers[i](</span><br><span class="line">               output</span><br><span class="line">           )</span><br><span class="line"></span><br><span class="line">           outputs_class, outputs_mask, attn_mask = self.forward_prediction_heads(output, mask_features, attn_mask_target_size=size_list[(i + <span class="number">1</span>) % self.num_feature_levels])</span><br><span class="line">           predictions_class.append(outputs_class)</span><br><span class="line">           predictions_mask.append(outputs_mask)</span><br><span class="line">           ...</span><br><span class="line">           </span><br><span class="line">   <span class="function"><span class="keyword">def</span> <span class="title">forward_prediction_heads</span><span class="params">(self, output, mask_features, attn_mask_target_size)</span>:</span></span><br><span class="line">       decoder_output = self.decoder_norm(output)</span><br><span class="line">       decoder_output = decoder_output.transpose(<span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">       outputs_class = self.class_embed(decoder_output)</span><br><span class="line">       mask_embed = self.mask_embed(decoder_output)</span><br><span class="line">       outputs_mask = torch.einsum(<span class="string">"bqc,bchw-&gt;bqhw"</span>, mask_embed, mask_features)</span><br><span class="line"></span><br><span class="line">       <span class="comment"># <span class="doctag">NOTE:</span> prediction is of higher-resolution</span></span><br><span class="line">       <span class="comment"># [B, Q, H, W] -&gt; [B, Q, H*W] -&gt; [B, h, Q, H*W] -&gt; [B*h, Q, HW]</span></span><br><span class="line">       attn_mask = F.interpolate(outputs_mask, size=attn_mask_target_size, mode=<span class="string">"bilinear"</span>, align_corners=<span class="keyword">False</span>)</span><br><span class="line">       <span class="comment">#print(outputs_mask.shape,attn_mask.shape)</span></span><br><span class="line">       <span class="comment"># must use bool type</span></span><br><span class="line">       <span class="comment"># If a BoolTensor is provided, positions with ``True`` are not allowed to attend while ``False`` values will be unchanged.</span></span><br><span class="line">       attn_mask = (attn_mask.sigmoid().flatten(<span class="number">2</span>).unsqueeze(<span class="number">1</span>).repeat(<span class="number">1</span>, self.num_heads, <span class="number">1</span>, <span class="number">1</span>).flatten(<span class="number">0</span>, <span class="number">1</span>) &lt; <span class="number">0.5</span>).bool()</span><br><span class="line">       attn_mask = attn_mask.detach()</span><br><span class="line"></span><br><span class="line">       <span class="keyword">return</span> outputs_class, outputs_mask, attn_mask</span><br></pre></td></tr></table></figure>
+<p><strong>第二个改进是多尺度特征改善小目标分割</strong>，对应于pixel-decoder，作者使用了类似于Deformable DETR decoder端的设置，在decoder端采用了multi scale的特征输入做attention。这个步骤对于提升small object的segmentation帮助很大。具体代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MSDeformAttnPixelDecoder</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward_features</span><span class="params">(self, features)</span>:</span> <span class="comment">#[res3,res4,res5]</span></span><br><span class="line">        srcs = []</span><br><span class="line">        pos = []</span><br><span class="line">        <span class="comment"># Reverse feature maps into top-down order (from low to high resolution)</span></span><br><span class="line">        <span class="keyword">for</span> idx, f <span class="keyword">in</span> enumerate(self.transformer_in_features[::<span class="number">-1</span>]):</span><br><span class="line">            x = features[f].float()  <span class="comment"># deformable detr does not support half precision</span></span><br><span class="line">            srcs.append(self.input_proj[idx](x))</span><br><span class="line">            pos.append(self.pe_layer(x))</span><br><span class="line"></span><br><span class="line">        y, spatial_shapes, level_start_index = self.transformer(srcs, pos) <span class="comment">#MSDeformAttnTransformerEncoderOnly</span></span><br><span class="line"></span><br><span class="line">        bs = y.shape[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">        split_size_or_sections = [<span class="keyword">None</span>] * self.transformer_num_feature_levels</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(self.transformer_num_feature_levels):</span><br><span class="line">            <span class="keyword">if</span> i &lt; self.transformer_num_feature_levels - <span class="number">1</span>:</span><br><span class="line">                split_size_or_sections[i] = level_start_index[i + <span class="number">1</span>] - level_start_index[i]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                split_size_or_sections[i] = y.shape[<span class="number">1</span>] - level_start_index[i]</span><br><span class="line">        y = torch.split(y, split_size_or_sections, dim=<span class="number">1</span>) [x3,x4,x5]</span><br><span class="line">        </span><br><span class="line">        out = []</span><br><span class="line">        multi_scale_features = []</span><br><span class="line">        num_cur_levels = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> i, z <span class="keyword">in</span> enumerate(y):</span><br><span class="line">            zz = z.transpose(<span class="number">1</span>, <span class="number">2</span>).view(bs, <span class="number">-1</span>, spatial_shapes[i][<span class="number">0</span>], spatial_shapes[i][<span class="number">1</span>])</span><br><span class="line"></span><br><span class="line">            out.append(zz)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># append `out` with extra FPN levels</span></span><br><span class="line">        <span class="comment"># Reverse feature maps into top-down order (from low to high resolution)</span></span><br><span class="line">        <span class="keyword">for</span> idx, f <span class="keyword">in</span> enumerate(self.in_features[:self.num_fpn_levels][::<span class="number">-1</span>]):</span><br><span class="line"></span><br><span class="line">            x = features[f].float()</span><br><span class="line"></span><br><span class="line">            lateral_conv = self.lateral_convs[idx]</span><br><span class="line">            output_conv = self.output_convs[idx]</span><br><span class="line">            cur_fpn = lateral_conv(x)</span><br><span class="line">            <span class="comment"># Following FPN implementation, we use nearest upsampling here</span></span><br><span class="line">            y = cur_fpn + F.interpolate(out[<span class="number">-1</span>], size=cur_fpn.shape[<span class="number">-2</span>:], mode=<span class="string">"bilinear"</span>, align_corners=<span class="keyword">False</span>)</span><br><span class="line">            y = output_conv(y)</span><br><span class="line">            out.append(y)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> o <span class="keyword">in</span> out:</span><br><span class="line">            <span class="keyword">if</span> num_cur_levels &lt; self.maskformer_num_feature_levels:</span><br><span class="line">                multi_scale_features.append(o)</span><br><span class="line">                num_cur_levels += <span class="number">1</span>      </span><br><span class="line">        <span class="keyword">return</span> self.mask_features(out[<span class="number">-1</span>]), out[<span class="number">0</span>], multi_scale_features</span><br></pre></td></tr></table></figure>
+<p>此外，文章还额外提出了三个小改进：</p>
+<ul>
+<li>将 Self 和 Cross Attention 的顺序做一个变换，让 Cross 在前面，因为在图像特征没加入计算时自身做 Self 效率会较低；</li>
+<li>文章将 Transformer 解码器的初始序列设置为可学版本；</li>
+<li>整个模型将不使用 dropout 操作。</li>
+<li>使用point-rend head 改善分割边界质量，同时降低显存；</li>
+</ul>
+<p>mask2former/modeling/meta_arch/mask_former_head.py </p>
+<p><strong>backbone:res50</strong></p>
+<p>800x800(short size=800) —&gt;res2[1, 256, 200, 200],res3[1, 512, 100, 100],res4[1, 1024, 50, 50],res5[1, 2048, 25, 25],</p>
+<p><strong>pixel decoder:MSDeformAttnPixelDecoder</strong>(6 layers)</p>
+<p> res3,res4,res5—&gt;MSDeformAttnTransformerEncoderOnly—&gt;x1[1, 256, 25, 25],x2[1, 256, 50, 50],x3[1, 256, 100, 100],</p>
+<p>x1,x2,x3+FPN(res2) —-&gt;x1[1, 256, 25, 25],x2[1, 256, 50, 50],x3[1, 256, 100, 100],x4[1, 256, 200, 200]</p>
+<p> res3,res4,res5—&gt;  <strong>mask_features</strong>:conv[x4],<strong>transformer_encoder_features</strong>:x4,<strong>multi_scale_features</strong>:[x1,x2,x3]</p>
+<p><strong>Transformer decoder:MultiScaleMaskedTransformerDecoder</strong></p>
+<p>input：multi_scale_features,mask_features </p>
+<p>query_feat(100x256)，mask_features[1, 256, 200, 200]  —&gt;forward_prediction_heads—&gt;outputs_class[1, 100, 134],outputs_mask[1, 100, 200, 200],attn_mask[8, 100, 625]，attn_mask是有outputs_mask插值降采样得到</p>
+<h4 id="3-PointRend"><a href="#3-PointRend" class="headerlink" title="3.PointRend"></a>3.PointRend</h4><p>文中使用了各种术语，比如rend、subdivision、ray-tracing，是想说明一个问题: 图像是对真实目标的一个离散化表达，真实目标的一些属性，如区域联通性、边缘连续性，在图像中同样存在。那么分割问题就可以看作预测一个真实目标在离散化后的图像中所占的区域，即：point-wise label prediction（点对点分类）。连续性体现在：图像中的像素可以通过插值得到与真实目标一一对应的坐标点。分割是在离散化的网格区域点对点的分类，但是有些点很难分类的准确，这些点大部分处在目标的边缘。pointrend方法的提出是对这些模糊分割的点，做更进一步的预测，即：精细分割。主要分成3步，如下图所示：1）候选点（或模糊分割点）选取；2）点特征提取；3）点分割预测。</p>
+<p><img src="/img/pointRend.png" alt="img"></p>
+<h5 id="1-候选点选取"><a href="#1-候选点选取" class="headerlink" title="1.候选点选取"></a><strong>1.候选点选取</strong></h5><p>候选点选取在训练和测试过程是不一样的，其中推断过程是通过迭代的方式从一个低分辨率的分割图像得到一个高分辨率的图像，这种方式不适合训练过程中的梯度反传，故采用另一种方式。</p>
+<p><strong>Point select for training</strong></p>
+<ul>
+<li>随机生成kN个点，其中k&gt;1。</li>
+<li>估计这kN个点的不确定程度，并根据不确定程度，筛选前βN个点，β取值范围为[0, 1]。其中不确定程度的估计方式与推断过程估计方式相同，使用低分辨率的分割置信度。</li>
+<li>在剩余的点中，均匀采用得到（1-β）N个点。</li>
+</ul>
+<p><img src="/img/point_select_train.png" alt="img"></p>
+<p>在PointRend中，采用了k=3和$\beta=0.75$的采样策略参数，采样得到$14^{2}$个点；从 coarse prediction 中插值的 GT 类别的概率和 0.5 之间的距离作为 point-wise 不确定性度量.</p>
+<p><strong>Point select for inference</strong></p>
+<p>推断过程是迭代进行的，具体过程如下图所示，首先通过上采样，将模型直接输出的低分辨率的分割图的长宽各扩大2倍得到高分辨的分割图，如从4x4的特征图上采样得到8x8的特征图；然后在高分辨分割图中，筛选N个分割模糊的点，即分割置信度（若置信度区间为[0,1]）在0.5左右的点，如在下图8x8的高分辨率分割图中，点集中在边缘附近。这N个点为最终筛选出来进行再次确认的点。以此类推，逐步迭代，得到最终目标分辨率的分割图。</p>
+<p><img src="/img/subdivision.png" alt="img"></p>
+<p>在PointRend中，对于预测类别 c 的矩形框，除非特别说明，均采用 adaptive subdivision 来通过 5 steps 将 7x7 coarse 预测精细化到 224x224. 每一次迭代，选择并更新 $N=28^2$个基于预测值和 0.5 之间的差异性距离得到最不确定的点.</p>
+<h5 id="2-点特征提取"><a href="#2-点特征提取" class="headerlink" title="2.点特征提取"></a><strong>2.点特征提取</strong></h5><p>点特征提取包括fine-grained特征和coarse特征，其中coarse为K维，来自低分辨的分割mask，fine-grained特征来自原cnn backbone某个stage或者多个stage的组合特征。文中使用P2层的卷积特征作为fine-grained特征提取的特征图，具体流程如下图。</p>
+<p><img src="/img/pointRend-ppl.png" alt="img"></p>
+<h5 id="3-点分割预测"><a href="#3-点分割预测" class="headerlink" title="3. 点分割预测"></a>3. 点分割预测</h5><p>如上图所示紫色箭头，得到候选点的特征表达后，经过一组MLP，来得到最后的N个点的分割预测结果。其中，在实验中使用了4个全连接层，其中<strong>每个全连接层的输出，都联合coarse feature</strong>，作为下一个全连接层的输入。</p>
+<h5 id="5-Results"><a href="#5-Results" class="headerlink" title="5. Results"></a>5. Results</h5><p><img src="/img/pointRend-res.png" alt="img"></p>
+<p>其中左边一列图为mask rcnn的结果，右边一列图为PointRend的结果，从视觉效果看，PointRend对物体边缘描述更加精细化。</p>
+<h4 id="4-Panoptic-SegFormer"><a href="#4-Panoptic-SegFormer" class="headerlink" title="4.Panoptic SegFormer"></a>4.Panoptic SegFormer</h4><p> Delving Deeper into Panoptic Segmentation with Transformers</p>
+<p><img src="/img/PSFormer-ppl.png" alt="img"></p>
+<p>该结构与DETR类似，不同之处在于：</p>
+<p>（1）backbone使用多尺度特征(C3,C4,C5);</p>
+<p>（2）针对decoder中query做了进一步精细划分,解耦location和Mask。针对Thing Query使用location Decoder捕获thing类别位置信息对Thing Query进行refine；此后使用refine后的Thing Query和Stuff Query作为Mask Decoder 输出mask结果。其中location Decoders使用bbox信息辅助监督，可以加速网络收敛；</p>
+<p>（3）后处理部分，使用Mask-wise merge策略融合things和stuff获取最终的mask结果.</p>
+<p>下面详细讲一下location decoder、mask decoder和mask-wise merge部分。</p>
+<p><strong>Location Decoder</strong></p>
+<p>给定N个初始化queries，训练阶段，在location decoder后面添加一个辅助MLP来预测位置和尺寸，location decoder的输出称为location-aware queries；推理阶段，去除辅助MLP。这一个辅助loss，可以帮助网络快速收敛，每个query关注区域指向性更明确。</p>
+<p><strong>Mask Decoder</strong></p>
+<p>mask decoder将location decoder的输出location-wise queries当作query，和MaskFormer预测mask和类别不同的是，Panoptic SegFormer预测mask需要先将attention map拆分成A3，A4，A5，然后都上采样到H/8xW/8的分辨率，concat在一起得到A_fuse，最后通过1x1卷积得到mask预测结果。</p>
+<p><strong>Mask-wise merge</strong></p>
+<p><img src="/img/mask-wise-merge.png" alt="img"></p>
+<p>之前的分割去重，一般都是使用pixel-wise argmax策略，也就是重叠部分保留预测分数最大的类别。本文提出的mask-wise merge策略，对于重叠部分进行舍弃，上图是伪代码。</p>
+<p>很喜欢作者在conclusion里面提到的一句话， Given the similarities and differences among the various segmentation tasks, “seek common ground while reserving differences” is a more reasonable guiding ideology.  完全的统一框架不见得是最好的选择，“求同存异”才是一个更合理的指导思想。</p>
+<p>代码链接：<a href="https://github.com/zhiqi-li/Panoptic-SegFormer" target="_blank" rel="noopener">https://github.com/zhiqi-li/Panoptic-SegFormer</a></p>
+<p>结果复现：</p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>PQ</th>
+<th>SQ</th>
+<th>RQ</th>
+<th>N</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>All(paper)</td>
+<td>49.600</td>
+<td>81.600</td>
+<td>59.900</td>
+<td>133</td>
+</tr>
+<tr>
+<td>All(rep)</td>
+<td>49.900</td>
+<td>81.500</td>
+<td>60.200</td>
+<td>133</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h4 id="5-K-Net"><a href="#5-K-Net" class="headerlink" title="5. K-Net"></a>5. K-Net</h4><p>K-Net: Towards Unified Image Segmentation</p>
+<p><img src="/img/knet-simple.png" alt="img"></p>
+<p>K-Net的目标也是在于统一实例分割和语义分割。如上图所示，语义分割核心结构就是由一组kernel来负责语义mask的生成，让kernel数量与数据集类别数据保持一致，每个kernel负责一个固定类别masker的生成。受此启发，在实例分割中，可以通过同样方式引入一组卷积核来负责 mask 的生成，限定一个 kernel 只分割一个物体，每个kernel负责分割不同的物体，实例分割任务统一到一个框架内。</p>
+<p><strong>Group-Aware Kernels</strong></p>
+<p>理论上一组instance kernel就可以得到实例分割结果，但实验结果却相差甚远，与sem seg 相比，ins seg需要的kernel要求更高：</p>
+<p>(1)在sem seg中，每个单独的sem kernel与类别(sem class)是绑定的，在每张图上都可以学习分割同一个类别，而ins seg不具备，而是通过Bipartite matching 来做的 target assignment,这导致每个kernel在每张图上学习的目标是根据当前的预测情况动态分配的。</p>
+<p>(2)ins kernel需要区分appearence和scale变化的物体，需要具备更强的判别特性；</p>
+<p>基于此，作者设计了<strong>Kernel Update Head</strong> 基于 mask 和特征图来将 kernel 动态化；如下图所示，Kernel Update Head 首先获得每个 kernel 对应 pixel group 的 feature，然后以某种方式动态地更新当前kernel。</p>
+<p><img src="/img/kernel-update-head.png" alt="img"></p>
+<p>此外，为了使得kernel可以modeling全局信息，作者还新增kernel interaction模块，最终得到的特征可用于class prediction, dynamic kernels 和mask predictions. </p>
+<p><img src="/img/knet-ppl.png" alt="img"></p>
+<p>为了得到更精细化的mask，可以通过叠加多个Kernel Update Head对mask和kernel进行迭代式refine.最终K-Net pipeline如上图所示，在论文中使用了3个Kernel Update Head和100个ins kernel.</p>
+<p>注：在COCO-Panoptic上多尺度训练36epoch，训练一个K-Net，使用16张V1100需要两天半，在两台机器的情况下，训练时间有点长。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/transformer/" rel="tag"># transformer</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/12/05/transformer-soup/" rel="next" title="Transformer 杂记">
+                <i class="fa fa-chevron-left"></i> Transformer 杂记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/03/21/IOD/" rel="prev" title="增量目标检测方法调研">
+                增量目标检测方法调研 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">39</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#方法"><span class="nav-number">1.</span> <span class="nav-text">方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-MaskFormer"><span class="nav-number">1.1.</span> <span class="nav-text">1.MaskFormer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Mask2Former"><span class="nav-number">1.2.</span> <span class="nav-text">2.Mask2Former</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-PointRend"><span class="nav-number">1.3.</span> <span class="nav-text">3.PointRend</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-候选点选取"><span class="nav-number">1.3.1.</span> <span class="nav-text">1.候选点选取</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-点特征提取"><span class="nav-number">1.3.2.</span> <span class="nav-text">2.点特征提取</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-点分割预测"><span class="nav-number">1.3.3.</span> <span class="nav-text">3. 点分割预测</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-Results"><span class="nav-number">1.3.4.</span> <span class="nav-text">5. Results</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-Panoptic-SegFormer"><span class="nav-number">1.4.</span> <span class="nav-text">4.Panoptic SegFormer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-K-Net"><span class="nav-number">1.5.</span> <span class="nav-text">5. K-Net</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="transformer,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="论文信息： An image is worth 16x16 words: Transformers for image recognition at scale代码链接：https://github.com/google-research/vision_transformer整体信息：ViT（vision transformer）是Google在2020年提出的直接将transformer应用在图">
+<meta name="keywords" content="transformer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Transformer 在图像领域应用的开拓者VIT">
+<meta property="og:url" content="https://blog.nicehuster.cn/2021/07/21/vit/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="论文信息： An image is worth 16x16 words: Transformers for image recognition at scale代码链接：https://github.com/google-research/vision_transformer整体信息：ViT（vision transformer）是Google在2020年提出的直接将transformer应用在图">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/arch.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/position_embedding.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/vit-procedu.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/models.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/exp.png">
+<meta property="og:updated_time" content="2022-04-12T04:11:36.659Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Transformer 在图像领域应用的开拓者VIT">
+<meta name="twitter:description" content="论文信息： An image is worth 16x16 words: Transformers for image recognition at scale代码链接：https://github.com/google-research/vision_transformer整体信息：ViT（vision transformer）是Google在2020年提出的直接将transformer应用在图">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/arch.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2021/07/21/vit/">
+
+
+
+
+
+  <title>Transformer 在图像领域应用的开拓者VIT | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2021/07/21/vit/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Transformer 在图像领域应用的开拓者VIT</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-07-21T19:13:39+08:00">
+                2021-07-21
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>论文信息：</strong> <a href="https://arxiv.org/pdf/2010.11929.pdf" target="_blank" rel="noopener">An image is worth 16x16 words: Transformers for image recognition at scale</a><br><strong>代码链接：</strong><a href="https://github.com/google-research/vision_transformer" target="_blank" rel="noopener">https://github.com/google-research/vision_transformer</a><br><strong>整体信息：</strong>ViT（vision transformer）是Google在2020年提出的直接将transformer应用在图像分类的模型，后面很多的工作都是基于ViT进行改进的。ViT的思路很简单：直接把图像分成固定大小的patchs，然后通过线性变换得到patch embedding，这就类比NLP的words和word embedding，由于transformer的输入就是a sequence of token embeddings，所以将图像的patch embeddings送入transformer后就能够进行特征提取从而分类了。</p>
+<p><img src="/img/arch.png" alt="vit"></p>
+<a id="more"></a>
+<p>ViT模型原理如上图所示，其实ViT模型只是用了transformer的Encoder来提取特征（原始的transformer还有decoder部分，用于实现sequence to sequence，比如机器翻译）。下面将分别对各个部分做详细的介绍。</p>
+<h3 id="1-Patch-Embedding"><a href="#1-Patch-Embedding" class="headerlink" title="1.Patch Embedding"></a>1.Patch Embedding</h3><p>对于ViT来说，首先要将原始patch形式的2-D图像转换成一系列1-D的patch embeddings，这就好似NLP中的word embedding。输入的2-D图像记为$\mathbf{x} \in \mathbb{R}^{H \times W \times C}$,其中$H$和$W$分别是图像的高和宽，而$C$为通道数，对于RGB图像为3。如果将图像分为大小为$P \times P$的patchs,可以通过reshape等操作得到一系列patchs：$\mathbf{x}_{p} \in \mathbb{R}^{N \times\left(P^{2} \cdot C\right)}$ ,总共可以得到的patch数是$N=H W / P^{2}$,这个就是序列的长度。注意这里直接将patch拉平为1-D，其特征大小为$P^{2} \cdot C$ .然后通过一个简单的线性变换将patchs映射成D大小的维度，这就是patch embeddings:$\mathbf{x}_{\mathbf{p}}^{\prime} \in \mathbb{R}^{N \times D}$, 在实现上等同于对于x进行一个$P \times P$ 且stride为$P$ 的卷积操作。下面是具体的实现代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PatchEmbed</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="string">""" Image to Patch Embedding</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, img_size=<span class="number">224</span>, patch_size=<span class="number">16</span>, in_chans=<span class="number">3</span>, embed_dim=<span class="number">768</span>)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        img_size = to_2tuple(img_size)</span><br><span class="line">        patch_size = to_2tuple(patch_size)</span><br><span class="line">        num_patches = (img_size[<span class="number">1</span>] // patch_size[<span class="number">1</span>]) * (img_size[<span class="number">0</span>] // patch_size[<span class="number">0</span>])</span><br><span class="line">        self.img_size = img_size</span><br><span class="line">        self.patch_size = patch_size</span><br><span class="line">        self.num_patches = num_patches</span><br><span class="line"></span><br><span class="line">        self.proj = nn.Conv2d(in_chans, embed_dim, kernel_size=patch_size, stride=patch_size)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, x)</span>:</span></span><br><span class="line">        B, C, H, W = x.shape</span><br><span class="line">        <span class="comment"># FIXME look at relaxing size constraints</span></span><br><span class="line">        <span class="keyword">assert</span> H == self.img_size[<span class="number">0</span>] <span class="keyword">and</span> W == self.img_size[<span class="number">1</span>], \</span><br><span class="line">            <span class="string">f"Input image size (<span class="subst">&#123;H&#125;</span>*<span class="subst">&#123;W&#125;</span>) doesn't match model (<span class="subst">&#123;self.img_size[<span class="number">0</span>]&#125;</span>*<span class="subst">&#123;self.img_size[<span class="number">1</span>]&#125;</span>)."</span></span><br><span class="line">        x = self.proj(x).flatten(<span class="number">2</span>).transpose(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line">        <span class="keyword">return</span> x</span><br></pre></td></tr></table></figure>
+<h3 id="2-Position-Embedding"><a href="#2-Position-Embedding" class="headerlink" title="2. Position Embedding"></a>2. Position Embedding</h3><p>除了patch embeddings，模型还需要另外一个特殊的position embedding。transformer和CNN不同，需要position embedding来编码tokens的位置信息，这主要是因为self-attention是permutation-invariant，即打乱sequence里的tokens的顺序并不会改变结果。如果不给模型提供patch的位置信息，那么模型就需要通过patchs的语义来学习拼图，这就额外增加了学习成本。ViT论文中对比了几种不同的position embedding方案(如下），最后发现如果不提供positional embedding效果会差，但其它各种类型的positional embedding效果都接近，这主要是因为ViT的输入是相对较大的patchs而不是pixels，所以学习位置信息相对容易很多。</p>
+<ul>
+<li>无positional embedding</li>
+<li>1-D positional embedding：把2-D的patchs看成1-D序列</li>
+<li>2-D positional embedding：考虑patchs的2-D位置（x, y）</li>
+<li>Relative positional embeddings：patchs的相对位置</li>
+</ul>
+<p>在ViT中默认采用学习（训练的）的1-D positional embedding，在输入transformer的encoder之前直接将patch embeddings和positional embedding相加:</p>
+<figure class="highlight crystal"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这里多1是为了后面要说的class token，embed_dim即patch embed_dim</span></span><br><span class="line"><span class="keyword">self</span>.pos_embed = nn.Parameter(torch.zeros(<span class="number">1</span>, num_patches + <span class="number">1</span>, embed_dim)) </span><br><span class="line"></span><br><span class="line"><span class="comment"># patch emded + pos_embed</span></span><br><span class="line">x = x + <span class="keyword">self</span>.pos_embed</span><br></pre></td></tr></table></figure>
+<p>论文中也对学习到的positional embedding进行了可视化，发现相近的patchs的positional embedding比较相似，而且同行或同列的positional embedding也相近：</p>
+<p><img src="/img/position_embedding.png" alt="vit"></p>
+<p>这里额外要注意的一点，如果改变图像的输入大小，ViT不会改变patchs的大小，那patch的数量$N$也会发生变化，那么之前学习的pos_embed就维度对不上了，ViT采用的方案是通过插值来解决这个问题。但是这种情形一般会造成性能少许损失，可以通过finetune模型来解决。另外最新的论文<a href="https://arxiv.org/pdf/2102.10882.pdf" target="_blank" rel="noopener">CPVT</a>通过implicit Conditional Position encoding来解决这个问题（插入Conv来隐式编码位置信息，zero padding让Conv学习到绝对位置信息）。</p>
+<h3 id="3-Class-Token"><a href="#3-Class-Token" class="headerlink" title="3. Class Token"></a>3. Class Token</h3><p>除了patch token，ViT借鉴BERT还增加了一个特殊的class token。后面会说，transformer的encoder输入是a sequence patch embeddings，输出也是同样长度的a sequence patch features，但图像分类最后需要获取image feature，简单的策略是采用pooling，比如求patch features的平均来获取image feature，但是ViT并没有采用类似的pooling策略，而是直接增加一个特殊的class token，其最后输出的特征加一个linear classifier就可以实现对图像的分类（ViT的pre-training时是接一个MLP head），所以输入ViT的sequence长度是$N+1$,class token对应的embedding在训练时随机初始化，然后通过训练得到，具体实现如下：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 随机初始化</span></span><br><span class="line">self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))</span><br><span class="line"></span><br><span class="line"><span class="comment"># Classifier head</span></span><br><span class="line">self.head = nn.Linear(self.num_features, num_classes) if num_classes &gt; 0 <span class="keyword">else</span> nn.Identity()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 具体forward过程</span></span><br><span class="line">B = x.shape[0]</span><br><span class="line">x = self.patch_embed(x)</span><br><span class="line">cls_tokens = self.cls_token.expand(B, -1, -1)  <span class="comment"># stole cls_tokens impl from Phil Wang, thanks</span></span><br><span class="line">x = torch.cat((cls_tokens, x), dim=1)</span><br><span class="line">x = x + self.pos_embed</span><br></pre></td></tr></table></figure>
+<h3 id="4-Transformer-Encoder"><a href="#4-Transformer-Encoder" class="headerlink" title="4. Transformer Encoder"></a>4. Transformer Encoder</h3><p>transformer最核心的操作就是self-attention，其实attention机制很早就在NLP和CV领域应用了，比如带有attention机制的seq2seq模型，但是transformer完全摒弃RNN或LSTM结构，直接采用attention机制反而取得了更好的效果：attention is all you need！简单来说，attention就是根据当前查询对输入信息赋予不同的权重来聚合信息，从操作上看就是一种“加权平均”。attention中共有3个概念：query, key和value，其中key和value是成对的，对于一个给定的query向量$q \in \mathbb{R}^{d}$,通过计算内积来匹配k个key向量(维度也是d,$K \in \mathbb{R}^{k \times d}$),得到的内积通过softmax来归一化得到k个权重，那么对于query其attention的输出就是k个key向量对应的value向量（即矩阵$V \in \mathbb{R}^{k \times d}$),对于一系列的N个query(即矩阵$Q \in \mathbb{R}^{N \times d}$)，可以通过矩阵计算它们的attention输出：</p>
+<script type="math/tex; mode=display">
+\operatorname{Attention}(Q, K, V)=\operatorname{Softmax}\left(\frac{Q K^{T}}{\sqrt{d_{k}}}\right) V</script><p>这里的$\sqrt{d_{k}}$为缩放因子以避免点击带来的方差影响。上述的Attention机制称为<strong>Scaled dot product attention</strong>，其实attention机制的变种有很多，但基本原理是相似的。如果$Q,K,V$都是从一个包含$N$个向量的sequence($X \in \mathbb{R}^{N \times D}$)变换得到：</p>
+<script type="math/tex; mode=display">
+Q=X W_{Q}, K=X W_{K}, V=X W_{V}</script><p>那么此时就变成了<strong>self-attention</strong>，这个时候就有N个(key,value)对,self-attention是transformer最核心部分，self-attention其实就是输入向量之间进行相互attention来学习到新特征。前面说过我们已经得到图像的patch sequence，那么送入self-attention就能到同样size的sequence输出，只不过特征改变了。更进一步，transformer采用的是<strong>multi-head self-attention (MSA）</strong>，所谓的MSA就是采用定义h个attention heads，即采用h个self-attention应用在输入sequence上，在操作上可以将sequence拆分成h个size为$N \times d$，这里$D=h d$,不同的heads得到的输出concat在一起然后通过线性变换得到最终的输出,size也是$N \times D$:</p>
+<script type="math/tex; mode=display">
+\operatorname{MSA}(\mathbf{z})=\left[\mathrm{SA}_{1}(z) ; \mathrm{SA}_{2}(z) ; \cdots ; \mathrm{SA}_{k}(z)\right] \mathrm{U}_{m s a} \quad \mathrm{U}_{m s a} \in \mathbb{R}^{k \cdot D_{h} \times D}</script><p>MSA的计算量是和$N^{2}$成比例的，所以ViT的输入是patch embeddings，而不是pixel embeddings，这有计算量上的考虑。在实现上，MSA是可以并行计算各个head的，具体代码如下：</p>
+<figure class="highlight haskell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="type">Attention</span>(<span class="title">nn</span>.<span class="type">Module</span>):</span></span><br><span class="line"><span class="class">    def __init__(<span class="title">self</span>, <span class="title">dim</span>, <span class="title">num_heads</span>=8, <span class="title">qkv_bias</span>=<span class="type">False</span>, <span class="title">qk_scale</span>=<span class="type">None</span>, <span class="title">attn_drop</span>=0., <span class="title">proj_drop</span>=0.):</span></span><br><span class="line"><span class="class">        super().__init__()</span></span><br><span class="line"><span class="class">        self.num_heads = num_heads</span></span><br><span class="line"><span class="class">        head_dim = dim // num_heads</span></span><br><span class="line"><span class="class">    </span></span><br><span class="line"><span class="class">        self.scale = qk_scale or head_dim ** -0.5</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">        self.qkv = nn.<span class="type">Linear</span>(<span class="title">dim</span>, <span class="title">dim</span> * 3, <span class="title">bias</span>=<span class="title">qkv_bias</span>)</span></span><br><span class="line"><span class="class">        self.attn_drop = nn.<span class="type">Dropout</span>(<span class="title">attn_drop</span>)</span></span><br><span class="line"><span class="class">        self.proj = nn.<span class="type">Linear</span>(<span class="title">dim</span>, <span class="title">dim</span>)</span></span><br><span class="line"><span class="class">        # 这里包含了dropout</span></span><br><span class="line"><span class="class">        self.proj_drop = nn.<span class="type">Dropout</span>(<span class="title">proj_drop</span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">    def forward(<span class="title">self</span>, <span class="title">x</span>):</span></span><br><span class="line"><span class="class">        <span class="type">B</span>, <span class="type">N</span>, <span class="type">C</span> = x.shape</span></span><br><span class="line"><span class="class">        qkv = self.qkv(<span class="title">x</span>).reshape(<span class="type">B</span>, <span class="type">N</span>, 3, <span class="title">self</span>.<span class="title">num_heads</span>, <span class="type">C</span> // <span class="title">self</span>.<span class="title">num_heads</span>).permute(2, 0, 3, 1, 4)</span></span><br><span class="line"><span class="class">        q, k, v = qkv[0], qkv[1], qkv[2]   # make torchscript happy (<span class="title">cannot</span> <span class="title">use</span> <span class="title">tensor</span> <span class="title">as</span> <span class="title">tuple</span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">        attn = (<span class="title">q</span> @ <span class="title">k</span>.<span class="title">transpose</span>(-2, -1)) * self.scale</span></span><br><span class="line"><span class="class">        attn = attn.softmax(<span class="title">dim</span>=-1)</span></span><br><span class="line"><span class="class">        attn = self.attn_drop(<span class="title">attn</span>)</span></span><br><span class="line"><span class="class"></span></span><br><span class="line"><span class="class">        x = (<span class="title">attn</span> @ <span class="title">v</span>).transpose(1, 2).reshape(<span class="type">B</span>, <span class="type">N</span>, <span class="type">C</span>)</span></span><br><span class="line"><span class="class">        x = self.proj(<span class="title">x</span>)</span></span><br><span class="line"><span class="class">        x = self.proj_drop(<span class="title">x</span>)</span></span><br><span class="line"><span class="class">        return x</span></span><br></pre></td></tr></table></figure>
+<p>在transformer中，MSA后跟一个FFN（Feed-forward network），这个FFN包含两个FC层，第一个FC层将特征从维度D变换成4D，后一个FC层将特征从维度4D变成D，中间的非线性激活函数采用GeLU，其实这就是一个MLP，具体实现如下：</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Mlp</span>(<span class="title">nn</span>.<span class="title">Module</span>):</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(<span class="keyword">self</span>, in_features, hidden_features=None, out_features=None, act_layer=nn.GELU, drop=<span class="number">0</span>.)</span></span><span class="symbol">:</span></span><br><span class="line">        <span class="keyword">super</span>().__init_<span class="number">_</span>()</span><br><span class="line">        out_features = out_features <span class="keyword">or</span> in_features</span><br><span class="line">        hidden_features = hidden_features <span class="keyword">or</span> in_features</span><br><span class="line">        <span class="keyword">self</span>.fc1 = nn.Linear(in_features, hidden_features)</span><br><span class="line">        <span class="keyword">self</span>.act = act_layer()</span><br><span class="line">        <span class="keyword">self</span>.fc2 = nn.Linear(hidden_features, out_features)</span><br><span class="line">        <span class="keyword">self</span>.drop = nn.Dropout(drop)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(<span class="keyword">self</span>, x)</span></span><span class="symbol">:</span></span><br><span class="line">        x = <span class="keyword">self</span>.fc1(x)</span><br><span class="line">        x = <span class="keyword">self</span>.act(x)</span><br><span class="line">        x = <span class="keyword">self</span>.drop(x)</span><br><span class="line">        x = <span class="keyword">self</span>.fc2(x)</span><br><span class="line">        x = <span class="keyword">self</span>.drop(x)</span><br><span class="line">        <span class="keyword">return</span> x</span><br></pre></td></tr></table></figure>
+<p>那么一个完成transformer encoder block就包含一个MSA后面接一个FFN，其实MSA和FFN均包含和ResNet一样的skip connection，另外MSA和FFN后面都包含layer norm层，具体实现如下：</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">class Block(nn.Module):</span><br><span class="line"></span><br><span class="line">    def __init__(self, dim, num_heads, <span class="attribute">mlp_ratio</span>=4., <span class="attribute">qkv_bias</span>=<span class="literal">False</span>, <span class="attribute">qk_scale</span>=None, <span class="attribute">drop</span>=0., <span class="attribute">attn_drop</span>=0.,</span><br><span class="line">                 <span class="attribute">drop_path</span>=0., <span class="attribute">act_layer</span>=nn.GELU, <span class="attribute">norm_layer</span>=nn.LayerNorm):</span><br><span class="line">        super().__init__()</span><br><span class="line">        self.norm1 = norm_layer(dim)</span><br><span class="line">        self.attn = Attention(</span><br><span class="line">            dim, <span class="attribute">num_heads</span>=num_heads, <span class="attribute">qkv_bias</span>=qkv_bias, <span class="attribute">qk_scale</span>=qk_scale, <span class="attribute">attn_drop</span>=attn_drop, <span class="attribute">proj_drop</span>=drop)</span><br><span class="line">        # NOTE: drop path <span class="keyword">for</span> stochastic depth, we shall see <span class="keyword">if</span> this is better than dropout here</span><br><span class="line">        self.drop_path = DropPath(drop_path) <span class="keyword">if</span> drop_path &gt; 0. <span class="keyword">else</span> nn.Identity()</span><br><span class="line">        self.norm2 = norm_layer(dim)</span><br><span class="line">        mlp_hidden_dim = int(dim * mlp_ratio)</span><br><span class="line">        self.mlp = Mlp(<span class="attribute">in_features</span>=dim, <span class="attribute">hidden_features</span>=mlp_hidden_dim, <span class="attribute">act_layer</span>=act_layer, <span class="attribute">drop</span>=drop)</span><br><span class="line"></span><br><span class="line">    def forward(self, x):</span><br><span class="line">        x = x + self.drop_path(self.attn(self.norm1(x)))</span><br><span class="line">        x = x + self.drop_path(self.mlp(self.norm2(x)))</span><br><span class="line">        return x</span><br></pre></td></tr></table></figure>
+<h3 id="5-ViT"><a href="#5-ViT" class="headerlink" title="5. ViT"></a>5. ViT</h3><p>对于ViT模型来说，就类似CNN那样，不断堆积transformer encoder blocks，最后提取class token对应的特征用于图像分类，论文中也给出了模型的公式表达，其中（1）就是提取图像的patch embeddings，然后和class token对应的embedding拼接在一起并加上positional embedding；（2）是MSA，而（3）是MLP，（2）和（3）共同组成了一个transformer encoder block，共有L层；（4)是对class token对应的输出做layer norm，然后就可以用来图像分类。</p>
+<p><img src="/img/vit-procedu.png" alt="vit"></p>
+<p>ViT模型的超参数主要包括以下，这些超参数直接影响模型参数以及计算量：</p>
+<blockquote>
+<ol>
+<li>Layers：block的数量；</li>
+<li>Hidden size D：隐含层特征，D在各个block是一直不变的；</li>
+<li>MLP size：一般设置为4D大小；</li>
+<li>Heads：MSA中的heads数量；</li>
+<li>Patch size：模型输入的patch size，ViT中共有两个设置：14x14和16x16，这个只影响计算量；</li>
+</ol>
+</blockquote>
+<p>类似BERT，ViT共定义了3中不同大小的模型：Base，Large和Huge，其对应的模型参数不同，如下所示。如ViT-L/16指的是采用Large结构，输入的patch size为16x16。类似BERT，ViT共定义了3中不同大小的模型：Base，Large和Huge，其对应的模型参数不同，如下所示。如ViT-L/16指的是采用Large结构，输入的patch size为16x16。</p>
+<p><img src="/img/models.png" alt="vit"></p>
+<h3 id="6-Experiments"><a href="#6-Experiments" class="headerlink" title="6. Experiments"></a>6. Experiments</h3><p>ViT并不像CNN那样具有inductive bias，论文中发现如果如果直接在ImageNet上训练，同level的ViT模型效果要差于ResNet，但是如果在比较大的数据集上petraining，然后再finetune，效果可以超越ResNet。比如ViT在Google私有的300M JFT数据集上pretrain后，在ImageNet上的最好Top-1 acc可达88.55%，这已经和ImageNet上的SOTA相当了（Noisy Student EfficientNet-L2效果为88.5%，Google最新的SOTA是Meta Pseudo Labels，效果可达90.2%）：</p>
+<p><img src="/img/exp.png" alt="vit"></p>
+<p>那么ViT至少需要多大的数据量才能和CNN旗鼓相当呢？这个论文也做了实验，结果如下图所示，从图上所示这个预训练所使用的数据量要达到100M时才能显示ViT的优势。transformer的一个特色是它的scalability：当模型和数据量提升时，性能持续提升。在大数据面前，ViT可能会发挥更大的优势。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/transformer/" rel="tag"># transformer</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/04/12/vfnet/" rel="next" title="VFNet高性能的密集目标检测器">
+                <i class="fa fa-chevron-left"></i> VFNet高性能的密集目标检测器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/08/12/swin/" rel="prev" title="Swin-transformer">
+                Swin-transformer <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">82</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">39</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Patch-Embedding"><span class="nav-number">1.</span> <span class="nav-text">1.Patch Embedding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Position-Embedding"><span class="nav-number">2.</span> <span class="nav-text">2. Position Embedding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Class-Token"><span class="nav-number">3.</span> <span class="nav-text">3. Class Token</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-Transformer-Encoder"><span class="nav-number">4.</span> <span class="nav-text">4. Transformer Encoder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-ViT"><span class="nav-number">5.</span> <span class="nav-text">5. ViT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Experiments"><span class="nav-number">6.</span> <span class="nav-text">6. Experiments</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -113,7 +113,7 @@
 <meta property="og:image" content="https://blog.nicehuster.cn/img/seesaw-mitigation.png">
 <meta property="og:image" content="https://blog.nicehuster.cn/img/seesaw-compensation.png">
 <meta property="og:image" content="https://blog.nicehuster.cn/img/seesaw-exp.png">
-<meta property="og:updated_time" content="2022-04-22T09:01:40.695Z">
+<meta property="og:updated_time" content="2022-04-22T09:06:42.087Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="长尾目标检测-Seesaw Loss[转载]">
 <meta name="twitter:description" content="论文信息： Seesaw Loss for Long-Tailed Instance Segmentation代码链接：https://github.com/open-mmlab/mmdetection/tree/master/configs/seesaw_loss整体信息：这是 MMDet 团队参加 LVIS 2020 竞赛获得rank1时提出地损失函数，这篇文章指出了限制检测器在长尾分布数据上">
@@ -384,9 +384,8 @@
       
 
       
-        <p><strong>论文信息：</strong> <a href="https://arxiv.org/abs/2008.10032" target="_blank" rel="noopener">Seesaw Loss for Long-Tailed Instance Segmentation</a><br><strong>代码链接：</strong><a href="https://github.com/open-mmlab/mmdetection/tree/master/configs/seesaw_loss" target="_blank" rel="noopener">https://github.com/open-mmlab/mmdetection/tree/master/configs/seesaw_loss</a><br><strong>整体信息：</strong>这是 MMDet 团队参加 LVIS 2020 竞赛获得rank1时提出地损失函数，这篇文章指出了限制检测器在长尾分布数据上性能的一个关键原因：施加在尾部类别（tail class上的<strong>正负样本梯度的比例</strong>是不均衡的。因此，我们提出 <strong>Seesaw Loss</strong> <strong>来动态地抑制尾部类别上过量的负样本梯度，同时补充对误分类样本的惩罚</strong>。 Seesaw Loss 显著提升了尾部类别的分类准确率，进而为检测器在长尾数据集上的整体性能带来可观的增益。</p>
+        <p><strong>论文信息：</strong> <a href="https://arxiv.org/abs/2008.10032" target="_blank" rel="noopener">Seesaw Loss for Long-Tailed Instance Segmentation</a><br><strong>代码链接：</strong><a href="https://github.com/open-mmlab/mmdetection/tree/master/configs/seesaw_loss" target="_blank" rel="noopener">https://github.com/open-mmlab/mmdetection/tree/master/configs/seesaw_loss</a><br><strong>整体信息：</strong>这是 MMDet 团队参加 LVIS 2020 竞赛获得rank1时提出地损失函数，这篇文章指出了限制检测器在长尾分布数据上性能的一个关键原因：施加在尾部类别（tail class上的<strong>正负样本梯度的比例</strong>是不均衡的。因此，我们提出 <strong>Seesaw Loss</strong> <strong>来动态地抑制尾部类别上过量的负样本梯度，同时补充对误分类样本的惩罚</strong>。 Seesaw Loss 显著提升了尾部类别的分类准确率，进而为检测器在长尾数据集上的整体性能带来可观的增益。由于原作在<a href="https://zhuanlan.zhihu.com/p/339126633" target="_blank" rel="noopener">知乎</a>上已有讲解，我就不班门弄斧，直接搬运过来，侵权删。</p>
 <a id="more"></a>
-<p>由于原作在知乎上已有讲解，我就不班门弄斧，直接搬运过来，侵权删。</p>
 <h2 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h2><p>在长尾分布的数据集中（例如：LVIS），大部分训练样本来自头部类别（head class），而只有少量样本来自尾部类别（tail class）。因此在训练过程中，来自头部类别的样本会对尾部类别施加过量的负样本梯度，淹没了来自尾部类别自身的正样本梯度。这种不平衡的学习过程导致分类器倾向于给予尾部类别很低的响应，以降低训练的loss。如下图所示，我们统计了在 LVIS v1.0 上训练Mask R-CNN过程中，施加在每个类别的分类器上正负样本累计梯度的分布。</p>
 <p><img src="/img/seesaw-distribution.png" alt="img"></p>
 <p>显然，头部类别获得的正负样本梯度比例接近1.0，而越是稀有的尾部类别，其获得的正负样本梯度的比例就越小。由此带来的结果就是分类的准确率随着样本数的减少而急剧下降，进而严重影响了检测器的性能。</p>

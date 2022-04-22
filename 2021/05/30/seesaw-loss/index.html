@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Long-tailed object detection,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="论文信息： Seesaw Loss for Long-Tailed Instance Segmentation代码链接：https://github.com/open-mmlab/mmdetection/tree/master/configs/seesaw_loss整体信息：这是 MMDet 团队参加 LVIS 2020 竞赛获得rank1时提出地损失函数，这篇文章指出了限制检测器在长尾分布数据上">
+<meta name="keywords" content="Long-tailed object detection">
+<meta property="og:type" content="article">
+<meta property="og:title" content="长尾目标检测-Seesaw Loss[转载]">
+<meta property="og:url" content="https://blog.nicehuster.cn/2021/05/30/seesaw-loss/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="论文信息： Seesaw Loss for Long-Tailed Instance Segmentation代码链接：https://github.com/open-mmlab/mmdetection/tree/master/configs/seesaw_loss整体信息：这是 MMDet 团队参加 LVIS 2020 竞赛获得rank1时提出地损失函数，这篇文章指出了限制检测器在长尾分布数据上">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/seesaw-distribution.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/seesaw-ce.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/seesaw-mitigation.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/seesaw-compensation.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/seesaw-exp.png">
+<meta property="og:updated_time" content="2022-04-22T09:01:40.695Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="长尾目标检测-Seesaw Loss[转载]">
+<meta name="twitter:description" content="论文信息： Seesaw Loss for Long-Tailed Instance Segmentation代码链接：https://github.com/open-mmlab/mmdetection/tree/master/configs/seesaw_loss整体信息：这是 MMDet 团队参加 LVIS 2020 竞赛获得rank1时提出地损失函数，这篇文章指出了限制检测器在长尾分布数据上">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/seesaw-distribution.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2021/05/30/seesaw-loss/">
+
+
+
+
+
+  <title>长尾目标检测-Seesaw Loss[转载] | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2021/05/30/seesaw-loss/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">长尾目标检测-Seesaw Loss[转载]</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-05-30T19:13:39+08:00">
+                2021-05-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>论文信息：</strong> <a href="https://arxiv.org/abs/2008.10032" target="_blank" rel="noopener">Seesaw Loss for Long-Tailed Instance Segmentation</a><br><strong>代码链接：</strong><a href="https://github.com/open-mmlab/mmdetection/tree/master/configs/seesaw_loss" target="_blank" rel="noopener">https://github.com/open-mmlab/mmdetection/tree/master/configs/seesaw_loss</a><br><strong>整体信息：</strong>这是 MMDet 团队参加 LVIS 2020 竞赛获得rank1时提出地损失函数，这篇文章指出了限制检测器在长尾分布数据上性能的一个关键原因：施加在尾部类别（tail class上的<strong>正负样本梯度的比例</strong>是不均衡的。因此，我们提出 <strong>Seesaw Loss</strong> <strong>来动态地抑制尾部类别上过量的负样本梯度，同时补充对误分类样本的惩罚</strong>。 Seesaw Loss 显著提升了尾部类别的分类准确率，进而为检测器在长尾数据集上的整体性能带来可观的增益。</p>
+<a id="more"></a>
+<p>由于原作在知乎上已有讲解，我就不班门弄斧，直接搬运过来，侵权删。</p>
+<h2 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h2><p>在长尾分布的数据集中（例如：LVIS），大部分训练样本来自头部类别（head class），而只有少量样本来自尾部类别（tail class）。因此在训练过程中，来自头部类别的样本会对尾部类别施加过量的负样本梯度，淹没了来自尾部类别自身的正样本梯度。这种不平衡的学习过程导致分类器倾向于给予尾部类别很低的响应，以降低训练的loss。如下图所示，我们统计了在 LVIS v1.0 上训练Mask R-CNN过程中，施加在每个类别的分类器上正负样本累计梯度的分布。</p>
+<p><img src="/img/seesaw-distribution.png" alt="img"></p>
+<p>显然，头部类别获得的正负样本梯度比例接近1.0，而越是稀有的尾部类别，其获得的正负样本梯度的比例就越小。由此带来的结果就是分类的准确率随着样本数的减少而急剧下降，进而严重影响了检测器的性能。</p>
+<h3 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h3><p>为了方便直观理解，我们可以把正负样本梯度不均衡的问题，类比于一个一边放有较重物体而另一边放有较轻物体的跷跷板（Seesaw），如下图所示。为了平衡这个跷跷板，一个简单可行的方案就是缩短重物一侧跷跷板的臂长，即减少重物的重量在平衡过程中的权重。回到正负样本梯度不均衡的问题，我们提出了 Seesaw Loss 来动态地减少由头部类别施加在尾部类别上过量的负样本梯度的权重，从而达到正负样本梯度相对平衡的效果。</p>
+<p><img src="/img/seesaw-ce.png" alt="img"></p>
+<p>Seesaw Loss的数学表达如下，</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+&L_{\text {seesaw }}(\mathbf{z})=-\sum_{i=1}^{C} y_{i} \log \left(\widehat{\sigma}_{i}\right) \\
+&\text { with } \widehat{\sigma}_{i}=\frac{e^{z_{i}}}{\sum_{j \neq i}^{C} \mathcal{S}_{i j} e^{z_{j}}+e^{z_{i}}}
+\end{aligned}</script><p>$y_{i} \in\{0,1\}$ 是one-hot label, $\mathbf{z}=\left[z_{1}, z_{2}, \ldots, z_{C}\right]$ ,是每一类预测的 logit。此时，对于一个第 i类的样本，它施加在第 j类上的负样本梯度为</p>
+<script type="math/tex; mode=display">
+\frac{\partial L_{\text {seesaw }}(\mathbf{z})}{\partial z_{j}}=\mathcal{S}_{i j} \frac{e^{z_{j}}}{e^{z_{i}}} \widehat{\sigma}_{i}</script><p>这里我们可以发现 $S_{ij}$就像一个平衡系数，通过调节 $S_{ij}$，我们可以达到放大或者缩小第 i类施加在第 j 类上的负样本梯度的效果。这样，我们就可以通过选择合适 $S_{ij}$来达到平衡正负样本梯度的目的。</p>
+<p>在 Seesaw Loss 的设计中，我们考虑了两方面的因素，一方面我们需要考虑类别间样本分布的关系（class-wise），并据此减少头部类别对尾部类别的”惩罚” （负样本梯度）；另一方面，盲目减少对尾部类别的惩罚会增加错误分类的风险，因为部分误分类的样本受到的惩罚变小了，因此对于那些在训练过程中误分类的样本我们需要保证其受到足够的”惩罚”。据此， $S_{ij}$由两项相乘得到，</p>
+<script type="math/tex; mode=display">
+\mathcal{S}_{i j}=\mathcal{M}_{i j} \cdot \mathcal{C}_{i j}</script><p>$M_{ij}$ <strong>（Mitigation Factor）</strong>用来缓解尾部类别上过量的负样本梯度, $C_{ij}$ (<strong>Compensation Factor）</strong>用来补充那些错误分类样本上的”惩罚”。</p>
+<h4 id="1-Mitigation-Factor"><a href="#1-Mitigation-Factor" class="headerlink" title="1. Mitigation Factor"></a>1. Mitigation Factor</h4><p><img src="/img/seesaw-mitigation.png" alt="img"></p>
+<p>既然正负样本梯度不平衡的问题来自于样本数量的不平衡，那么一种直接有效的办法就是根据不同类别之间样本数量的相对比例来进行调节。在训练过程中，Seesaw Loss在线地统计每一类的累计训练样本数量 $N_{ij}$ 并根据如下公式计算$M_{ij}$ ,</p>
+<script type="math/tex; mode=display">
+\mathcal{M}_{i j}=\left\{\begin{array}{cc}
+1, & \text { if } N_{i} \leq N_{j} \\
+\left(\frac{N_{j}}{N_{i}}\right)^{p}, & \text { if } N_{i}>N_{j}
+\end{array}\right.</script><p>也就是说当第 i类比第j类出现地 就会自动根据两类之间不平衡的程度来减少第 i类对第j类施加的负样本梯度。此外，我们在线地累计样本数量，而非使用预先统计的数据集样本分布，这样的设计主要是因为一些高级的样本 sampling 方式会改变数据集的分布（例如：repeat factor sampler, class balanced sampler 等)。在这种情况下，预先统计的方式无法反映训练过程中数据的真实分布。</p>
+<h4 id="2-Compensation-Factor"><a href="#2-Compensation-Factor" class="headerlink" title="2. Compensation Factor"></a>2. Compensation Factor</h4><p><img src="/img/seesaw-compensation.png" alt="img"></p>
+<p>为了防止过度减少负样本梯度而带来的分类错误，Seesaw Loss会增加对那些错误分类样本的惩罚。具体来说，如果一个第i 类的样本错误分给了第 j类，Seesaw Loss会根据两类之间的分类置信度的相对比值来适当的增加对第 j类的惩罚。$C_{ij}$的计算如下，</p>
+<script type="math/tex; mode=display">
+\mathcal{C}_{i j}=\left\{\begin{array}{cc}
+1, & \text { if } \sigma_{j} \leq \sigma_{i} \\
+\left(\frac{\sigma_{j}}{\sigma_{i}}\right)^{q}, & \text { if } \sigma_{j}>\sigma_{i}
+\end{array}\right.</script><h4 id="3-Normalized-Linear-Activation"><a href="#3-Normalized-Linear-Activation" class="headerlink" title="3. Normalized Linear Activation"></a>3. Normalized Linear Activation</h4><p>受到face recognition，few-shot learning等领域的启发，Seesaw Loss在预测分类logit的时候对weight和feature进行了归一化处理，即</p>
+<script type="math/tex; mode=display">
+\begin{gathered}
+z=\tau \widetilde{\mathcal{W}}^{T} \tilde{x}+b \\
+\widetilde{\mathcal{W}}_{i}=\frac{\mathcal{W}_{i}}{\left\|\mathcal{W}_{i}\right\|_{2}}, i \in C, \tilde{x}=\frac{x}{\|x\|_{2}}
+\end{gathered}</script><h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><p><img src="/img/seesaw-exp.png" alt="img"></p>
+<p>Seesaw相比于 EQL 和 BAGS 两种专门为 LVIS 数据设计的方法取得了显著的性能优势，在 end-to-end 训练的情况下在 test-dev 上取得高达30.0 AP的精度。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Long-tailed-object-detection/" rel="tag"># Long-tailed object detection</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/04/12/vfnet/" rel="next" title="VFNet高性能的密集目标检测器">
+                <i class="fa fa-chevron-left"></i> VFNet高性能的密集目标检测器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/07/21/vit/" rel="prev" title="Transformer 在图像领域应用的开拓者VIT">
+                Transformer 在图像领域应用的开拓者VIT <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">83</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">40</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Motivation"><span class="nav-number">1.</span> <span class="nav-text">Motivation</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#方法"><span class="nav-number">1.1.</span> <span class="nav-text">方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Mitigation-Factor"><span class="nav-number">1.1.1.</span> <span class="nav-text">1. Mitigation Factor</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Compensation-Factor"><span class="nav-number">1.1.2.</span> <span class="nav-text">2. Compensation Factor</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Normalized-Linear-Activation"><span class="nav-number">1.1.3.</span> <span class="nav-text">3. Normalized Linear Activation</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验"><span class="nav-number">1.2.</span> <span class="nav-text">实验</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

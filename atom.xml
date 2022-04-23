@@ -157,6 +157,28 @@
   </entry>
   
   <entry>
+    <title>目标检测上的自监督学习</title>
+    <link href="https://blog.nicehuster.cn/2021/05/30/InsLoc/"/>
+    <id>https://blog.nicehuster.cn/2021/05/30/InsLoc/</id>
+    <published>2021-05-30T11:13:39.000Z</published>
+    <updated>2022-04-23T08:56:07.524Z</updated>
+    
+    <content type="html"><![CDATA[<p><strong>论文信息：</strong> <a href="https://arxiv.org/abs/2102.08318" target="_blank" rel="noopener">Instance Localization for Self-supervised Detection Pretraining</a><br><strong>代码链接：</strong><a href="https://github.com/limbo0000/InstanceLoc" target="_blank" rel="noopener">https://github.com/limbo0000/InstanceLoc</a><br><strong>整体信息：</strong>这是被CVPR2021接收的一篇关于在</p><a id="more"></a><p>现有的自监督学习方法极大地提升了在图像分类任务上的指标上限，然而在目标检测任务上的迁移性能却与分类任务不一致。论文将这种迁移学习中存在的misalignment问题归咎为:(1)预训练网络结构和目标检测网络结构不一致；(2)现有的对比学习自监督方式是一个分类问题，没有对位置建模。</p><p> 方法很直观，将同一个Instance随机crop得到patch，随机粘贴到不同的背景中，使用对比学习进行自监督学习。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;strong&gt;论文信息：&lt;/strong&gt; &lt;a href=&quot;https://arxiv.org/abs/2102.08318&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Instance Localization for Self-supervised Detection Pretraining&lt;/a&gt;&lt;br&gt;&lt;strong&gt;代码链接：&lt;/strong&gt;&lt;a href=&quot;https://github.com/limbo0000/InstanceLoc&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://github.com/limbo0000/InstanceLoc&lt;/a&gt;&lt;br&gt;&lt;strong&gt;整体信息：&lt;/strong&gt;这是被CVPR2021接收的一篇关于在&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
+    
+    
+      <category term="self-supervised learning" scheme="https://blog.nicehuster.cn/tags/self-supervised-learning/"/>
+    
+  </entry>
+  
+  <entry>
     <title>长尾目标检测-Seesaw Loss[转载]</title>
     <link href="https://blog.nicehuster.cn/2021/05/30/seesaw-loss/"/>
     <id>https://blog.nicehuster.cn/2021/05/30/seesaw-loss/</id>
@@ -444,39 +466,6 @@
     
       &lt;p&gt;上一篇博客主要介绍到mmdetection这个检测框架的一些结构设计以及代码的总体逻辑。这篇就主要介绍一下在mmdetection被大量使用的配置和注册。&lt;/p&gt;
 &lt;h3 id=&quot;配置类&quot;&gt;&lt;a href=&quot;#配置类&quot; class=&quot;headerlink&quot; title=&quot;配置类&quot;&gt;&lt;/a&gt;配置类&lt;/h3&gt;&lt;p&gt;配置方式支持 python/json/yaml, 从 mmcv 的 Config 解析, 其功能同 maskrcnn-benchmark 的 yacs 类似, 将字典的取值方式属性化. 这里帖部分代码，以供学习。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="mmdetection" scheme="https://blog.nicehuster.cn/categories/mmdetection/"/>
-    
-    
-      <category term="mmdetection" scheme="https://blog.nicehuster.cn/tags/mmdetection/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>mmdetection详解指北 (一)</title>
-    <link href="https://blog.nicehuster.cn/2020/09/01/mmdetection-1/"/>
-    <id>https://blog.nicehuster.cn/2020/09/01/mmdetection-1/</id>
-    <published>2020-09-01T11:13:39.000Z</published>
-    <updated>2020-09-18T07:19:24.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>平时做的都些检测相关的项目，因此对于各类检测框架使用较多，以及一些不知名的repo都有用过，平时接触的都是业务项目，很少去认真的看一个repo中算法的框架设计，最近项目处于交付阶段，主要是客户和平台开发人员对界面的问题。趁有空mmdetection的代码重新看了一遍，顺便做了一些笔记。</p><h3 id="组件设计"><a href="#组件设计" class="headerlink" title="组件设计"></a>组件设计</h3><blockquote><ul><li>BackBone: 特征提取骨架网络,ResNet,ResneXt,ssd_vgg, hrnet 等。</li><li>Neck: 连接骨架和头部. 多层级特征融合,FPN,BFP,PAFPN 等。</li><li>DenseHead: 处理特征图上的密集框部分, 主要分 AnchorHead。AnchorFreeHead 两大类，分别有 RPNHead, SSDHead,RetinaHead 和 FCOSHead 等。</li><li>RoIHead (BBoxHead/MaskHead): 在特征图上对 roi 做类别分类或位置回归等 (1.x)。</li><li>ROIHead:bbox 或 mask 的 roi_extractor+head(2.0, 合并了 extractor 和 head)</li><li>SingleStage: BackBone + Neck + DenseHead</li><li>TwoStage: BackBone + Neck + DenseHead + RoIHead(2.0)</li></ul></blockquote><a id="more"></a><h3 id="结构设计"><a href="#结构设计" class="headerlink" title="结构设计"></a>结构设计</h3><h4 id="代码结构"><a href="#代码结构" class="headerlink" title="代码结构"></a>代码结构</h4><blockquote><ul><li><p>configs 网络组件结构等配置信息 </p></li><li><p>tools: 训练和测试的最终包装和一些实用脚本 </p></li><li><p>mmdet:</p><blockquote><ul><li>apis: 分布式环境设定 (1.x,2.0 移植到 mmcv), 推断, 测试, 训练基础代码;</li><li>core: anchor 生成,bbox,mask 编解码, 变换, 标签锚定, 采样等, 模型评估, 加速, 优化器，后处理;</li><li>datasets:coco,voc 等数据类, 数据 pipelines 的统一格式, 数据增强，数据采样;</li><li>models: 模型组件 (backbone,head,loss,neck)，采用注册和组合构建的形式完成模型搭建</li><li>ops: 优化加速代码, 包括 nms,roialign,dcn,masked_conv，focal_loss 等</li></ul></blockquote></li></ul></blockquote><p><img src="/img/image-20200917202833058.png" alt="image-20200917202833058"></p><h4 id="总体逻辑"><a href="#总体逻辑" class="headerlink" title="总体逻辑"></a>总体逻辑</h4><p>从 tools/train.py 中能看到整体可分如下 4 个步骤:</p><blockquote><ul><li><p>1.mmcv.Config.fromfile 从配置文件解析配置信息, 并做适当更新, 包括环境搜集，预加载模型文件, 分布式设置，日志记录等;</p></li><li><p>2.mmdet.models 中的 build_detector 根据配置信息构造模型 ;</p><blockquote><ul><li>2.1 build 系列函数调用 build_from_cfg 函数, 按 type 关键字从注册表中获取相应的对象, 对象的具名参数在注册文件中赋值;</li><li>2.2 registr.py 放置了模型的组件注册器。其中注册器的 register_module 成员函数是一个装饰器功能函数，在具体的类对象 <em>A</em> 头上装饰 @X.register _module，并同时在 <em>A</em> 对象所在包的初始化文件中调用 <em>A</em>，即可将 <em>A</em> 保存到 registry.module_dict 中, 完成注册;_</li><li>2.3 目前包含 BACKBONES,NECKS,ROI_EXTRACTORS,SHARED_ HEADS,HEADS,LOSSES,DETECTORS 七个模型相关注册器，另外还有数据类，优化器等注册器;</li></ul></blockquote></li></ul><ul><li><p>3.build_dataset 根据配置信息获取数据类;</p><blockquote><ul><li>3.1 coco，cityscapes，voc，deepfasion，lvis，wider_face 等数据 (数据类扩展见后续例子)。</li></ul></blockquote></li><li><p>4.train_detector 模型训练流程:</p><blockquote><ul><li>4.1数据 loader 化, 模型分布式化，优化器选取</li><li>4.2 进入 runner 训练流程 (来自 mmcv 库，采用 hook 方式，整合了 pytorch 训练流程)</li><li>4.3 训练 pipelines 具体细节见后续展开。</li></ul></blockquote></li></ul></blockquote><p>后续说说配置文件，注册机制和训练逻辑。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;平时做的都些检测相关的项目，因此对于各类检测框架使用较多，以及一些不知名的repo都有用过，平时接触的都是业务项目，很少去认真的看一个repo中算法的框架设计，最近项目处于交付阶段，主要是客户和平台开发人员对界面的问题。趁有空mmdetection的代码重新看了一遍，顺便做了一些笔记。&lt;/p&gt;
-&lt;h3 id=&quot;组件设计&quot;&gt;&lt;a href=&quot;#组件设计&quot; class=&quot;headerlink&quot; title=&quot;组件设计&quot;&gt;&lt;/a&gt;组件设计&lt;/h3&gt;&lt;blockquote&gt;
-&lt;ul&gt;
-&lt;li&gt;BackBone: 特征提取骨架网络,ResNet,ResneXt,ssd_vgg, hrnet 等。&lt;/li&gt;
-&lt;li&gt;Neck: 连接骨架和头部. 多层级特征融合,FPN,BFP,PAFPN 等。&lt;/li&gt;
-&lt;li&gt;DenseHead: 处理特征图上的密集框部分, 主要分 AnchorHead。AnchorFreeHead 两大类，分别有 RPNHead, SSDHead,RetinaHead 和 FCOSHead 等。&lt;/li&gt;
-&lt;li&gt;RoIHead (BBoxHead/MaskHead): 在特征图上对 roi 做类别分类或位置回归等 (1.x)。&lt;/li&gt;
-&lt;li&gt;ROIHead:bbox 或 mask 的 roi_extractor+head(2.0, 合并了 extractor 和 head)&lt;/li&gt;
-&lt;li&gt;SingleStage: BackBone + Neck + DenseHead&lt;/li&gt;
-&lt;li&gt;TwoStage: BackBone + Neck + DenseHead + RoIHead(2.0)&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/blockquote&gt;
     
     </summary>
     

@@ -2,9 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://blog.nicehuster.cn/2021/03/30/fixmatch/</loc>
+    <loc>https://blog.nicehuster.cn/2020/03/16/ocrnet/</loc>
     
-    <lastmod>2022-04-24T04:09:45.804Z</lastmod>
+    <lastmod>2022-04-24T12:12:41.989Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.nicehuster.cn/2021/11/09/knowledge-distillation/</loc>
+    
+    <lastmod>2022-04-24T08:30:22.122Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.nicehuster.cn/2021/06/04/fixmatch/</loc>
+    
+    <lastmod>2022-04-24T07:42:11.780Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.nicehuster.cn/2021/06/05/unbiased-teacher/</loc>
+    
+    <lastmod>2022-04-24T07:41:54.687Z</lastmod>
     
   </url>
   
@@ -583,13 +604,6 @@
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/2019/04/02/docker/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://blog.nicehuster.cn/2018/03/09/dl_environ/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
@@ -597,14 +611,14 @@
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/2019/06/12/fine-grain/</loc>
+    <loc>https://blog.nicehuster.cn/2019/04/02/docker/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/29/tensorRT_customlayer/</loc>
+    <loc>https://blog.nicehuster.cn/2019/06/12/fine-grain/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -619,6 +633,13 @@
   
   <url>
     <loc>https://blog.nicehuster.cn/2018/07/25/tensorRT_install/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.nicehuster.cn/2018/07/29/tensorRT_customlayer/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     

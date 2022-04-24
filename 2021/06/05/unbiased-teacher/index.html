@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="semi-supervised learning,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="论文信息： Unbiased Teacher for Semi-Supervised Object Detection代码链接：https://github.com/facebookresearch/unbiased-teacher整体信息：这是facebook research在半监督目标检测上的工作。以往的半监督学习多聚焦与分类任务上，在检测任务上少有涉及。解决半监督目标检测的一个直接方法是应">
+<meta name="keywords" content="semi-supervised learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="unbiased teacher-半监督目标检测">
+<meta property="og:url" content="https://blog.nicehuster.cn/2021/06/05/unbiased-teacher/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="论文信息： Unbiased Teacher for Semi-Supervised Object Detection代码链接：https://github.com/facebookresearch/unbiased-teacher整体信息：这是facebook research在半监督目标检测上的工作。以往的半监督学习多聚焦与分类任务上，在检测任务上少有涉及。解决半监督目标检测的一个直接方法是应">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/unbiased-teacher-ssod.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/unbiased-teacher-overfit.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/unbiased-teacher-pipeline.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/unbiased-teacher-coco-standard.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/unbiased-teacher-coco-addition.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/unbiased-teacher-ablation-study.png">
+<meta property="og:updated_time" content="2022-04-24T07:41:54.687Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="unbiased teacher-半监督目标检测">
+<meta name="twitter:description" content="论文信息： Unbiased Teacher for Semi-Supervised Object Detection代码链接：https://github.com/facebookresearch/unbiased-teacher整体信息：这是facebook research在半监督目标检测上的工作。以往的半监督学习多聚焦与分类任务上，在检测任务上少有涉及。解决半监督目标检测的一个直接方法是应">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/unbiased-teacher-ssod.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2021/06/05/unbiased-teacher/">
+
+
+
+
+
+  <title>unbiased teacher-半监督目标检测 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2021/06/05/unbiased-teacher/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">unbiased teacher-半监督目标检测</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-06-05T19:13:39+08:00">
+                2021-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>论文信息：</strong> <a href="https://arxiv.org/abs/2102.09480" target="_blank" rel="noopener">Unbiased Teacher for Semi-Supervised Object Detection</a><br><strong>代码链接：</strong><a href="https://github.com/facebookresearch/unbiased-teacher" target="_blank" rel="noopener">https://github.com/facebookresearch/unbiased-teacher</a><br><strong>整体信息：</strong>这是facebook research在半监督目标检测上的工作。以往的半监督学习多聚焦与分类任务上，在检测任务上少有涉及。解决半监督目标检测的一个直接方法是应用半监督分类方法，但是由于目标检测的特性，图像分类方法并不适合，主要原因在于目标检测任务中的类别不平衡严重阻碍了伪标签的使用。</p>
+<p><img src="/img/unbiased-teacher-ssod.png" alt="img"></p>
+<a id="more"></a>
+<p><img src="/img/unbiased-teacher-overfit.png" alt="img"></p>
+<p><strong>目标检测中存在前景背景不平衡和前景之间类不平衡，这些不平衡导致半监督训练中产生有偏差的预测</strong>。伪标签作为图像分类半监督中最有效的方法之一，在目标检测中因为倾向置信度高的类别和区域导致产生偏差。<strong>将偏差伪标签加入训练会加重类不平衡问题和产生过拟合</strong>。如上图所示。</p>
+<h3 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h3><p><img src="/img/unbiased-teacher-pipeline.png" alt="img"></p>
+<p>如上图所示，Unbiased Teacher框架包含俩个部分，Burn-In 和 Teacher-Student Mutual Learning。在Burn-In 阶段，使用所有有标注数据训练目标检测器。在第二阶段，我们先将Burn-In训练好的检测器复制给两个模型（Teacher和Student）。第二阶段的目标是通过一种共同学习的机制来更新Teacher和Student模型，Teacher模型产生伪标签用于训练Student模型，然后student模型学到的知识再用于更新teacher模型，因此用于训练student模型的伪标签本身也在自我更新。</p>
+<h4 id="1-Burn-In"><a href="#1-Burn-In" class="headerlink" title="1. Burn In"></a>1. Burn In</h4><p>该阶段使用所有标注数据来训练检测模型，使用$L_{sup}$ 优化模型参数：</p>
+<script type="math/tex; mode=display">
+\mathcal{L}_{s u p}=\sum_{i} \mathcal{L}_{\text {cls }}^{r p n}\left(\boldsymbol{x}_{i}^{s}, \boldsymbol{y}_{i}^{s}\right)+\mathcal{L}_{r e g}^{r p n}\left(\boldsymbol{x}_{i}^{s}, \boldsymbol{y}_{i}^{s}\right)+\mathcal{L}_{\text {cls }}^{r o i}\left(\boldsymbol{x}_{i}^{s}, \boldsymbol{y}_{i}^{s}\right)+\mathcal{L}_{r e g}^{r o i}\left(\boldsymbol{x}_{i}^{s}, \boldsymbol{y}_{i}^{s}\right)</script><p>在作者的appendix有验证burn-in阶段的必要性，在早期阶段，burn-in可以使模型获得更准确的伪标签，而且可以加快模型收敛。</p>
+<h4 id="2-Teacher-Student-Mutual-Learning"><a href="#2-Teacher-Student-Mutual-Learning" class="headerlink" title="2. Teacher-Student Mutual Learning"></a>2. Teacher-Student Mutual Learning</h4><p>teacher模型生成伪标签用于训练student模型，student模型的权重转移给teacher模型以更新teacher模型，在teacher和student的迭代训练中提高了检测准确率。随着检测准确率的提高，teacher产生更为准确和稳定的伪标签，这是性能改善的关键。我们也可以将teacher视为student在不同的时间步里进行temporal ensemble所得，这与我们的研究一致，即teacher的准确率高于student。与先前的研究相比，<strong>改善teacher的关键因素就是student模型的多样性</strong>，所以我们采用强增强图片作为student的输入，使用弱增强图片作为teacher的输入以提供可信赖的伪标签.</p>
+<h5 id="Student-Learning-with-Pseudo-Labeling"><a href="#Student-Learning-with-Pseudo-Labeling" class="headerlink" title="Student Learning with Pseudo-Labeling"></a>Student Learning with Pseudo-Labeling</h5><p>我们首先设置一个置信度阈值 $\delta$，用于过滤低置信度的预测框，这些低置信度的预测框极有可能是错误的正样本。此外，含噪的伪标签会涌向teacher模型，所以我们将teacher和student分开训练。在获得伪标签后只有student的权重可以通过反向传播更新:</p>
+<script type="math/tex; mode=display">
+\theta_{s} \leftarrow \theta_{s}+\gamma \frac{\partial\left(\mathcal{L}_{s u p}+\boldsymbol{\lambda}_{u} \mathcal{L}_{\text {unsup }}\right)}{\partial \theta_{s}}, \quad \mathcal{L}_{\text {unsup }}=\sum_{i} \mathcal{L}_{c l s}^{r p n}\left(\boldsymbol{x}_{i}^{u}, \hat{\boldsymbol{y}}_{i}^{u}\right)+\mathcal{L}_{c l s}^{r o i}\left(\boldsymbol{x}_{i}^{u}, \hat{\boldsymbol{y}}_{i}^{u}\right)</script><h5 id="Teacher-Refinement-via-Exponential-Moving-Average"><a href="#Teacher-Refinement-via-Exponential-Moving-Average" class="headerlink" title="Teacher Refinement via Exponential Moving Average"></a>Teacher Refinement via Exponential Moving Average</h5><p>为了获得稳定的伪标签，我们应用EMA来逐步更新teacher模型。</p>
+<script type="math/tex; mode=display">
+\theta_{t} \leftarrow \alpha \theta_{t}+(1-\alpha) \theta_{s}</script><h4 id="3-Bias-in-pseudo-label"><a href="#3-Bias-in-pseudo-label" class="headerlink" title="3. Bias in pseudo-label"></a>3. Bias in pseudo-label</h4><p>理论上来说，基于伪标签的方法可以解决由于标签匮乏带来的问题，但是目标检测任务中的不平衡属性影响了该方法的有效性。目标检测中存在前景-背景不平衡和前景中类不平衡问题，如果在训练数据不充足的情况下使用标准CE，模型会倾向于预测主要类别，这会导致预测偏向数量较多的类别,生成类不平衡的伪标签(偏差伪标签)。在训练时使用偏差伪标签会使不平衡预测问题恶化。</p>
+<p>为了解决这个问题，我们考虑一种简单但是高效的方法，在ROIhead的多类别分类loss中，我们使用Focal loss代替CE loss。Focal loss将给置信度较低的目标实例分配更多的loss权重，这样模型会看重hard目标而不是那些极有可能是主要类别的简单目标。</p>
+<p>另一方面，采用EMA机制可以防止决策边界急剧的向少数类别倾斜，teacher模型的权重可表示为</p>
+<script type="math/tex; mode=display">
+\theta_{t}^{i}=\hat{\theta}-\gamma \sum_{k=1}^{i-1}\left(1-\alpha^{-k+(i-1)}\right) \frac{\partial\left(\mathcal{L}_{s u p}+\boldsymbol{\lambda}_{u} \mathcal{L}_{u n s u p}\right)}{\partial \theta_{s}^{k}}</script><p>EMA-training使得Teacher模型有利于产生更稳定的伪标签，解决SS-OD中的类失衡问题。</p>
+<h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><p>以FasterRCNN作为目标检测器，置信度阈值$\delta = 0.7$；<strong>弱增强</strong>：随机水平翻转flip；强增强：color jitter, grayscale,gaussian blur, cutout等等。</p>
+<h4 id="COCO-standard"><a href="#COCO-standard" class="headerlink" title="COCO-standard"></a>COCO-standard</h4><p><img src="/img/unbiased-teacher-coco-standard.png" alt="img"></p>
+<p>从上述表格可以看出，有标签数据越少，本文提出的方法改善越大。在作者看来，主要原因在于：（1）伪标签更准确；（2）EMA和Focal loss有效地解决伪标签类失衡问题；</p>
+<h4 id="COCO-additional-and-VOC"><a href="#COCO-additional-and-VOC" class="headerlink" title="COCO-additional and VOC"></a>COCO-additional and VOC</h4><p>作者还有进一步验证在100%标注数据下，使用额外无标注数据能否进一步提升模型性能。</p>
+<p><img src="/img/unbiased-teacher-coco-addition.png" alt="img"></p>
+<h4 id="ablation-study"><a href="#ablation-study" class="headerlink" title="ablation study"></a>ablation study</h4><p><strong>EMA:</strong> teacher和student同步更新，目前半监督图像分类中最优的模型Fixmatch也是同步更新。</p>
+<p><strong>Focal loss：</strong>有使用Focal loss的模型产生的伪标签分布与真是标签分布更相似，将KL散度从1.7915（无EMA无Focal loss）改善到0.2001（无EMA有Focal loss）</p>
+<p><img src="/img/unbiased-teacher-ablation-study.png" alt="img"></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>这篇文章分析了直接将半监督分类方法应用与目标检测任务时存在的俩个问题：类失衡和过拟合，并提出了unbiased-teacher，简单高效的解决了上述俩个问题。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/semi-supervised-learning/" rel="tag"># semi-supervised learning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/06/04/fixmatch/" rel="next" title="fixmatch-基于数据增强实现半监督学习">
+                <i class="fa fa-chevron-left"></i> fixmatch-基于数据增强实现半监督学习
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/07/21/vit/" rel="prev" title="Transformer 在图像领域应用的开拓者VIT">
+                Transformer 在图像领域应用的开拓者VIT <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">92</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">45</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#核心思想"><span class="nav-number">1.</span> <span class="nav-text">核心思想</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Burn-In"><span class="nav-number">1.1.</span> <span class="nav-text">1. Burn In</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Teacher-Student-Mutual-Learning"><span class="nav-number">1.2.</span> <span class="nav-text">2. Teacher-Student Mutual Learning</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Student-Learning-with-Pseudo-Labeling"><span class="nav-number">1.2.1.</span> <span class="nav-text">Student Learning with Pseudo-Labeling</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Teacher-Refinement-via-Exponential-Moving-Average"><span class="nav-number">1.2.2.</span> <span class="nav-text">Teacher Refinement via Exponential Moving Average</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-Bias-in-pseudo-label"><span class="nav-number">1.3.</span> <span class="nav-text">3. Bias in pseudo-label</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验"><span class="nav-number">2.</span> <span class="nav-text">实验</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#COCO-standard"><span class="nav-number">2.1.</span> <span class="nav-text">COCO-standard</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#COCO-additional-and-VOC"><span class="nav-number">2.2.</span> <span class="nav-text">COCO-additional and VOC</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ablation-study"><span class="nav-number">2.3.</span> <span class="nav-text">ablation study</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

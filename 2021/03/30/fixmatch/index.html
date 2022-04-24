@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="self-supervised learning,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="论文信息：FixMatch: Simplifying Semi-Supervised Learning with Consistency and Confidence代码链接：https://github.com/google-research/fixmatch整体信息：这在实际业务场景中，大量的标注数据对于模型性能的提升至关重要，但是获取标注数据是一个耗时耗力的过程，例如工业场景中由于机台型号的">
+<meta name="keywords" content="self-supervised learning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="fixmatch-基于数据增强实现半监督学习">
+<meta property="og:url" content="https://blog.nicehuster.cn/2021/03/30/fixmatch/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="论文信息：FixMatch: Simplifying Semi-Supervised Learning with Consistency and Confidence代码链接：https://github.com/google-research/fixmatch整体信息：这在实际业务场景中，大量的标注数据对于模型性能的提升至关重要，但是获取标注数据是一个耗时耗力的过程，例如工业场景中由于机台型号的">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/fixmatch.jpg">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/fixmatch-algo.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/fixmatch-aug.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/fixmatch-exp.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/fixmatch-cifar.png">
+<meta property="og:updated_time" content="2022-04-24T04:05:15.222Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="fixmatch-基于数据增强实现半监督学习">
+<meta name="twitter:description" content="论文信息：FixMatch: Simplifying Semi-Supervised Learning with Consistency and Confidence代码链接：https://github.com/google-research/fixmatch整体信息：这在实际业务场景中，大量的标注数据对于模型性能的提升至关重要，但是获取标注数据是一个耗时耗力的过程，例如工业场景中由于机台型号的">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/fixmatch.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2021/03/30/fixmatch/">
+
+
+
+
+
+  <title>fixmatch-基于数据增强实现半监督学习 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2021/03/30/fixmatch/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">fixmatch-基于数据增强实现半监督学习</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-03-30T19:13:39+08:00">
+                2021-03-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>论文信息：</strong><a href="https://arxiv.org/abs/2001.07685" target="_blank" rel="noopener">FixMatch: Simplifying Semi-Supervised Learning with Consistency and Confidence</a><br><strong>代码链接：</strong><a href="https://github.com/google-research/fixmatch" target="_blank" rel="noopener">https://github.com/google-research/fixmatch</a><br><strong>整体信息：</strong>这在实际业务场景中，大量的标注数据对于模型性能的提升至关重要，但是获取标注数据是一个耗时耗力的过程，例如工业场景中由于机台型号的更换导致模型性能下降，花费大量时间对新数据进行重新标注大概率会导致模型上线时间delay，而半监督学习(Semi-Supervised Learning, SSL)探究了如何利用大量未标注数据和部分标注数据来提升模型性能。而本文，谷歌提出的fixmatch，是对现有SSL方法进行显著简化的算法。</p>
+<a id="more"></a>
+<p><img src="/img/fixmatch.jpg" alt="preview"></p>
+<h3 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h3><p>如上图所示，训练过程包括两个部分，有监督训练和无监督训练。有label的数据，执行有监督训练，和普通分类任务训练没有区别。没有label的数据，经过首先经过弱增强获取伪标签。然后利用该伪标签去监督强增强的输出值，只有大于一定阈值条件才执行伪标签的生成。无监督的训练过程包含两种思想在里面，即一致性正则化和伪标签训练。</p>
+<h4 id="1-一致性正则"><a href="#1-一致性正则" class="headerlink" title="1. 一致性正则"></a>1. 一致性正则</h4><p>一致性正则化是当前半监督SOTA工作中一个重要的组件，其建立在一个基本假设：<strong>相同图片经过不同扰动（增强）经过网络会输出相同预测结果</strong>，因此对这二者进行loss计算便可以对网络进行监督训练，又被称为自监督训练。loss计算如下：</p>
+<script type="math/tex; mode=display">
+\sum_{b=1}^{\mu B}\left\|p_{\mathrm{m}}\left(y \mid \alpha\left(u_{b}\right)\right)-p_{\mathrm{m}}\left(y \mid \alpha\left(u_{b}\right)\right)\right\|_{2}^{2}</script><p>其中，$\alpha$ 表示随机的弱增强操作。</p>
+<h4 id="2-伪标签"><a href="#2-伪标签" class="headerlink" title="2. 伪标签"></a>2. 伪标签</h4><p>伪标签是利用模型本身为未标记数据获取人工标签的思想。通常是使用“hard”标签，也就是argmax获取的onehot标签，仅保留最大类概率超过阈值的标签。计算loss的时如下：</p>
+<script type="math/tex; mode=display">
+\frac{1}{\mu B} \sum_{b=1}^{\mu B} \mathbb{1}\left(\max \left(q_{b}\right) \geq \tau\right) \mathrm{H}\left(\hat{q}_{b}, q_{b}\right)</script><p>其中，$\hat{q}_{b}=\arg \max \left(q_{b}\right)$ , $\tau$ 是阈值。</p>
+<h4 id="3-为什么work？"><a href="#3-为什么work？" class="headerlink" title="3.为什么work？"></a>3.为什么work？</h4><p>无监督训练过程实际上是一个孪生网络，可以提取到图片的有用特征。弱增强不至于图像失真，再加上输出伪标签阈值的设置，极大程度上降低了引入错误标签噪声的可能性。而仅仅使用弱增强可能会导致训练过拟合，无法提取到本质的特征，所以使用强增强。强增强带来图片的严重失真，但是依然是保留足够可以辨认类别的特征。有监督和无监督混合训练，逐步提高模型的表达能力。</p>
+<h3 id="算法流程"><a href="#算法流程" class="headerlink" title="算法流程"></a>算法流程</h3><p><img src="/img/fixmatch-algo.png" alt="img"></p>
+<blockquote>
+<p>1.输入：有标签数据，无标签数据，另外需要设定一些超参，包括置信度阈值，无标签采样比例，loss权重。</p>
+<p>2.对有标签数据进行监督训练，使Cross-Entropy loss；</p>
+<p>3.遍历无标签数据，利用弱增强获取伪标签；</p>
+<p>4.利用获取的伪标签对无标签数据进行训练，同样利用Cross-Entropy loss；</p>
+<p>5.基于loss权重，对俩者loss进行融合；</p>
+</blockquote>
+<h3 id="loss设计"><a href="#loss设计" class="headerlink" title="loss设计"></a>loss设计</h3><p>loss包含俩部分：有标注数据的监督训练$L_s$和无标注数据的伪标签监督训练$L_u$。</p>
+<script type="math/tex; mode=display">
+\ell_{s}=\frac{1}{B} \sum_{b=1}^{B} \mathrm{H}\left(p_{b}, p_{\mathrm{m}}\left(y \mid \alpha\left(x_{b}\right)\right)\right)</script><script type="math/tex; mode=display">
+\ell_{u}=\frac{1}{\mu B} \sum_{b=1}^{\mu B} \mathbb{1}\left(\max \left(q_{b}\right) \geq \tau\right) \mathrm{H}\left(\hat{q}_{b}, p_{\mathrm{m}}\left(y \mid \mathcal{A}\left(u_{b}\right)\right)\right)</script><p>其中，$\alpha(.)$ 表示弱增强，一般为flip翻转，shift平移；$\mathcal{A}$(.)为强增强，一般为颜色变换，对比度增强等等。</p>
+<h3 id="数据增强"><a href="#数据增强" class="headerlink" title="数据增强"></a>数据增强</h3><p>在fixmatch中包含俩种数据增强：weak aug和strong aug. weak aug为标准的flip-and-shift增强策略，50%的概率进行flip和12.5%的概率进行shift，包括水平和竖直方向。对于strong aug，论文主要应用RandAugment和CTAugment两种策略，都是为提高模型表现而提出的增强策略。</p>
+<p><img src="/img/fixmatch-aug.png" alt="img"></p>
+<p>对于RandAugment：(1)从这个列表里随机选出N个增强，例如N为2；(2)然后选择一个随机的幅度M，例如50%之类的；（3）将所选的增强应用于图像，每种增强都有50％的可能性被应用。</p>
+<h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><p>作者在CIFRAR，SVHN，STL数据集上做了详尽的实验，从实验结果来看，均优于以前的方法。</p>
+<p><img src="/img/fixmatch-exp.png" alt="img"></p>
+<p>在CIFAR-10和SVHN上选用的是Wide ResNet-28-2模型， CIFAR-100选用的是WRN-28-8，STL-10选用的是WRN-37-2。在每个类只有四张图片的情况下，fixmatch明显优于其他方法。</p>
+<p>对于极端缺少标注的场景，仅仅使用每个类别使用1张图片，共10张标注的图片就可以达到78%的最大accuracy，当然这种做法和挑选的样本质量有关，作者也做了相关实验论证。不过也证明本文的方法的确work。</p>
+<p><img src="/img/fixmatch-cifar.png" alt="img"></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>fixmatch是SSL领域的一篇经典论文，做法简单有效，利用少量的标注图片就可以达到一个不错的效果，这对于获取标注困难的场景非常有意义。很值得在业务场景试一下。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/self-supervised-learning/" rel="tag"># self-supervised learning</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/03/13/ttfnet/" rel="next" title="TTFNet 快速训练版的CenterNet">
+                <i class="fa fa-chevron-left"></i> TTFNet 快速训练版的CenterNet
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2021/04/12/vfnet/" rel="prev" title="VFNet高性能的密集目标检测器">
+                VFNet高性能的密集目标检测器 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">89</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">42</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#核心思想"><span class="nav-number">1.</span> <span class="nav-text">核心思想</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-一致性正则"><span class="nav-number">1.1.</span> <span class="nav-text">1. 一致性正则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-伪标签"><span class="nav-number">1.2.</span> <span class="nav-text">2. 伪标签</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-为什么work？"><span class="nav-number">1.3.</span> <span class="nav-text">3.为什么work？</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#算法流程"><span class="nav-number">2.</span> <span class="nav-text">算法流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#loss设计"><span class="nav-number">3.</span> <span class="nav-text">loss设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据增强"><span class="nav-number">4.</span> <span class="nav-text">数据增强</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验"><span class="nav-number">5.</span> <span class="nav-text">实验</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

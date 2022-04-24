@@ -100,18 +100,24 @@
 
 
 
-<meta name="description" content="论文信息： Instance Localization for Self-supervised Detection Pretraining代码链接：https://github.com/limbo0000/InstanceLoc整体信息：这是被CVPR2021接收的一篇关于在">
+<meta name="description" content="论文信息： Instance Localization for Self-supervised Detection Pretraining代码链接：https://github.com/limbo0000/InstanceLoc整体信息：这是被CVPR2021的文章，现有的自监督学习方法极大地提升了在图像分类任务上的指标上限，然而在目标检测任务上的迁移性能却与分类任务不一致。论文将这种迁移学习中存">
 <meta name="keywords" content="self-supervised learning">
 <meta property="og:type" content="article">
 <meta property="og:title" content="目标检测上的自监督学习">
 <meta property="og:url" content="https://blog.nicehuster.cn/2021/05/30/InsLoc/index.html">
 <meta property="og:site_name" content="一起打怪升级呀">
-<meta property="og:description" content="论文信息： Instance Localization for Self-supervised Detection Pretraining代码链接：https://github.com/limbo0000/InstanceLoc整体信息：这是被CVPR2021接收的一篇关于在">
+<meta property="og:description" content="论文信息： Instance Localization for Self-supervised Detection Pretraining代码链接：https://github.com/limbo0000/InstanceLoc整体信息：这是被CVPR2021的文章，现有的自监督学习方法极大地提升了在图像分类任务上的指标上限，然而在目标检测任务上的迁移性能却与分类任务不一致。论文将这种迁移学习中存">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2022-04-23T08:56:07.524Z">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/ins-loc.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/ins-loc-box-aug.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/ins-loc-ap-acc.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/ins-loc-loc-eval.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/ins-loc-sl.png">
+<meta property="og:updated_time" content="2022-04-24T04:06:06.073Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="目标检测上的自监督学习">
-<meta name="twitter:description" content="论文信息： Instance Localization for Self-supervised Detection Pretraining代码链接：https://github.com/limbo0000/InstanceLoc整体信息：这是被CVPR2021接收的一篇关于在">
+<meta name="twitter:description" content="论文信息： Instance Localization for Self-supervised Detection Pretraining代码链接：https://github.com/limbo0000/InstanceLoc整体信息：这是被CVPR2021的文章，现有的自监督学习方法极大地提升了在图像分类任务上的指标上限，然而在目标检测任务上的迁移性能却与分类任务不一致。论文将这种迁移学习中存">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/ins-loc.png">
 
 
 
@@ -378,10 +384,23 @@
       
 
       
-        <p><strong>论文信息：</strong> <a href="https://arxiv.org/abs/2102.08318" target="_blank" rel="noopener">Instance Localization for Self-supervised Detection Pretraining</a><br><strong>代码链接：</strong><a href="https://github.com/limbo0000/InstanceLoc" target="_blank" rel="noopener">https://github.com/limbo0000/InstanceLoc</a><br><strong>整体信息：</strong>这是被CVPR2021接收的一篇关于在</p>
+        <p><strong>论文信息：</strong> <a href="https://arxiv.org/abs/2102.08318" target="_blank" rel="noopener">Instance Localization for Self-supervised Detection Pretraining</a><br><strong>代码链接：</strong><a href="https://github.com/limbo0000/InstanceLoc" target="_blank" rel="noopener">https://github.com/limbo0000/InstanceLoc</a><br><strong>整体信息：</strong>这是被CVPR2021的文章，现有的自监督学习方法极大地提升了在图像分类任务上的指标上限，然而在目标检测任务上的迁移性能却与分类任务不一致。论文将这种迁移学习中存在的misalignment问题归咎为:(1)预训练网络结构和目标检测网络结构不一致；(2)现有的对比学习自监督方式是一个分类问题，没有对位置建模。</p>
 <a id="more"></a>
-<p>现有的自监督学习方法极大地提升了在图像分类任务上的指标上限，然而在目标检测任务上的迁移性能却与分类任务不一致。论文将这种迁移学习中存在的misalignment问题归咎为:(1)预训练网络结构和目标检测网络结构不一致；(2)现有的对比学习自监督方式是一个分类问题，没有对位置建模。</p>
-<p> 方法很直观，将同一个Instance随机crop得到patch，随机粘贴到不同的背景中，使用对比学习进行自监督学习。</p>
+<p><img src="/img/ins-loc.png" alt="img"></p>
+<p> 方法很直观，将同一个Instance随机crop得到patch，随机粘贴到不同的背景中，使用对比学习进行自监督学习。其中对比学习框架上是按照MoCo来的，其中包括queue设计、动量更新等。</p>
+<h4 id="Bounding-Box-Augmentation"><a href="#Bounding-Box-Augmentation" class="headerlink" title="Bounding-Box Augmentation"></a>Bounding-Box Augmentation</h4><p>在对比学习中，通常需要构建俩个不同view下的输入，在InsLoc这篇论文中，采用的是anchor的方式生成的。</p>
+<p><img src="/img/ins-loc-box-aug.png" alt="img"></p>
+<p>给定gt box，可以计算所有anchors和gt的iou，选取IOU&gt;0.5的anchor作为aug box构造输入对，进行对比学习。</p>
+<script type="math/tex; mode=display">
+\begin{aligned}
+v_{q}^{\prime} &=\operatorname{RoIAlign}\left(f\left(I_{q}^{\prime}\right), b_{q}\right) \\
+v_{k_{+}}^{\prime} &=\operatorname{RoIAlign}\left(f\left(I_{k_{+}}^{\prime}\right), b_{k_{+}}\right)
+\end{aligned}</script><p>gt box和aug box经过roi align之后得到roi特征，再经由一个俩层的MLP层得到最终特征表示，用于后续的contrastive learning。</p>
+<h4 id="Experients"><a href="#Experients" class="headerlink" title="Experients"></a>Experients</h4><p><img src="/img/ins-loc-ap-acc.png" alt="img"></p>
+<p>从上图可以看出，相比于其他方法，insloc牺牲了很多分类上的acc，但都贡献在检测的ap上。</p>
+<p><img src="/img/ins-loc-loc-eval.png" alt="img"></p>
+<p>在论文中还提到如何评估自监督方法是否具有关注定位的能力。<strong>转化为patch块的位置预测。</strong> 如上图所示。下面是对应方法的实验结果。IncLoc对于定位能力是最强。</p>
+<p><img src="/img/ins-loc-sl.png" alt="image-20220424103025560"></p>
 
       
     </div>
@@ -476,8 +495,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview sidebar-panel sidebar-panel-active">
+      <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
           <p class="site-author-name" itemprop="name">nicehuster</p>
@@ -490,7 +518,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">88</span>
+                <span class="site-state-item-count">89</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -579,6 +607,22 @@
 
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Bounding-Box-Augmentation"><span class="nav-number">1.</span> <span class="nav-text">Bounding-Box Augmentation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Experients"><span class="nav-number">2.</span> <span class="nav-text">Experients</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

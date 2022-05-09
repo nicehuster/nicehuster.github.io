@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://blog.nicehuster.cn/2022/05/08/mask-transfiner/</loc>
+    
+    <lastmod>2022-05-09T10:11:56.953Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://blog.nicehuster.cn/2020/03/16/ocrnet/</loc>
     
     <lastmod>2022-04-24T12:12:41.989Z</lastmod>
@@ -611,13 +618,6 @@
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/2019/04/02/docker/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://blog.nicehuster.cn/2019/06/12/fine-grain/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
@@ -625,14 +625,14 @@
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/26/tensorRT_introduce/</loc>
+    <loc>https://blog.nicehuster.cn/2019/04/02/docker/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/25/tensorRT_install/</loc>
+    <loc>https://blog.nicehuster.cn/2018/07/26/tensorRT_introduce/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -647,6 +647,13 @@
   
   <url>
     <loc>https://blog.nicehuster.cn/2018/07/27/tensorRT_usage/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.nicehuster.cn/2018/07/25/tensorRT_install/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     

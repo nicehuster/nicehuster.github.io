@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="instance segmentation,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="论文信息：Mask Transfiner for High-Quality Instance Segmentation代码链接：https://github.com/SysCV/transfiner整体信息：这是ETH和港科大合作发表在CVPR2022上有关实例分割的论文，该论文中提出的Mask Transfiner通过引入 Incoherent Regions检测机制的方式，在不产生额外计算成本">
+<meta name="keywords" content="instance segmentation">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Mask Transfiner详解">
+<meta property="og:url" content="https://blog.nicehuster.cn/2022/05/08/mask-transfiner/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="论文信息：Mask Transfiner for High-Quality Instance Segmentation代码链接：https://github.com/SysCV/transfiner整体信息：这是ETH和港科大合作发表在CVPR2022上有关实例分割的论文，该论文中提出的Mask Transfiner通过引入 Incoherent Regions检测机制的方式，在不产生额外计算成本">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/mask-transfiner.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/mask-transfiner-motivation.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/mask-transfiner-property-incoherent-region.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/mask-transfiner-incoherent-region.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/mask-transfiner-pipeline.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/mask-transfiner-coco-exp.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/mask-transfiner-com.png">
+<meta property="og:updated_time" content="2022-05-09T10:11:56.953Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Mask Transfiner详解">
+<meta name="twitter:description" content="论文信息：Mask Transfiner for High-Quality Instance Segmentation代码链接：https://github.com/SysCV/transfiner整体信息：这是ETH和港科大合作发表在CVPR2022上有关实例分割的论文，该论文中提出的Mask Transfiner通过引入 Incoherent Regions检测机制的方式，在不产生额外计算成本">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/mask-transfiner.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2022/05/08/mask-transfiner/">
+
+
+
+
+
+  <title>Mask Transfiner详解 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2022/05/08/mask-transfiner/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Mask Transfiner详解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-05-08T19:13:39+08:00">
+                2022-05-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><strong>论文信息：</strong><a href="https://arxiv.org/abs/2111.13673" target="_blank" rel="noopener">Mask Transfiner for High-Quality Instance Segmentation</a><br><strong>代码链接：</strong><a href="https://github.com/SysCV/transfiner" target="_blank" rel="noopener">https://github.com/SysCV/transfiner</a><br><strong>整体信息：</strong>这是ETH和港科大合作发表在CVPR2022上有关实例分割的论文，该论文中提出的Mask Transfiner通过引入 Incoherent Regions检测机制的方式，在不产生额外计算成本的情况下，有效地改善目标分割mask。在COCO，Cityscapes和BDD100K上均取得了明显的性能提升。</p>
+<p><img src="/img/mask-transfiner.png" alt="img"></p>
+<a id="more"></a>
+<h3 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h3><p><img src="/img/mask-transfiner-motivation.png" alt="img"></p>
+<p>现有的实例分割方法在高频区域的分割依旧比较粗糙，边缘像素点存在大量错分的情况，要获取精细化的mask，需要大分辨率的深度特征图来保留物体细节，与此同时，大尺寸会带来高计算量和内存消耗，因此如何在不显著提高计算成本的条件下，获取精细化mask极具挑战。</p>
+<p>大致做法是，如上图所示，首先识别容易出错并需要优化的pixel区域（黄色区域）,在论文里面称Incoherent Regions，这些区域往往出现在物体边界或者高频区域。只需要对这些pixel区域进行优化就行，优化的具体措施下面详细介绍。当然作者也有分析，实际预测错误的所有pixel中，有43%是分布在Incoherent Regions，作者将这部分区域的pixel直接替换成gt，coco mask ap可以提升倒51.</p>
+<p><img src="/img/mask-transfiner-property-incoherent-region.png" alt="img"></p>
+<h4 id="Incoherent-Regions定义"><a href="#Incoherent-Regions定义" class="headerlink" title="Incoherent Regions定义"></a>Incoherent Regions定义</h4><p>实例分割的边缘错误很多是空间分辨率过低产生的，例如对物体标注mask的下采样、过小的RoI池化、和基于PCA/DCT的系数压缩等。这些分割方法把低分辨率特征作为输入，由于丢失了高分辨率图上的物体细节，使准确地分割物体细节非常困难。而Incoherent Regions可以很好的计算mask由于分辨率下降而导致信息丢失的区域。</p>
+<p><img src="/img/mask-transfiner-incoherent-region.png" alt="img"></p>
+<h3 id="Mask-Transfiner框架"><a href="#Mask-Transfiner框架" class="headerlink" title="Mask Transfiner框架"></a>Mask Transfiner框架</h3><p><img src="/img/mask-transfiner-pipeline.png" alt="img"></p>
+<h4 id="1-Incoherent-Regions检测"><a href="#1-Incoherent-Regions检测" class="headerlink" title="1. Incoherent Regions检测"></a>1. Incoherent Regions检测</h4><p>Incoherent Regions的检测遵循由低到高的级联设计（cascaded design）。如图上图右侧，为了检测RoI金字塔上的不同层级上信息损失节点，Transfiner先将最低层的RoI特征（28x28）和初始的物体mask预测作为输入，采用一个简单的全卷积网络（四个3×3 卷积）预测四叉树的根节点。每个根结点会分解到临近更高RoI层对应的4个子节点，例如从RoI大小28x28延伸到56x56。对于高层的RoI特征，Transfiner对上一层损失区域检测的mask做上采样后与RoI特征拼接，并使用单个1×1卷积层预测更精细的信息损失节点，以保持检测模块的轻量化。</p>
+<h4 id="2-四叉树构造"><a href="#2-四叉树构造" class="headerlink" title="2. 四叉树构造"></a>2. 四叉树构造</h4><p>四叉树的结构如上图的 Point Quadtree部分所示，来自低层级的RoI特征（如分辨率28×28）的信息损失节点在其相邻的更高层的RoI中（如分辨率56×56）中有四个对应子节点。为了减少计算量，我们只将预测为损失节点的像素点向上层进一步分解，并把树的最大深度设为3。更为具体地，我们把从最低层级（28x28）检测到的信息损失点作为根节点，从上到下递归扩展四个子象限点，构建了一个多层次的四叉树。在更高层的特征图上选取子象限点，是因为大尺度特征具有更高的分辨率和更多的物体局部细节。</p>
+<h4 id="3-节点编码"><a href="#3-节点编码" class="headerlink" title="3. 节点编码"></a>3. 节点编码</h4><p>节点编码器（Node Encoder）使用四种不同的信息线索对每个四叉树节点进行编码：</p>
+<ol>
+<li>从 FPN 金字塔的相应位置和层级提取的细粒度深度特征。</li>
+<li>初始检测器的粗略掩码预测提供高层的语义信息。</li>
+<li>相对位置编码，补充节点在RoI中的距离相关性。</li>
+<li>每个节点的周围临近点信息来补充局部细节。</li>
+</ol>
+<h4 id="4-编码和像素解码"><a href="#4-编码和像素解码" class="headerlink" title="4. 编码和像素解码"></a>4. 编码和像素解码</h4><p>四叉树节点经编码器编码后，为了建模点之间的关联，序列编码器(Sequence Encoder)中的多头注意力模块会对输入序列进行点之间的特征融合及更新。相较于MLP，Transformer可以执行序列上的全局跨尺度推理。序列编码器的每一层都由多头自注意力模块和全连接的前馈网络（FFN）组成。为了给输入序列补充足够的前景和背景信息，我们还将RoI金字塔中最低层大小为14x14的196个特征点输入。与标准Transformer解码器不同，Transfiner 的像素解码器(Pixel Decoder)是一个简单的两层 MLP，不具有多头注意力模块。它对树中每个节点的输出查询进行解码，以预测最终的实例标签。</p>
+<h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><p>1.在coco数据集上的SOTA结果对比</p>
+<p><img src="/img/mask-transfiner-coco-exp.png" alt="img"></p>
+<ol>
+<li>可视化分析比较</li>
+</ol>
+<p><img src="/img/mask-transfiner-com.png" alt="img"></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/instance-segmentation/" rel="tag"># instance segmentation</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/03/24/Faster_ILOD/" rel="next" title="增量目标检测方法 Faster ILOD">
+                <i class="fa fa-chevron-left"></i> 增量目标检测方法 Faster ILOD
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">93</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">46</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Motivation"><span class="nav-number">1.</span> <span class="nav-text">Motivation</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Incoherent-Regions定义"><span class="nav-number">1.1.</span> <span class="nav-text">Incoherent Regions定义</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mask-Transfiner框架"><span class="nav-number">2.</span> <span class="nav-text">Mask Transfiner框架</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Incoherent-Regions检测"><span class="nav-number">2.1.</span> <span class="nav-text">1. Incoherent Regions检测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-四叉树构造"><span class="nav-number">2.2.</span> <span class="nav-text">2. 四叉树构造</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-节点编码"><span class="nav-number">2.3.</span> <span class="nav-text">3. 节点编码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-编码和像素解码"><span class="nav-number">2.4.</span> <span class="nav-text">4. 编码和像素解码</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实验"><span class="nav-number">3.</span> <span class="nav-text">实验</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

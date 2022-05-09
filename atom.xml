@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://blog.nicehuster.cn/"/>
-  <updated>2022-04-13T04:30:07.119Z</updated>
+  <updated>2022-05-09T10:11:56.953Z</updated>
   <id>https://blog.nicehuster.cn/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Mask Transfiner详解</title>
+    <link href="https://blog.nicehuster.cn/2022/05/08/mask-transfiner/"/>
+    <id>https://blog.nicehuster.cn/2022/05/08/mask-transfiner/</id>
+    <published>2022-05-08T11:13:39.000Z</published>
+    <updated>2022-05-09T10:11:56.953Z</updated>
+    
+    <content type="html"><![CDATA[<p><strong>论文信息：</strong><a href="https://arxiv.org/abs/2111.13673" target="_blank" rel="noopener">Mask Transfiner for High-Quality Instance Segmentation</a><br><strong>代码链接：</strong><a href="https://github.com/SysCV/transfiner" target="_blank" rel="noopener">https://github.com/SysCV/transfiner</a><br><strong>整体信息：</strong>这是ETH和港科大合作发表在CVPR2022上有关实例分割的论文，该论文中提出的Mask Transfiner通过引入 Incoherent Regions检测机制的方式，在不产生额外计算成本的情况下，有效地改善目标分割mask。在COCO，Cityscapes和BDD100K上均取得了明显的性能提升。</p><p><img src="/img/mask-transfiner.png" alt="img"></p><a id="more"></a><h3 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h3><p><img src="/img/mask-transfiner-motivation.png" alt="img"></p><p>现有的实例分割方法在高频区域的分割依旧比较粗糙，边缘像素点存在大量错分的情况，要获取精细化的mask，需要大分辨率的深度特征图来保留物体细节，与此同时，大尺寸会带来高计算量和内存消耗，因此如何在不显著提高计算成本的条件下，获取精细化mask极具挑战。</p><p>大致做法是，如上图所示，首先识别容易出错并需要优化的pixel区域（黄色区域）,在论文里面称Incoherent Regions，这些区域往往出现在物体边界或者高频区域。只需要对这些pixel区域进行优化就行，优化的具体措施下面详细介绍。当然作者也有分析，实际预测错误的所有pixel中，有43%是分布在Incoherent Regions，作者将这部分区域的pixel直接替换成gt，coco mask ap可以提升倒51.</p><p><img src="/img/mask-transfiner-property-incoherent-region.png" alt="img"></p><h4 id="Incoherent-Regions定义"><a href="#Incoherent-Regions定义" class="headerlink" title="Incoherent Regions定义"></a>Incoherent Regions定义</h4><p>实例分割的边缘错误很多是空间分辨率过低产生的，例如对物体标注mask的下采样、过小的RoI池化、和基于PCA/DCT的系数压缩等。这些分割方法把低分辨率特征作为输入，由于丢失了高分辨率图上的物体细节，使准确地分割物体细节非常困难。而Incoherent Regions可以很好的计算mask由于分辨率下降而导致信息丢失的区域。</p><p><img src="/img/mask-transfiner-incoherent-region.png" alt="img"></p><h3 id="Mask-Transfiner框架"><a href="#Mask-Transfiner框架" class="headerlink" title="Mask Transfiner框架"></a>Mask Transfiner框架</h3><p><img src="/img/mask-transfiner-pipeline.png" alt="img"></p><h4 id="1-Incoherent-Regions检测"><a href="#1-Incoherent-Regions检测" class="headerlink" title="1. Incoherent Regions检测"></a>1. Incoherent Regions检测</h4><p>Incoherent Regions的检测遵循由低到高的级联设计（cascaded design）。如图上图右侧，为了检测RoI金字塔上的不同层级上信息损失节点，Transfiner先将最低层的RoI特征（28x28）和初始的物体mask预测作为输入，采用一个简单的全卷积网络（四个3×3 卷积）预测四叉树的根节点。每个根结点会分解到临近更高RoI层对应的4个子节点，例如从RoI大小28x28延伸到56x56。对于高层的RoI特征，Transfiner对上一层损失区域检测的mask做上采样后与RoI特征拼接，并使用单个1×1卷积层预测更精细的信息损失节点，以保持检测模块的轻量化。</p><h4 id="2-四叉树构造"><a href="#2-四叉树构造" class="headerlink" title="2. 四叉树构造"></a>2. 四叉树构造</h4><p>四叉树的结构如上图的 Point Quadtree部分所示，来自低层级的RoI特征（如分辨率28×28）的信息损失节点在其相邻的更高层的RoI中（如分辨率56×56）中有四个对应子节点。为了减少计算量，我们只将预测为损失节点的像素点向上层进一步分解，并把树的最大深度设为3。更为具体地，我们把从最低层级（28x28）检测到的信息损失点作为根节点，从上到下递归扩展四个子象限点，构建了一个多层次的四叉树。在更高层的特征图上选取子象限点，是因为大尺度特征具有更高的分辨率和更多的物体局部细节。</p><h4 id="3-节点编码"><a href="#3-节点编码" class="headerlink" title="3. 节点编码"></a>3. 节点编码</h4><p>节点编码器（Node Encoder）使用四种不同的信息线索对每个四叉树节点进行编码：</p><ol><li>从 FPN 金字塔的相应位置和层级提取的细粒度深度特征。</li><li>初始检测器的粗略掩码预测提供高层的语义信息。</li><li>相对位置编码，补充节点在RoI中的距离相关性。</li><li>每个节点的周围临近点信息来补充局部细节。</li></ol><h4 id="4-编码和像素解码"><a href="#4-编码和像素解码" class="headerlink" title="4. 编码和像素解码"></a>4. 编码和像素解码</h4><p>四叉树节点经编码器编码后，为了建模点之间的关联，序列编码器(Sequence Encoder)中的多头注意力模块会对输入序列进行点之间的特征融合及更新。相较于MLP，Transformer可以执行序列上的全局跨尺度推理。序列编码器的每一层都由多头自注意力模块和全连接的前馈网络（FFN）组成。为了给输入序列补充足够的前景和背景信息，我们还将RoI金字塔中最低层大小为14x14的196个特征点输入。与标准Transformer解码器不同，Transfiner 的像素解码器(Pixel Decoder)是一个简单的两层 MLP，不具有多头注意力模块。它对树中每个节点的输出查询进行解码，以预测最终的实例标签。</p><h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><p>1.在coco数据集上的SOTA结果对比</p><p><img src="/img/mask-transfiner-coco-exp.png" alt="img"></p><ol><li>可视化分析比较</li></ol><p><img src="/img/mask-transfiner-com.png" alt="img"></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;strong&gt;论文信息：&lt;/strong&gt;&lt;a href=&quot;https://arxiv.org/abs/2111.13673&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Mask Transfiner for High-Quality Instance Segmentation&lt;/a&gt;&lt;br&gt;&lt;strong&gt;代码链接：&lt;/strong&gt;&lt;a href=&quot;https://github.com/SysCV/transfiner&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://github.com/SysCV/transfiner&lt;/a&gt;&lt;br&gt;&lt;strong&gt;整体信息：&lt;/strong&gt;这是ETH和港科大合作发表在CVPR2022上有关实例分割的论文，该论文中提出的Mask Transfiner通过引入 Incoherent Regions检测机制的方式，在不产生额外计算成本的情况下，有效地改善目标分割mask。在COCO，Cityscapes和BDD100K上均取得了明显的性能提升。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/mask-transfiner.png&quot; alt=&quot;img&quot;&gt;&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
+    
+    
+      <category term="instance segmentation" scheme="https://blog.nicehuster.cn/tags/instance-segmentation/"/>
+    
+  </entry>
   
   <entry>
     <title>增量目标检测方法 Faster ILOD</title>
@@ -445,28 +468,6 @@
     
     
       <category term="detection" scheme="https://blog.nicehuster.cn/tags/detection/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>抠图神器U^2-Net</title>
-    <link href="https://blog.nicehuster.cn/2020/09/14/U-2-Net/"/>
-    <id>https://blog.nicehuster.cn/2020/09/14/U-2-Net/</id>
-    <published>2020-09-14T11:13:39.000Z</published>
-    <updated>2020-09-18T07:17:55.000Z</updated>
-    
-    <content type="html"><![CDATA[<p><strong>论文信息：</strong> Going Deeper with Nested U-Structure for Salient Object Detection<br><strong>代码链接：</strong><a href="https://github.com/NathanUA/U-2-Net" target="_blank" rel="noopener">https://github.com/NathanUA/U-2-Net</a><br><strong>整体信息：</strong> 这是发表在PR2020上的一篇关于显著性检测的文章，作者是秦雪彬。从标题上可以看到本文的一个idea是设计了一个deeper的U型结构的网络解决显著性目标检测问题。作者认为，目前显著性目标检测有两种主流思路，一为多层次深层特征集成multi-level deep feature integration，一为多尺度特征提取Multi-scale feature extraction。多层次深层特征集成方法主要集中在开发更好的多层次特征聚合策略上。而多尺度特征提取这一类方法旨在设计更新的模块，从主干网获取的特征中同时提取局部和全局信息。而几乎所有上述方法，都是为了更好地利用现有的图像分类的Backbones生成的特征映射。而作者另辟蹊径，提出了一种新颖而简单的结构，它直接逐级提取多尺度特征，用于显著目标检测，而不是利用这些主干的特征来开发和添加更复杂的模块和策略。下图是该方法与其他方法的一个比较：</p><a id="more"></a><p><img src="/img/image-20200918105536819.png" alt="image-20200918105536819"></p><h3 id="显著性检测"><a href="#显著性检测" class="headerlink" title="显著性检测"></a>显著性检测</h3><p>在讲这篇文章之前，有必要先了解显著性检测这个任务。</p><blockquote><p><a href="https://zhuanlan.zhihu.com/p/115002897" target="_blank" rel="noopener">显著性检测</a></p></blockquote><p><strong>显著性检测</strong>，就是使用图像处理技术和计算机视觉算法来定位图片中最“显著”的区域。显著区域就是指图片中引人注目的区域或比较重要的区域，例如人眼在观看一幅图片时会首先关注的区域。例如下图，我们人眼一眼看过去首先注意到的不是草坪，而是躺在草坪上的内马尔，内马尔所在的区域就是显著性区域。这种自动定位图像或场景重要区域的过程称为<strong>显着性检测</strong>。</p><p><img src="/img/v2-422783ab5d5d66fd0dbf5653166ddbd8_720w.jpg" alt></p><h4 id="显著性检测和图像分割区别"><a href="#显著性检测和图像分割区别" class="headerlink" title="显著性检测和图像分割区别"></a>显著性检测和图像分割区别</h4><p>这个任务和图像分割十分类似，区别在于：</p><blockquote><ul><li>1.目标数量：显著性目标检测一般只检一个目标，一般目标检测不会限制数量；</li><li>目标类别： 显著性目标检测不关心目标类别，只关心显著性强的目标，一般目标检测会得到目标位置和类别；</li><li>问题建模不同：显著性目标检测，很早期的时候是通过对一些共性的特征建模，比如该目标一般在图像中心，一般是什么样的颜色分布等等。一般目标检测问题，则是希望特征能够更好的把目标表达出来，越细节越好，特征越丰富约好，因为要区分类别</li><li>groundtruth定义不同：两者互有交集，也有不同；前者，往往定义的是一些显著性较强的目标，比如行人，动物等等，而且前者是不输出类别标签信息；后者，gt标签定义是明确的，可以严格的输出对应类别标签；</li></ul></blockquote><p>其实，说白了，显著性检测等同于是一个二分类的语义分割模型，此外，显著的区域 不一定就是 目标，目标很可能不是显著的；</p><h3 id="方法设计"><a href="#方法设计" class="headerlink" title="方法设计"></a>方法设计</h3><h4 id="Residual-U-blocks"><a href="#Residual-U-blocks" class="headerlink" title="Residual U-blocks"></a>Residual U-blocks</h4><p>了解了显著性检测这个任务之后，来具体了解一下这篇文章的具体方法设计。作者设计一种Residual U-blocks，用于捕获 intra-stage 的 multi-scales 特征。</p><p><img src="/img/image-20200917201033485.png" alt="image-20200917201033485"></p><p>上图为普通卷积block，Res-like block，Inception-like block，Dense-like block和Residual U-blocks的对比图，明显可以看出Residual U-blocks是受了U-Net的启发。</p><p>Residual U-blocks有以下三部分组成：</p><blockquote><ul><li>一个输入卷积层，它将输入的feature map x (H × W × $C_{in}$)转换成中间feature map $F_1(x)$，$F_1(x)$通道数为$C_{out}$。这是一个用于局部特征提取的普通卷积层。</li><li>一个U-like的对称的encoder-decoder结构，高度为L，以中间feature map $F_1(x)$为输入，去学习提取和编码多尺度文本信息$U(F_1(x))$,U表示类U-Net结构。更大L会得到更深层的U-block（RSU），更多的池操作，更大的感受野和更丰富的局部和全局特征。配置此参数允许从具有任意空间分辨率的输入特征图中提取多尺度特征。从逐渐降采样特征映射中提取多尺度特征，并通过渐进上采样、合并和卷积等方法将其编码到高分辨率的特征图中。这一过程减少了大尺度直接上采样造成的细节损失。</li><li>一种残差连接，它通过求和来融合局部特征和多尺度特征：$F_1(x) + U(F_1(x))$。</li></ul></blockquote><p><img src="/img/image-20200917201132725.png" alt="image-20200917201132725"></p><p>RSU与Res block的主要设计区别在于RSU用U-Net结构代替了普通的单流卷积，用一个权重层(weight layer)形成的局部特征来代替原始特征。这种设计的变更使网络能够从多个尺度直接从每个残差块提取特征。更值得注意的是，U结构的计算开销很小，因为大多数操作都是在下采样的特征映射上进行的。</p><h4 id="U-2-Net的结构"><a href="#U-2-Net的结构" class="headerlink" title="U^2-Net的结构"></a>U^2-Net的结构</h4><p>U^2-Net的网络结构如下：</p><p><img src="/img/image-20200917201255253.png" alt="image-20200917201255253"></p><p>与U-Net的网络结构做一个对比：</p><p><img src="/img/1*TXfEPqTbFBPCbXYh2bstlA.png" alt="Learn How to Train U-Net On Your Dataset | by Sukriti Paul | Coinmonks |  Medium"></p><p>直观上可以发现，U^2-Net的每一个Block都是一个U-Net结构的模块，即上述Residual U-blocks。当然，你也可以继续Going Deeper, 每个Block里面的U-Net的子Block仍然可以是一个U-Net结构，命名为U^3-Net。</p><h3 id="损失函数设计"><a href="#损失函数设计" class="headerlink" title="损失函数设计"></a>损失函数设计</h3><p>类似于HED算法的deep supervision方式，作者设计了如下函数：</p><script type="math/tex; mode=display">\mathcal{L}=\sum_{m=1}^{M} w_{\text {side}}^{(m)} \ell_{\text {side}}^{(m)}+w_{\text {fuse}} \ell_{\text {fuse}}</script><p>其中，M=6, 为U2Net 的 Sup1, Sup2, …, Sup6 stage.$w_{\text {side}}^{(m)}$  $l_{\text {side}}^{(m)}$ 为对应的损失函数输出和权重；$w_{f u s e} \ell_{f u s e}$ 为融合的损失函数和权重;对于每一个$l$使用的都是标准的BCE Loss：</p><script type="math/tex; mode=display">\ell=-\sum_{(r, c)}^{(H, W)}\left[P_{G(r, c)} \log P_{S(r, c)}+\left(1-P_{G(r, c)}\right) \log \left(1-P_{S(r, c)}\right)\right]</script><h3 id="实验可视化"><a href="#实验可视化" class="headerlink" title="实验可视化"></a>实验可视化</h3><p>所提出的模型是使用DUTS-TR数据集进行训练，该数据集包含大约10000个样本图像，并使用标准数据增强技术进行扩充。研究人员在6个用于突出目标检测的基准数据集上评估了该模型：DUT-OMRON、DUTS-TE、HKU-IS、ECSSD、PASCAL-S和SOD。评价结果表明，在这6个基准点上，新模型与现有方法具有相当好的性能。</p><p><img src="/img/image-20200918110749081.png" alt="image-20200918110749081"></p><p>U^2-Net的实现是开源的，并提供了两种不同的预训练模型：U2Net(176.3M的较大模型，在GTX 1080Ti GPU上为30 FPS)，以及U2NetP(4.7M小模型，最高可达到40 FPS)。代码和预训练模型都可以在<a href="https://github.com/NathanUA/U-2-Net" target="_blank" rel="noopener">Github</a>。下面是我直接用作者开源的模型跑出来的结果，抠图效果很好，精细到发丝的那种。</p><p><img src="/img/image-20200917201523395.png" alt="image-20200917201523395"></p><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>该论文的优势在于：</p><blockquote><ul><li>提出RSU模块，融合不同尺度感受野的特征，来捕捉不同尺度的上下文信息；</li><li>基于 RSU 模块的 池化(pooling) 操作，在不显著增加计算成本的前提下，增加了整个网络结构的深度(depth).</li></ul></blockquote>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;strong&gt;论文信息：&lt;/strong&gt; Going Deeper with Nested U-Structure for Salient Object Detection&lt;br&gt;&lt;strong&gt;代码链接：&lt;/strong&gt;&lt;a href=&quot;https://github.com/NathanUA/U-2-Net&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://github.com/NathanUA/U-2-Net&lt;/a&gt;&lt;br&gt;&lt;strong&gt;整体信息：&lt;/strong&gt; 这是发表在PR2020上的一篇关于显著性检测的文章，作者是秦雪彬。从标题上可以看到本文的一个idea是设计了一个deeper的U型结构的网络解决显著性目标检测问题。作者认为，目前显著性目标检测有两种主流思路，一为多层次深层特征集成multi-level deep feature integration，一为多尺度特征提取Multi-scale feature extraction。多层次深层特征集成方法主要集中在开发更好的多层次特征聚合策略上。而多尺度特征提取这一类方法旨在设计更新的模块，从主干网获取的特征中同时提取局部和全局信息。而几乎所有上述方法，都是为了更好地利用现有的图像分类的Backbones生成的特征映射。而作者另辟蹊径，提出了一种新颖而简单的结构，它直接逐级提取多尺度特征，用于显著目标检测，而不是利用这些主干的特征来开发和添加更复杂的模块和策略。下图是该方法与其他方法的一个比较：&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
-    
-    
-      <category term="saliency detection" scheme="https://blog.nicehuster.cn/tags/saliency-detection/"/>
     
   </entry>
   

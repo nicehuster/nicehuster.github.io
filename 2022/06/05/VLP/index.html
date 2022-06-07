@@ -108,14 +108,14 @@
 <meta property="og:site_name" content="一起打怪升级呀">
 <meta property="og:description" content="前几天看完CLIP论文后觉得视觉-语言预训练(Vision-Language Pretraining)这个方向还挺有意思，就顺便找了一篇关于VLP的综述文章：VLP: A Survey on Vision-Language Pre-training，这篇文章有详细地介绍了VLP领域的最新进展和总结，包括了图像-文本和视频-文本的预训练。对于完整的了解VLP这个领域有很大帮助。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://blog.nicehuster.cn/Users/nicehuster/Desktop/hexo-blog_v2/source/img/vlp-single-stream-vs-dual-stream.png">
-<meta property="og:image" content="https://blog.nicehuster.cn/Users/nicehuster/Desktop/hexo-blog_v2/source/img/vlp-datasets.png">
-<meta property="og:image" content="https://blog.nicehuster.cn/Users/nicehuster/Desktop/hexo-blog_v2/source/img/vlp-sota.png">
-<meta property="og:updated_time" content="2022-06-07T07:34:10.092Z">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/vlp-single-stream-vs-dual-stream.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/vlp-datasets.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/vlp-sota.png">
+<meta property="og:updated_time" content="2022-06-07T08:33:47.376Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="视觉-语言预训练(Vision-Language Pretraining)综述">
 <meta name="twitter:description" content="前几天看完CLIP论文后觉得视觉-语言预训练(Vision-Language Pretraining)这个方向还挺有意思，就顺便找了一篇关于VLP的综述文章：VLP: A Survey on Vision-Language Pre-training，这篇文章有详细地介绍了VLP领域的最新进展和总结，包括了图像-文本和视频-文本的预训练。对于完整的了解VLP这个领域有很大帮助。">
-<meta name="twitter:image" content="https://blog.nicehuster.cn/Users/nicehuster/Desktop/hexo-blog_v2/source/img/vlp-single-stream-vs-dual-stream.png">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/vlp-single-stream-vs-dual-stream.png">
 
 
 
@@ -398,7 +398,7 @@
 <h3 id="特征提取"><a href="#特征提取" class="headerlink" title="特征提取"></a>特征提取</h3><p>特征提取部分分为视觉特征提取和文本特征提取。视觉特征提取包括图像特征提取和视频特征提取。</p>
 <h4 id="图像特征提取"><a href="#图像特征提取" class="headerlink" title="图像特征提取"></a>图像特征提取</h4><blockquote>
 <ol>
-<li>OD-based Region Features (OD-RFs)：使用预训练的目标检测模型来提取视觉特征，常用的是Faster RCNN；</li>
+<li>OD-based Region Features (OD-RFs)：使用预训练的目标检测模型识别图像中目标区域，并提取每个区域的表示，来提取视觉特征，常用的是Faster RCNN；</li>
 <li>CNN-based Grid Features (CNN-GFs)：直接用CNN对整张图提取视觉特征获得网格特征；</li>
 <li>ViT-based Patch Features (ViT-PFs)：使用ViT将图片压平成序列，对于transformer类型的encoder的输入比较友好；</li>
 </ol>
@@ -412,7 +412,7 @@
 <li>从整体结构设计上，可以划分为：Encoder-Only和Encoder-Decoder；</li>
 </ol>
 </blockquote>
-<p><img src="/Users/nicehuster/Desktop/hexo-blog_v2/source/img/vlp-single-stream-vs-dual-stream.png" alt="image-20220607114126559"></p>
+<p><img src="/img/vlp-single-stream-vs-dual-stream.png" alt="image-20220607114126559"></p>
 <h4 id="Single-stream-vs-Dual-stream"><a href="#Single-stream-vs-Dual-stream" class="headerlink" title="Single-stream vs Dual-stream"></a>Single-stream vs Dual-stream</h4><p>单流架构是指将文本和视觉特征连接在一起，然后馈送到单个Transformer块中。双流架构是指文本和视觉特征不是串联在一起而是独立地发送到两个不同的Transformer块中。单流架构一般来说更加parameter-efficient。双流架构一般采用上图虚线所表示的cross attention进行特征交互。</p>
 <h4 id="Encoder-Only-vs-Encoder-Decoder"><a href="#Encoder-Only-vs-Encoder-Decoder" class="headerlink" title="Encoder-Only vs Encoder-Decoder"></a>Encoder-Only vs Encoder-Decoder</h4><p>许多VLP模型采用encoder-only的体系结构，其中跨模态表示被直接馈送到输出层以生成最终输出。相比之下，其他VLP模型主张使用encoder-decoder体系结构，其中跨模态表示首先被馈送到decoder，然后被馈送到输出层。</p>
 <h3 id="预训练目标"><a href="#预训练目标" class="headerlink" title="预训练目标"></a>预训练目标</h3><p>在论文中对预训练目标归纳为了四类：Completion、Matching、Temporal和Particular。</p>
@@ -424,12 +424,12 @@
 <h5 id="Vision-Language-Matching"><a href="#Vision-Language-Matching" class="headerlink" title="Vision-Language Matching"></a>Vision-Language Matching</h5><p>视觉语言匹配(VLM)是最常见的预训练模型的目标，以实现视觉和语言的匹配。以双流VLP模型为例，在得到视觉表征和文本表征之后将其串联起来，作为俩种模式的融合表征，然后经过FC层和sigmoid函数，以预测0-1分数，0表示视觉-语言不匹配，1表示视觉和语言匹配。</p>
 <h5 id="Vision-Language-Contrastive-Learning"><a href="#Vision-Language-Contrastive-Learning" class="headerlink" title="Vision-Language Contrastive Learning"></a>Vision-Language Contrastive Learning</h5><p>视觉语言对比学习(VLC)从N × N个可能的视觉语言对中预测出匹配的视觉语言对。请注意，在一批训练中有N ~ N个负视觉语言对。VLP模型计算 softmax-normalized 的视觉(图像或视频)到文本的相似性和文本到视觉的相似性，并利用视觉到文本和文本到视觉相似性的交叉熵损失来更新自己。相似度通常用点积来实现。最常见的方法就是CLIP。</p>
 <h5 id="Word-Region-Alignment"><a href="#Word-Region-Alignment" class="headerlink" title="Word-Region Alignment"></a>Word-Region Alignment</h5><p>单词-区域对齐(WRA)是一种无监督的预训练目标，用于对齐视觉区域(视觉patch)和单词。VLP模型利用最优传输来学习视觉和语言之间的对齐。</p>
-<h3 id="预训练数据集"><a href="#预训练数据集" class="headerlink" title="预训练数据集"></a>预训练数据集</h3><p><img src="/Users/nicehuster/Desktop/hexo-blog_v2/source/img/vlp-datasets.png" alt="image-20220607151527603"></p>
+<h3 id="预训练数据集"><a href="#预训练数据集" class="headerlink" title="预训练数据集"></a>预训练数据集</h3><p><img src="/img/vlp-datasets.png" alt="image-20220607151527603"></p>
 <h3 id="下游任务"><a href="#下游任务" class="headerlink" title="下游任务"></a>下游任务</h3><p>下游任务主要有分类、回归、检索、生成以及其他任务。</p>
 <blockquote>
 <p><strong>分类任务</strong>：Visual Question Answering (VQA)，Visual Reasoning and Compositional Question Answering (GQA)，Video-Language Inference (VLI)，Natural Language for Visual Reasoning (NLVR)，Visual Entailment (VE)，Visual Commonsense Reasoning (VCR)，Grounding Referring Expressions (GRE)，Category Recognition (CR).<br><strong>回归任务</strong>：Multi-modal Sentiment Analysis (MSA).<br><strong>检索任务</strong>：Vision-Language Retrieval (VLR).<br><strong>生成任务</strong>：Visual Captioning (VC)，Novel Object Captioning at Scale (NoCaps)，Visual Dialogue (VD).<br><strong>其他任务</strong>：Multi-modal Machine Translation (MMT)，Vision-Language Navigation (VLN)，Optical Character Recognition (OCR).</p>
 </blockquote>
-<h3 id="SOTA-VLP-模型"><a href="#SOTA-VLP-模型" class="headerlink" title="SOTA VLP 模型"></a>SOTA VLP 模型</h3><p><img src="/Users/nicehuster/Desktop/hexo-blog_v2/source/img/vlp-sota.png" alt="vlp-sota"></p>
+<h3 id="SOTA-VLP-模型"><a href="#SOTA-VLP-模型" class="headerlink" title="SOTA VLP 模型"></a>SOTA VLP 模型</h3><p><img src="/img/vlp-sota.png" alt="vlp-sota"></p>
 <h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>第一篇关于VLP的调研综述。文章从特征提取、模型结构、预训练目标、预训练数据集和下游任务五个方面综述了其最新进展，并对具体的SOTA VLP模型进行了详细的总结。这能够帮助研究人员更好地了解VLP，并启发新的工作来推动这一领域的发展。</p>
 
       

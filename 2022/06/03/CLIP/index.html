@@ -117,7 +117,7 @@
 <meta property="og:image" content="https://blog.nicehuster.cn/img/zero-shot-cls.png">
 <meta property="og:image" content="https://blog.nicehuster.cn/img/zero-shot-clip-res50.png">
 <meta property="og:image" content="https://blog.nicehuster.cn/img/prompt-eng.png">
-<meta property="og:updated_time" content="2022-06-07T07:31:23.184Z">
+<meta property="og:updated_time" content="2022-06-07T08:17:32.448Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="CLIP图文多模态对比预训练方法详解">
 <meta name="twitter:description" content="CLIP是OpenAI在2021年发表的一种用NLP来监督CV的方法。成功连接文本和图像。CLIP全称是， Contrastive Language–Image Pre-training，一种基于对比文本-图像对的预训练方法。在了解CLIP具体方法之前，可以先看一下该工作的在一些下游任务的应用。">
@@ -422,6 +422,13 @@
 <p><img src="/img/zero-shot-clip-res50.png" alt="image-20220606165016300"></p>
 <h3 id="prompt-engineering"><a href="#prompt-engineering" class="headerlink" title="prompt engineering"></a>prompt engineering</h3><p>考虑到以单词作为标签存在歧义情况，比如在Oxford-IIIT Pet dataset 数据集中<code>boxer</code>表示斗牛犬，而在其他数据集中则可能表示拳击运动；在ImageNet中，<code>crane</code>同时表示了起重机和鹤。这种词语的多义显然对是因为缺少对标签的上下文描述导致的。为了解决这种问题，作者在指示上下文中添加了一些提示标签类型的词语，比如<code>A photo of a &lt;LABEL&gt;, a type of pet.</code>。作者将这个方法称之为“prompt engineering”。在合适地选取了不同的指示上下文，并且将其打分进行ensemble之后。作者发现这些Tricks竟能在zero-shot实验上提高5个绝对百分位，如Fig 2.3所示。</p>
 <p><img src="/img/prompt-eng.png" alt></p>
+<h3 id="limitation"><a href="#limitation" class="headerlink" title="limitation"></a>limitation</h3><p>这部分是最容易被忽略，但个人认为这部分往往更引人深思，这里简单的总结一下我关注的几个CLIP的limitation：</p>
+<ol>
+<li>CLIP在zero-shot上的性能虽然总体上比supervised baseline res50要好，但是在很多任务上是比不过sota，因此CLIP的迁移学习有待挖掘；</li>
+<li>CLIP在一下几种task上的性能不好：细粒度分类，计数等任务；</li>
+<li>CLIP本质上还是在有限的类别中进行对比推理，无法像image caption那样完全地灵活地生成新的概念，不同于生成模型；</li>
+<li>CLIP依旧没有解决深度学习poor data efficiency的问题；</li>
+</ol>
 <h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p>CLIP可以再预训练阶段学习到更多通用的视觉语义信息，并且给下游任务提供帮助。而且相比于以往的训练方法，打破了之前的固定种类标签的范式。</p>
 
       
@@ -639,7 +646,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#应用"><span class="nav-number">1.</span> <span class="nav-text">应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#动机"><span class="nav-number">2.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#具体方法"><span class="nav-number">3.</span> <span class="nav-text">具体方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用CLIP实现zero-shot分类"><span class="nav-number">4.</span> <span class="nav-text">使用CLIP实现zero-shot分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#prompt-engineering"><span class="nav-number">5.</span> <span class="nav-text">prompt engineering</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结论"><span class="nav-number">6.</span> <span class="nav-text">结论</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#应用"><span class="nav-number">1.</span> <span class="nav-text">应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#动机"><span class="nav-number">2.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#具体方法"><span class="nav-number">3.</span> <span class="nav-text">具体方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用CLIP实现zero-shot分类"><span class="nav-number">4.</span> <span class="nav-text">使用CLIP实现zero-shot分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#prompt-engineering"><span class="nav-number">5.</span> <span class="nav-text">prompt engineering</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#limitation"><span class="nav-number">6.</span> <span class="nav-text">limitation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结论"><span class="nav-number">7.</span> <span class="nav-text">结论</span></a></li></ol></div>
             
 
           </div>

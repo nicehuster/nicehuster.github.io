@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="multi-model,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="CLIP是OpenAI在2021年发表的一种用NLP来监督CV的方法。成功连接文本和图像。CLIP全称是， Contrastive Language–Image Pre-training，一种基于对比文本-图像对的预训练方法。在了解CLIP具体方法之前，可以先看一下该工作的在一些下游任务的应用。">
+<meta name="keywords" content="multi-model">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CLIP图文多模态对比预训练方法详解">
+<meta property="og:url" content="https://blog.nicehuster.cn/2022/06/03/CLIP/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="CLIP是OpenAI在2021年发表的一种用NLP来监督CV的方法。成功连接文本和图像。CLIP全称是， Contrastive Language–Image Pre-training，一种基于对比文本-图像对的预训练方法。在了解CLIP具体方法之前，可以先看一下该工作的在一些下游任务的应用。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://github.com/orpatashnik/StyleCLIP/raw/main/img/teaser.png">
+<meta property="og:image" content="https://kvfrans.com/content/images/2021/06/Screen-Shot-2021-06-10-at-8.47.23-PM.png">
+<meta property="og:image" content="https://camo.githubusercontent.com/238affd721b73ef2ff8f95114352188693623796bcc57b83f94747a7d2b6ff3a/68747470733a2f2f73746f726167652e676f6f676c65617069732e636f6d2f636c6f75642d7470752d636865636b706f696e74732f646574656374696f6e2f70726f6a656374732f76696c642f6173736574732f6e65775f7465617365722e706e67">
+<meta property="og:image" content="https://github.com/johanmodin/clifs/raw/master/media/odwalla.jpg">
+<meta property="og:image" content="https://openaiassets.blob.core.windows.net/$web/clip/draft/20210104b/overview-a.svg">
+<meta property="og:image" content="https://openaiassets.blob.core.windows.net/$web/clip/draft/20210104b/overview-b.svg">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/zero-shot-cls.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/zero-shot-clip-res50.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/prompt-eng.png">
+<meta property="og:updated_time" content="2022-06-07T07:31:23.184Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="CLIP图文多模态对比预训练方法详解">
+<meta name="twitter:description" content="CLIP是OpenAI在2021年发表的一种用NLP来监督CV的方法。成功连接文本和图像。CLIP全称是， Contrastive Language–Image Pre-training，一种基于对比文本-图像对的预训练方法。在了解CLIP具体方法之前，可以先看一下该工作的在一些下游任务的应用。">
+<meta name="twitter:image" content="https://github.com/orpatashnik/StyleCLIP/raw/main/img/teaser.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2022/06/03/CLIP/">
+
+
+
+
+
+  <title>CLIP图文多模态对比预训练方法详解 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2022/06/03/CLIP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">CLIP图文多模态对比预训练方法详解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-06-03T19:13:39+08:00">
+                2022-06-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>CLIP是OpenAI在2021年发表的一种用NLP来监督CV的方法。成功连接文本和图像。CLIP全称是， Contrastive Language–Image Pre-training，一种基于对比文本-图像对的预训练方法。在了解CLIP具体方法之前，可以先看一下该工作的在一些下游任务的应用。<br><a id="more"></a></p>
+<h3 id="应用"><a href="#应用" class="headerlink" title="应用"></a>应用</h3><p>1.风格迁移<a href="https://arxiv.org/abs/2103.17249" target="_blank" rel="noopener">styleCLIP</a></p>
+<p><img src="https://github.com/orpatashnik/StyleCLIP/raw/main/img/teaser.png" alt></p>
+<p>styleCLIP很神奇，CLIP可以理解各种抽象的妆容，比如发型，卸妆等等</p>
+<p>2.文本生成图像<a href="https://arxiv.org/abs/2106.14843" target="_blank" rel="noopener">CLIPDraw</a></p>
+<p><img src="https://kvfrans.com/content/images/2021/06/Screen-Shot-2021-06-10-at-8.47.23-PM.png" alt></p>
+<p>这个也是使用CLIP指导模型的生成，甚至无需训练，就可以生成简笔画，颇具有抽象派画风。</p>
+<p>3.开集目标检测<a href="https://arxiv.org/abs/2104.13921" target="_blank" rel="noopener">ViLD</a></p>
+<p><img src="https://camo.githubusercontent.com/238affd721b73ef2ff8f95114352188693623796bcc57b83f94747a7d2b6ff3a/68747470733a2f2f73746f726167652e676f6f676c65617069732e636f6d2f636c6f75642d7470752d636865636b706f696e74732f646574656374696f6e2f70726f6a656374732f76696c642f6173736574732f6e65775f7465617365722e706e67" alt></p>
+<p>传统目标检测方法可能只能告诉你以上均是玩具类别，但是基于CLIP还可以知道玩具颜色，玩具种类。</p>
+<p>4.文本视频检索<a href="https://github.com/johanmodin/clifs" target="_blank" rel="noopener">Clifs</a></p>
+<p><img src="https://github.com/johanmodin/clifs/raw/master/media/odwalla.jpg" alt></p>
+<p>CLIP还可以用于视频检索，如上图所示，告知“A truck with the text “odwalla””，可以基于文本内容检索到视频中对应帧的位置。</p>
+<h3 id="动机"><a href="#动机" class="headerlink" title="动机"></a>动机</h3><p>现有的模型都是基于固定的预定义物体类别集合进行监督训练。比如coco 80类等。但是这种限制性的监督型号限制了模型本身的泛化性，当需要识别新物体类别时需要重新收集新的数据重新训练，因此作者想到使用NLP里面文本信息获取监督信号。</p>
+<h3 id="具体方法"><a href="#具体方法" class="headerlink" title="具体方法"></a>具体方法</h3><p>CLIP是一种基于对比学习的多模态模型，与CV中的一些对比学习方法如moco和simclr不同的是，CLIP的训练数据是文本-图像对：一张图像和它对应的文本描述，这里希望通过对比学习，模型能够学习到文本-图像对的匹配关系。如下图所示，CLIP包括两个模型：<strong>Text Encoder</strong>和<strong>Image Encoder</strong>，其中Text Encoder用来提取文本的特征，可以采用NLP中常用的text transformer模型；而Image Encoder用来提取图像的特征，可以采用常用CNN模型或者vision transformer。</p>
+<p><img src="https://openaiassets.blob.core.windows.net/$web/clip/draft/20210104b/overview-a.svg" alt></p>
+<p>这里对提取的文本特征和图像特征进行对比学习。对于一个包含N个文本-图像对的训练batch，将N个文本特征和N个图像特征两两组合，CLIP模型会预测出 $N^2$ 个可能的文本-图像对的相似度，这里的相似度直接<strong>计算文本特征和图像特征的余弦相似性（cosine similarity）</strong>，即上图所示的矩阵。这里共有N个正样本，即真正属于一对的文本和图像（矩阵中的对角线元素），而剩余的个$N^2-N$个文本-图像对为负样本，那么CLIP的训练目标就是最大个N正样本的相似度，同时最小化$N^2-N$个负样本的相似度，对应的伪代码实现如下所示：</p>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># image_encoder - ResNet or Vision Transformer</span></span><br><span class="line"><span class="comment"># text_encoder - CBOW or Text Transformer</span></span><br><span class="line"><span class="comment"># I[n, h, w, c] - minibatch of aligned images</span></span><br><span class="line"><span class="comment"># T[n, l] - minibatch of aligned texts</span></span><br><span class="line"><span class="comment"># W_i[d_i, d_e] - learned proj of image to embed</span></span><br><span class="line"><span class="comment"># W_t[d_t, d_e] - learned proj of text to embed</span></span><br><span class="line"><span class="comment"># t - learned temperature parameter</span></span><br><span class="line"><span class="comment"># extract feature representations of each modality</span></span><br><span class="line">I_f = image_encoder(I) <span class="comment">#[n, d_i]</span></span><br><span class="line">T_f = text_encoder(T) <span class="comment">#[n, d_t]</span></span><br><span class="line"><span class="comment"># joint multimodal embedding [n, d_e]</span></span><br><span class="line">I_e = l2_normalize(np.dot(I_f, W_i), axis=<span class="number">1</span>)</span><br><span class="line">T_e = l2_normalize(np.dot(T_f, W_t), axis=<span class="number">1</span>)</span><br><span class="line"><span class="comment"># scaled pairwise cosine similarities [n, n]</span></span><br><span class="line">logits = np.dot(I_e, T_e.T) * np.exp(t)</span><br><span class="line"><span class="comment"># symmetric loss function</span></span><br><span class="line">labels = np.arange(n)</span><br><span class="line">loss_i = cross_entropy_loss(logits, labels, axis=<span class="number">0</span>)</span><br><span class="line">loss_t = cross_entropy_loss(logits, labels, axis=<span class="number">1</span>)</span><br><span class="line">loss = (loss_i + loss_t)/<span class="number">2</span></span><br></pre></td></tr></table></figure>
+<p>为了训练CLIP，OpenAI从互联网收集了4亿文本-图像对，论文称之为WebImageText。论文中Text Encoder固定选择一个包含63M参数的text transformer模型，而Image Encoder采用了两种的不同的架构，一是常用的CNN架构ResNet，二是基于transformer的ViT，其中ResNet包含5个不同大小的模型：ResNet50<strong>，</strong>ResNet101<strong>，</strong>RN50x4<strong>，</strong>RN50x16和RNx64（后面三个模型是按照EfficientNet缩放规则对ResNet分别增大4x，16x和64x得到），而ViT选择3个不同大小的模型：ViT-B/32<strong>，</strong>ViT-B/16<strong>和</strong>ViT-L/14。所有的模型都训练32个epoch，采用AdamW优化器，而且训练过程采用了一个较大的batch size：32768。由于数据量较大，最大的ResNet模型RN50x64需要在592个V100卡上训练18天，而最大ViT模型ViT-L/14需要在256张V100卡上训练12天，可见要训练CLIP需要耗费多大的资源。对于ViT-L/14，还在336的分辨率下额外finetune了一个epoch来增强性能，论文发现这个模型效果最好，记为ViT-L/14@336，论文中进行对比实验的CLIP模型也采用这个。</p>
+<p>值得思考的是，在CLIP中，作者没有采用预测式的目标函数优化模型，而是采样对比学习的方式进行优化，在这一块，原文有介绍，使用对比学习的方式训练模型，放宽了约束，模型也更容易收敛，相比于预测型监督，对比式监督可以提升4倍的训练效率。</p>
+<h3 id="使用CLIP实现zero-shot分类"><a href="#使用CLIP实现zero-shot分类" class="headerlink" title="使用CLIP实现zero-shot分类"></a>使用CLIP实现zero-shot分类</h3><p>当CLIP预训练好之后，有俩个编码器Text Encoder和Image Encoder，基于这俩训练好的encoder可以直接实现zero-shot分类，即无需任何训练数据，就能在某个下游任务上实现分类。具体步骤：</p>
+<p><img src="https://openaiassets.blob.core.windows.net/$web/clip/draft/20210104b/overview-b.svg" alt></p>
+<blockquote>
+<ol>
+<li>根据分类任务的分类标签构建每个类别的描述文本：A photo of {label}, 然后将这些文本送入Text Encoder获得对应的文本特征，如果类别数目为N，那么得到N个文本特征。</li>
+<li>将要预测的图像送入Image Encoder得到图像特征，然后与N个文本特征计算余弦相似度，将相似度大的作为图像预测类别。</li>
+</ol>
+</blockquote>
+<p>在zero-shot分类任务上，CLIP在多个数据集上取得优于在imagenet上fine的res101，具体可以看下图的结果对比：</p>
+<p><img src="/img/zero-shot-cls.png" alt></p>
+<p>在zero-shot任务上，作者在linear probe基础上做了详尽的实验，首先作者通过和经过强监督学习的Resnet-50提取的特征对比，任务都是分类任务，因此作者基于Resnet-50和CLIP提取出的特征，只是训练了最后的分类器，分类结果如下图所示。可以发现仅仅通过无监督的对比学习预训练得到的特征，即便是和强监督模型特征相比也是不分伯仲的。同时可以发现，zero-shot CLIP在一些动作识别任务中，比如Kinetics 700，UCF 101中有着比较大的提高，作者认为这可能是因为目前的文本描述中有很多以动词，动作为中心的句子导致的。</p>
+<p><img src="/img/zero-shot-clip-res50.png" alt="image-20220606165016300"></p>
+<h3 id="prompt-engineering"><a href="#prompt-engineering" class="headerlink" title="prompt engineering"></a>prompt engineering</h3><p>考虑到以单词作为标签存在歧义情况，比如在Oxford-IIIT Pet dataset 数据集中<code>boxer</code>表示斗牛犬，而在其他数据集中则可能表示拳击运动；在ImageNet中，<code>crane</code>同时表示了起重机和鹤。这种词语的多义显然对是因为缺少对标签的上下文描述导致的。为了解决这种问题，作者在指示上下文中添加了一些提示标签类型的词语，比如<code>A photo of a &lt;LABEL&gt;, a type of pet.</code>。作者将这个方法称之为“prompt engineering”。在合适地选取了不同的指示上下文，并且将其打分进行ensemble之后。作者发现这些Tricks竟能在zero-shot实验上提高5个绝对百分位，如Fig 2.3所示。</p>
+<p><img src="/img/prompt-eng.png" alt></p>
+<h3 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h3><p>CLIP可以再预训练阶段学习到更多通用的视觉语义信息，并且给下游任务提供帮助。而且相比于以往的训练方法，打破了之前的固定种类标签的范式。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/multi-model/" rel="tag"># multi-model</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/05/12/real-esrgan/" rel="next" title="Real-ESRGAN详解">
+                <i class="fa fa-chevron-left"></i> Real-ESRGAN详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/06/05/VLP/" rel="prev" title="视觉-语言预训练(Vision-Language Pretraining)综述">
+                视觉-语言预训练(Vision-Language Pretraining)综述 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">96</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#应用"><span class="nav-number">1.</span> <span class="nav-text">应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#动机"><span class="nav-number">2.</span> <span class="nav-text">动机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#具体方法"><span class="nav-number">3.</span> <span class="nav-text">具体方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用CLIP实现zero-shot分类"><span class="nav-number">4.</span> <span class="nav-text">使用CLIP实现zero-shot分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#prompt-engineering"><span class="nav-number">5.</span> <span class="nav-text">prompt engineering</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结论"><span class="nav-number">6.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

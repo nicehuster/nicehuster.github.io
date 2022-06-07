@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="multi-model,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="前几天看完CLIP论文后觉得视觉-语言预训练(Vision-Language Pretraining)这个方向还挺有意思，就顺便找了一篇关于VLP的综述文章：VLP: A Survey on Vision-Language Pre-training，这篇文章有详细地介绍了VLP领域的最新进展和总结，包括了图像-文本和视频-文本的预训练。对于完整的了解VLP这个领域有很大帮助。">
+<meta name="keywords" content="multi-model">
+<meta property="og:type" content="article">
+<meta property="og:title" content="视觉-语言预训练(Vision-Language Pretraining)综述">
+<meta property="og:url" content="https://blog.nicehuster.cn/2022/06/05/VLP/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="前几天看完CLIP论文后觉得视觉-语言预训练(Vision-Language Pretraining)这个方向还挺有意思，就顺便找了一篇关于VLP的综述文章：VLP: A Survey on Vision-Language Pre-training，这篇文章有详细地介绍了VLP领域的最新进展和总结，包括了图像-文本和视频-文本的预训练。对于完整的了解VLP这个领域有很大帮助。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/Users/nicehuster/Desktop/hexo-blog_v2/source/img/vlp-single-stream-vs-dual-stream.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/Users/nicehuster/Desktop/hexo-blog_v2/source/img/vlp-datasets.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/Users/nicehuster/Desktop/hexo-blog_v2/source/img/vlp-sota.png">
+<meta property="og:updated_time" content="2022-06-07T07:34:10.092Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="视觉-语言预训练(Vision-Language Pretraining)综述">
+<meta name="twitter:description" content="前几天看完CLIP论文后觉得视觉-语言预训练(Vision-Language Pretraining)这个方向还挺有意思，就顺便找了一篇关于VLP的综述文章：VLP: A Survey on Vision-Language Pre-training，这篇文章有详细地介绍了VLP领域的最新进展和总结，包括了图像-文本和视频-文本的预训练。对于完整的了解VLP这个领域有很大帮助。">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/Users/nicehuster/Desktop/hexo-blog_v2/source/img/vlp-single-stream-vs-dual-stream.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2022/06/05/VLP/">
+
+
+
+
+
+  <title>视觉-语言预训练(Vision-Language Pretraining)综述 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2022/06/05/VLP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">视觉-语言预训练(Vision-Language Pretraining)综述</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-06-05T19:13:39+08:00">
+                2022-06-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>前几天看完CLIP论文后觉得视觉-语言预训练(Vision-Language Pretraining)这个方向还挺有意思，就顺便找了一篇关于VLP的综述文章：<a href="https://arxiv.org/abs/2202.09061" target="_blank" rel="noopener">VLP: A Survey on Vision-Language Pre-training</a>，这篇文章有详细地介绍了VLP领域的最新进展和总结，包括了图像-文本和视频-文本的预训练。对于完整的了解VLP这个领域有很大帮助。</p>
+<a id="more"></a>
+<p>整篇综述从以下5个方面对视觉-语言预训练进行了详细地阐述：</p>
+<blockquote>
+<ol>
+<li>特征提取</li>
+<li>模型架构</li>
+<li>预训练目标</li>
+<li>预训练数据集</li>
+<li>下游任务</li>
+</ol>
+</blockquote>
+<p>VLP主要通过对大规模数据的预训练来学习不同模态之间的语义对应关系。例如，在图文预训练中，我们希望模型将文本中的“狗”与图像中的“狗”联系起来。在视频文本预训练中，我们期望模型将文本中的对象/动作映射到视频中的对象/动作。为了实现这一目标，需要巧妙地设计VLP对象和模型体系结构，以允许模型挖掘不同模式之间的关联。</p>
+<h3 id="特征提取"><a href="#特征提取" class="headerlink" title="特征提取"></a>特征提取</h3><p>特征提取部分分为视觉特征提取和文本特征提取。视觉特征提取包括图像特征提取和视频特征提取。</p>
+<h4 id="图像特征提取"><a href="#图像特征提取" class="headerlink" title="图像特征提取"></a>图像特征提取</h4><blockquote>
+<ol>
+<li>OD-based Region Features (OD-RFs)：使用预训练的目标检测模型来提取视觉特征，常用的是Faster RCNN；</li>
+<li>CNN-based Grid Features (CNN-GFs)：直接用CNN对整张图提取视觉特征获得网格特征；</li>
+<li>ViT-based Patch Features (ViT-PFs)：使用ViT将图片压平成序列，对于transformer类型的encoder的输入比较友好；</li>
+</ol>
+</blockquote>
+<h4 id="视频特征提取"><a href="#视频特征提取" class="headerlink" title="视频特征提取"></a>视频特征提取</h4><p>一般把视频当做M帧组成的图像信息。VLP模型利用上述图像特征提取方法提取frame特征。俩个常用的是CNN-GFs和ViT-PFs。对于CNN-GFs，一般是使用在imagenet上预训练的resnet和预先训练好的SlowFast来提取每个视频帧的2d特征和3d特征。将这些特征串联便可得到视频的视觉特征，通过FC层被投影到与token embedding相同的低维空间；对于ViT-PFs，一段视频clips $V_{i} \in \mathbb{R}^{M \times H \times W \times C}$ 会被分割为 $M \times N$ 的无重叠的时空patchs，大小为$P \times P$, 在这里 $N=\frac{H W}{P^{2}}$.</p>
+<h4 id="文本特征提取"><a href="#文本特征提取" class="headerlink" title="文本特征提取"></a>文本特征提取</h4><p>对于文本特征，一般使用Bert进行特征提取。VLP模型首先将输入的句子分割成一系列字词。然后再序列的开头和结尾处插入序列开始和结束标记。</p>
+<h3 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h3><p>模型结构主要从俩个视角进行划分：</p>
+<blockquote>
+<ol>
+<li>从多模态融合上，可以划分为：Single-stream和Dual-stream；</li>
+<li>从整体结构设计上，可以划分为：Encoder-Only和Encoder-Decoder；</li>
+</ol>
+</blockquote>
+<p><img src="/Users/nicehuster/Desktop/hexo-blog_v2/source/img/vlp-single-stream-vs-dual-stream.png" alt="image-20220607114126559"></p>
+<h4 id="Single-stream-vs-Dual-stream"><a href="#Single-stream-vs-Dual-stream" class="headerlink" title="Single-stream vs Dual-stream"></a>Single-stream vs Dual-stream</h4><p>单流架构是指将文本和视觉特征连接在一起，然后馈送到单个Transformer块中。双流架构是指文本和视觉特征不是串联在一起而是独立地发送到两个不同的Transformer块中。单流架构一般来说更加parameter-efficient。双流架构一般采用上图虚线所表示的cross attention进行特征交互。</p>
+<h4 id="Encoder-Only-vs-Encoder-Decoder"><a href="#Encoder-Only-vs-Encoder-Decoder" class="headerlink" title="Encoder-Only vs Encoder-Decoder"></a>Encoder-Only vs Encoder-Decoder</h4><p>许多VLP模型采用encoder-only的体系结构，其中跨模态表示被直接馈送到输出层以生成最终输出。相比之下，其他VLP模型主张使用encoder-decoder体系结构，其中跨模态表示首先被馈送到decoder，然后被馈送到输出层。</p>
+<h3 id="预训练目标"><a href="#预训练目标" class="headerlink" title="预训练目标"></a>预训练目标</h3><p>在论文中对预训练目标归纳为了四类：Completion、Matching、Temporal和Particular。</p>
+<h4 id="Completion"><a href="#Completion" class="headerlink" title="Completion"></a>Completion</h4><p>这类方法主要是通过对masked的元素进行重建来理解模态信息。包括：Masked Language Modeling、Prefix Language Modeling和 Masked Vision Modeling。</p>
+<h5 id="Masked-Language-Modeling"><a href="#Masked-Language-Modeling" class="headerlink" title="Masked Language Modeling"></a>Masked Language Modeling</h5><p>掩蔽语言建模(MLM)应该是被广泛应用在Bert模型中的一种预训练方式，通过利用上下文的可见的词向量预测masked词向量。而在VLP任务重则是使用上下文可见的词向量和视觉向量表征去预测masked的视觉或者词向量。</p>
+<h5 id="Prefix-Language-Modeling"><a href="#Prefix-Language-Modeling" class="headerlink" title="Prefix Language Modeling"></a>Prefix Language Modeling</h5><p>前缀语言建模(Prefix Language Model，Prefix LM)是屏蔽语言模型和语言建模的统一。前缀模型的提出是为了使模型具有实体生成能力，使得文本诱导的zero-shot具有无需fine-tuning的泛化性。</p>
+<h5 id="Masked-Vision-Modeling"><a href="#Masked-Vision-Modeling" class="headerlink" title="Masked Vision Modeling"></a>Masked Vision Modeling</h5><p>与MLM类似，MVM对视觉(图像或视频)区域或块进行采样，并通常以15%的概率mask其视觉特征。在给定剩余视觉特征和所有文本特征的情况下，VLP模型需要重建mask的视觉特征。</p>
+<h4 id="Matching"><a href="#Matching" class="headerlink" title="Matching"></a>Matching</h4><p>Matching是将视觉和语言统一到一个共享的隐层，生成通用的视觉语言表征。包括Vision-Language Matching， Vision-Language Contrastive Learning， Word-Region Alignment。</p>
+<h5 id="Vision-Language-Matching"><a href="#Vision-Language-Matching" class="headerlink" title="Vision-Language Matching"></a>Vision-Language Matching</h5><p>视觉语言匹配(VLM)是最常见的预训练模型的目标，以实现视觉和语言的匹配。以双流VLP模型为例，在得到视觉表征和文本表征之后将其串联起来，作为俩种模式的融合表征，然后经过FC层和sigmoid函数，以预测0-1分数，0表示视觉-语言不匹配，1表示视觉和语言匹配。</p>
+<h5 id="Vision-Language-Contrastive-Learning"><a href="#Vision-Language-Contrastive-Learning" class="headerlink" title="Vision-Language Contrastive Learning"></a>Vision-Language Contrastive Learning</h5><p>视觉语言对比学习(VLC)从N × N个可能的视觉语言对中预测出匹配的视觉语言对。请注意，在一批训练中有N ~ N个负视觉语言对。VLP模型计算 softmax-normalized 的视觉(图像或视频)到文本的相似性和文本到视觉的相似性，并利用视觉到文本和文本到视觉相似性的交叉熵损失来更新自己。相似度通常用点积来实现。最常见的方法就是CLIP。</p>
+<h5 id="Word-Region-Alignment"><a href="#Word-Region-Alignment" class="headerlink" title="Word-Region Alignment"></a>Word-Region Alignment</h5><p>单词-区域对齐(WRA)是一种无监督的预训练目标，用于对齐视觉区域(视觉patch)和单词。VLP模型利用最优传输来学习视觉和语言之间的对齐。</p>
+<h3 id="预训练数据集"><a href="#预训练数据集" class="headerlink" title="预训练数据集"></a>预训练数据集</h3><p><img src="/Users/nicehuster/Desktop/hexo-blog_v2/source/img/vlp-datasets.png" alt="image-20220607151527603"></p>
+<h3 id="下游任务"><a href="#下游任务" class="headerlink" title="下游任务"></a>下游任务</h3><p>下游任务主要有分类、回归、检索、生成以及其他任务。</p>
+<blockquote>
+<p><strong>分类任务</strong>：Visual Question Answering (VQA)，Visual Reasoning and Compositional Question Answering (GQA)，Video-Language Inference (VLI)，Natural Language for Visual Reasoning (NLVR)，Visual Entailment (VE)，Visual Commonsense Reasoning (VCR)，Grounding Referring Expressions (GRE)，Category Recognition (CR).<br><strong>回归任务</strong>：Multi-modal Sentiment Analysis (MSA).<br><strong>检索任务</strong>：Vision-Language Retrieval (VLR).<br><strong>生成任务</strong>：Visual Captioning (VC)，Novel Object Captioning at Scale (NoCaps)，Visual Dialogue (VD).<br><strong>其他任务</strong>：Multi-modal Machine Translation (MMT)，Vision-Language Navigation (VLN)，Optical Character Recognition (OCR).</p>
+</blockquote>
+<h3 id="SOTA-VLP-模型"><a href="#SOTA-VLP-模型" class="headerlink" title="SOTA VLP 模型"></a>SOTA VLP 模型</h3><p><img src="/Users/nicehuster/Desktop/hexo-blog_v2/source/img/vlp-sota.png" alt="vlp-sota"></p>
+<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>第一篇关于VLP的调研综述。文章从特征提取、模型结构、预训练目标、预训练数据集和下游任务五个方面综述了其最新进展，并对具体的SOTA VLP模型进行了详细的总结。这能够帮助研究人员更好地了解VLP，并启发新的工作来推动这一领域的发展。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/multi-model/" rel="tag"># multi-model</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/06/03/CLIP/" rel="next" title="CLIP图文多模态对比预训练方法详解">
+                <i class="fa fa-chevron-left"></i> CLIP图文多模态对比预训练方法详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">96</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">47</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#特征提取"><span class="nav-number">1.</span> <span class="nav-text">特征提取</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#图像特征提取"><span class="nav-number">1.1.</span> <span class="nav-text">图像特征提取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#视频特征提取"><span class="nav-number">1.2.</span> <span class="nav-text">视频特征提取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#文本特征提取"><span class="nav-number">1.3.</span> <span class="nav-text">文本特征提取</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模型结构"><span class="nav-number">2.</span> <span class="nav-text">模型结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Single-stream-vs-Dual-stream"><span class="nav-number">2.1.</span> <span class="nav-text">Single-stream vs Dual-stream</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Encoder-Only-vs-Encoder-Decoder"><span class="nav-number">2.2.</span> <span class="nav-text">Encoder-Only vs Encoder-Decoder</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#预训练目标"><span class="nav-number">3.</span> <span class="nav-text">预训练目标</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Completion"><span class="nav-number">3.1.</span> <span class="nav-text">Completion</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Masked-Language-Modeling"><span class="nav-number">3.1.1.</span> <span class="nav-text">Masked Language Modeling</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Prefix-Language-Modeling"><span class="nav-number">3.1.2.</span> <span class="nav-text">Prefix Language Modeling</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Masked-Vision-Modeling"><span class="nav-number">3.1.3.</span> <span class="nav-text">Masked Vision Modeling</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Matching"><span class="nav-number">3.2.</span> <span class="nav-text">Matching</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Vision-Language-Matching"><span class="nav-number">3.2.1.</span> <span class="nav-text">Vision-Language Matching</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Vision-Language-Contrastive-Learning"><span class="nav-number">3.2.2.</span> <span class="nav-text">Vision-Language Contrastive Learning</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Word-Region-Alignment"><span class="nav-number">3.2.3.</span> <span class="nav-text">Word-Region Alignment</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#预训练数据集"><span class="nav-number">4.</span> <span class="nav-text">预训练数据集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#下游任务"><span class="nav-number">5.</span> <span class="nav-text">下游任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SOTA-VLP-模型"><span class="nav-number">6.</span> <span class="nav-text">SOTA VLP 模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#最后"><span class="nav-number">7.</span> <span class="nav-text">最后</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

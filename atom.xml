@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://blog.nicehuster.cn/"/>
-  <updated>2022-06-07T08:33:47.376Z</updated>
+  <updated>2022-06-13T03:56:00.801Z</updated>
   <id>https://blog.nicehuster.cn/</id>
   
   <author>
@@ -15,6 +15,28 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>DeCLIP一种数据高效的CLIP训练方法</title>
+    <link href="https://blog.nicehuster.cn/2022/06/09/DeCLIP/"/>
+    <id>https://blog.nicehuster.cn/2022/06/09/DeCLIP/</id>
+    <published>2022-06-09T11:13:39.000Z</published>
+    <updated>2022-06-13T03:56:00.801Z</updated>
+    
+    <content type="html"><![CDATA[<p><strong>论文信息</strong>：<a href="https://arxiv.org/pdf/2110.05208.pdf" target="_blank" rel="noopener">Supervision Exists Everywhere: A Data Efficient Contrastive Language-Image Pre-training Paradigm</a><br><strong>代码链接</strong>：<a href="https://github.com/Sense-GVT/DeCLIP" target="_blank" rel="noopener">https://github.com/Sense-GVT/DeCLIP</a><br><strong>整体信息</strong>：这是商汤科技发表在ICLR2022上关于多模态预训练的工作，在前面的文章中介绍过CLIP，是一种基于对比文本-图像对的预训练方法，该方法需要在大量的图像-文本对数据集进行训练，在CLIP工作上就使用了4亿的图像-文本对数据，数百张卡进行预训练。为了提高训练效率，这篇工作提出了DeCLIP(Data Efficiency CLIP)方法，在较少数据下依旧可以取得不错的效果。</p><a id="more"></a><p><img src="/img/declip-sota.png" alt="declip-sota"></p><h3 id="具体方法"><a href="#具体方法" class="headerlink" title="具体方法"></a>具体方法</h3><p><img src="/img/clip-vs-declip.png" alt="clip-vs-declip"></p><p>上图，直观地，展示的是CLIP和DeCLIP方法的差异。CLIP是直接学习原始图片与对应的文本信息，使用俩个encoder分别编码图像信息和文本信息。图像encoder一般是resnet或者ViT，文本encoder一般使用transformer。之后将俩个embedding映射到相同的空间中，使用对比学习的思想进行训练。从方法上看，其实只使用了图像-文本对匹配的一种监督信号进行训练。假设batch size是N，共计N个图像-文本对$\left\{\left(x_{i}^{I}, x_{i}^{T}\right)\right\}$，损失函数InfoNCE如下：</p><script type="math/tex; mode=display">L_{I}=-\frac{1}{N} \sum_{i=1}^{N} \log \frac{\exp \left(\operatorname{sim}\left(\boldsymbol{z}_{i}^{I}, \boldsymbol{z}_{i}^{T}\right) / \tau\right)}{\sum_{j=1}^{N} \exp \left(\operatorname{sim}\left(\boldsymbol{z}_{i}^{I}, \boldsymbol{z}_{j}^{T}\right) / \tau\right)}</script><p>不同于CLIP，在DeCLIP方法中，使用了更多的自监督信号：1. 单模态的自监督学习；2. 跨模态的多视角监督学习；3. 最近邻监督学习；具体地，</p><ol><li><p><strong>单模态自监督学习</strong>（self-supervision within each modality, SS），包括使用<strong>SimSiam</strong>作为图像的自监督信号，和使用掩码语言模型<strong>MLM</strong>作为文本的自监督信号；</p><p><img src="/img/declip-ss.png" alt="declip-ss"></p><p>(a)<strong>图像自监督</strong>：同一张图片进过数据增强获得俩个view：$(x^{I}, \tilde{x}^{I})$,将经过数据增强后的结果经过相同的encoder得到俩个embedding向量$(z^{I}, \tilde{z}^{I})$，之后将其中一个embedding向量$x^{I}$再经过一个perd层得到向量$p^{I}$,训练时让$p^{I}$和$\tilde{x}^{I}$ 尽量接近；</p><p>(b)<strong>文本自监督</strong>：文本自监督使用的是MLM方法，即随机mask掉文本中15%的token，然后利用前后token预测被mask掉的token；</p></li><li><p><strong>跨模态多视角监督学习</strong>（Multi-View Supervision, MVS）：CLIP只使用的原始图像-文本对$\left(z^{I}, z^{T}\right)$，计算infoNCE损失，而DeCLIP中使用的是增强后的文本和图像计算infoNCE损失：$\left(z^{I}, z^{T}\right), \quad\left(\tilde{z}^{I}, z^{T}\right),\left(z^{I}, \tilde{z}^{T}\right), \quad\left(\tilde{z}^{I}, \tilde{z}^{T}\right)$ ，相比CLIP多了3个监督信息；</p></li><li><p><strong>最近邻监督学习</strong>（Nearest-Neighbor Supervision, NNS）：考虑到相同的图像可能会有类似的语言描述，因此选择语言描述相似的图文进行对比学习，通过维护一个先入先出的队列来模拟整个数据的分布，从队列中选择最相似的句子作为正样本$z^{T^{\prime}}$，之后使用InfoNCE计算最近邻损失：$\left(z^{I}, z^{T^{\prime}}\right),\left(\tilde{z}^{I}, z^{T^{\prime}}\right)$;</p><p><img src="/img/declip-nss.png" alt="declip-nss"></p></li></ol><p>在损失函数层面上，对以上三种不同监督的损失进行加权求和，得到最终的loss，具体地，如下所示：</p><script type="math/tex; mode=display">L_{D e C L I P}=(1-\alpha-\beta-\gamma) L_{C L I P}+\alpha\left(L_{I S S}+L_{T S S}\right)+\beta L_{M V S}+\gamma L_{N N S}</script><h3 id="数据集"><a href="#数据集" class="headerlink" title="数据集"></a>数据集</h3><p><img src="/img/declip-dataset.png" alt="declip-dataset"></p><p>在DeCLIP中，数据集包含俩部分：开源数据集29M和网络下载的数据集59M，总共88M训练数据，相比于CLIP使用的400M数据少很多。</p><h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><ol><li><p>Zero-shot准确率;</p><p><img src="/img/declip-zero-shot.png" alt="declip-zero-shot"></p><p>相比于CLIP，使用更少的训练数据，得到了更高的准确率；</p></li><li><p>下游任务表现；</p><p><img src="/img/declip-finetune.png" alt="declip-finetune"></p><p>在resnet和ViT俩种不同的encoder上，都证明了DeCLIP学习到的特征表示相比CLIP要强；</p></li><li><p>Ablation study</p><p><img src="/img/declip-ablation.png" alt="declip-ablation"></p><p>如上图证明了使用多种监督信息可有效的提升zero-shot准确率，而且相比于CLIP，DeCLIP的训练效率更高；</p></li></ol><h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>作者还在DeCLIP的基础上提出了<a href="https://arxiv.org/abs/2203.05796" target="_blank" rel="noopener">CLIP-benchmark</a>，其中包含了高质量的YFCC15M-V2数据集，而且复现了CLIP系列的相关方法(CLIP，DeCLIP，FILIP，DeCLIP，DeFILIP)。目前代码均已开源在<a href="https://github.com/Sense-GVT/DeCLIP" target="_blank" rel="noopener">这里</a>。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;strong&gt;论文信息&lt;/strong&gt;：&lt;a href=&quot;https://arxiv.org/pdf/2110.05208.pdf&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Supervision Exists Everywhere: A Data Efficient Contrastive Language-Image Pre-training Paradigm&lt;/a&gt;&lt;br&gt;&lt;strong&gt;代码链接&lt;/strong&gt;：&lt;a href=&quot;https://github.com/Sense-GVT/DeCLIP&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://github.com/Sense-GVT/DeCLIP&lt;/a&gt;&lt;br&gt;&lt;strong&gt;整体信息&lt;/strong&gt;：这是商汤科技发表在ICLR2022上关于多模态预训练的工作，在前面的文章中介绍过CLIP，是一种基于对比文本-图像对的预训练方法，该方法需要在大量的图像-文本对数据集进行训练，在CLIP工作上就使用了4亿的图像-文本对数据，数百张卡进行预训练。为了提高训练效率，这篇工作提出了DeCLIP(Data Efficiency CLIP)方法，在较少数据下依旧可以取得不错的效果。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
+    
+    
+      <category term="multi-model" scheme="https://blog.nicehuster.cn/tags/multi-model/"/>
+    
+  </entry>
   
   <entry>
     <title>视觉-语言预训练(Vision-Language Pretraining)综述</title>
@@ -439,28 +461,6 @@
     <summary type="html">
     
       &lt;p&gt;&lt;strong&gt;论文信息：&lt;/strong&gt; &lt;a href=&quot;https://arxiv.org/pdf/1909.00700.pdf&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Training-Time-Friendly Network for Real-Time Object Detection&lt;/a&gt;&lt;br&gt;&lt;strong&gt;代码链接：&lt;/strong&gt;&lt;a href=&quot;https://github.com/ZJULearning/ttfnet&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://github.com/ZJULearning/ttfnet&lt;/a&gt;&lt;br&gt;&lt;strong&gt;问题&lt;/strong&gt;： 这篇论文主要是解决CenterNet存在的一些问题，CenterNet在推理速度精度上表现不差，但存在训练耗时的问题，CenterNet官方代码训练coco需要2.5天，因此这篇论文主要是如何改进CenterNet训练耗时长的问题。作者基于CenterNet，在回归box时，作者认为由于CenterNet进行回归时仅仅使用中心点的那些目标是次优的选择，同时作者借助了FCOS是使用Ground Truth回归所有样本的思想，这里作者想到使用高斯核来选择回归样本，一方面可以增加回归的信息量，提升检测精度，同时作者指出这样有增加batch size的效果，可以使用更大的学习率以及有更短的训练时间。并且没有引入FCOS中耗时的NMS后处理过程，使得Inference时间减小。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
-    
-    
-      <category term="detection" scheme="https://blog.nicehuster.cn/tags/detection/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Generalized Focal Loss &amp;&amp; Generalized Focal Loss V2</title>
-    <link href="https://blog.nicehuster.cn/2021/03/12/gfl/"/>
-    <id>https://blog.nicehuster.cn/2021/03/12/gfl/</id>
-    <published>2021-03-12T11:13:39.000Z</published>
-    <updated>2022-04-12T03:38:58.000Z</updated>
-    
-    <content type="html"><![CDATA[<p><strong>论文信息：</strong> <a href="https://arxiv.org/pdf/2006.04388.pdf" target="_blank" rel="noopener">Generalized Focal Loss</a> &amp;&amp; <a href="https://arxiv.org/pdf/2011.12885.pdf" target="_blank" rel="noopener">Generalized Focal Loss V2</a><br><strong>代码链接：</strong> <a href="https://github.com/implus/GFocal" target="_blank" rel="noopener">https://github.com/implus/GFocal</a> &amp;&amp; <a href="https://github.com/implus/GFocalV2" target="_blank" rel="noopener">https://github.com/implus/GFocalV2</a><br><strong>整体信息：</strong>这倆篇论文都是出自南理工的李翔，从定位质量估计和边框表示的角度上对现有检测方法进行改进。在任意one-stage检测器上都能涨1-2点。GFLv1解决的是目前检测方法存在的两个问题：1）在训练和推理的时候，分类和质量估计的不一致性；2）狄拉克分布针对复杂场景下（模糊和不确定性边界）存在不灵活的问题。GFLv2是在v1的基础上，进一步地，使用概率分布的方式评估检测框质量，相比v1更有效，v2在ATSS上可以无痛涨点2-3点。</p><a id="more"></a><h3 id="GFLv1"><a href="#GFLv1" class="headerlink" title="GFLv1"></a>GFLv1</h3><p>方法的出发点主要是解决俩个问题：1）classification score 和 IoU/centerness score 训练测试不一致；2）bbox regression 采用的表示不够灵活，没有办法建模复杂场景下的uncertainty；</p><p><strong>问题1：训练测试不一致性</strong></p><p><img src="/img/gflv1_problem.png" alt="img"></p><p>不一致主要体先在俩方面：</p><blockquote><ol><li>用法不一致。训练的时候，分类和质量估计各自训记几个儿的，但测试的时候却又是乘在一起作为NMS score排序的依据，这个操作显然没有end-to-end，必然存在一定的gap；</li><li>对象不一致。借助Focal Loss的力量，分类分支能够使得少量的正样本和大量的负样本一起成功训练，但是质量估计（回归）通常就只针对正样本训练；</li></ol></blockquote><p><strong>问题2：bbox regression不灵活，无法建模复杂场景</strong><br>在复杂场景中，边界框的表示具有很强的不确定性，而现有的框回归本质都是建模了非常单一的狄拉克分布，非常不flexible。我们希望用一种general的分布去建模边界框的表示。问题二如图所示（比如被水模糊掉的滑板，以及严重遮挡的大象）：<br><img src="/img/gflv1_problem2.png" alt="img"></p><p>解决方法：</p><p><img src="/img/gflv1_solution.png" alt="img"></p><p>具体地，</p><h4 id="分类"><a href="#分类" class="headerlink" title="分类"></a>分类</h4><p>在分类分支上不再使用one-hot型类别标签监督，而是使用soft-one-hot 标签，标签值使用地iou值；如此，完美的将类别和位置信息结合利用起来了；传统地交叉熵、focal loss只能处理离散标签；因此作者在focal loss基础上提出 Quality Focal Loss，具体形式如下：</p><script type="math/tex; mode=display">\mathbf{Q F L}(\sigma)=-|y-\sigma|^{\beta}((1-y) \log (1-\sigma)+y \log (\sigma))</script><h4 id="回归"><a href="#回归" class="headerlink" title="回归"></a>回归</h4><p>考虑到真实的分布通常不会距离标注的位置太远，作者又额外加了个loss，希望网络能够快速地聚焦到标注位置附近的数值，使得他们概率尽可能大。Distribution Focal Loss：</p><script type="math/tex; mode=display">\mathbf{D F L}\left(\mathcal{S}_{i}, \mathcal{S}_{i+1}\right)=-\left(\left(y_{i+1}-y\right) \log \left(\mathcal{S}_{i}\right)+\left(y-y_{i}\right) \log \left(\mathcal{S}_{i+1}\right)\right)</script><p>其形式上与QFL的右半部分很类似，含义是以类似交叉熵的形式去优化与标签y最接近的一左一右两个位置的概率，从而让网络快速地聚焦到目标位置的邻近区域的分布中去。简单来讲，就是预测目标框边界附近地n个位置地概率值，然后基于概率值和n个位置进行加权，得到目标框边界值；目标的四个边框均采用上述操作，然后基于组合的目标框使用GIOU loss进行优化。</p><h4 id="损失函数"><a href="#损失函数" class="headerlink" title="损失函数"></a>损失函数</h4><script type="math/tex; mode=display">\mathcal{L}=\frac{1}{N_{\text {pos }}} \sum_{z} \mathcal{L}_{\mathcal{Q}}+\frac{1}{N_{\text {pos }}} \sum_{z} \mathbf{1}_{\left\{c_{z}^{*}>0\right\}}\left(\lambda_{0} \mathcal{L}_{\mathcal{B}}+\lambda_{1} \mathcal{L}_{\mathcal{D}}\right)</script><p>上面是训练loss函数，第一部分是分类分支的QFL；第二部分是回归分支的GIOU loss和Distribution Focal Loss；</p><h4 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h4><p><img src="/img/gflv1_exp.png" alt="img"></p><h3 id="GFLv2"><a href="#GFLv2" class="headerlink" title="GFLv2"></a>GFLv2</h3><p>问题：在GFLv1中，作者提出了对边界框进行一个一般化的分布表示建模。有了这个可以学习的表示之后，基本上那些非常清晰明确的边界，它的分布都很尖锐；而模糊定义不清的边界它们学习到的分布基本上会平下来，而且有的时候还经常出现双峰的情况。作者为了充分利用这分布，提出了GFLv2，利用分布形状的统计量去知道最终最终定位质量的估计。具体网络结构如下：<br><img src="/img/gflv2_framework.png" alt="img"></p><h4 id="核心思路"><a href="#核心思路" class="headerlink" title="核心思路"></a>核心思路</h4><p>直接取学习到的分布（分布是用离散化的多个和为1的回归数值表示的，详情参考GFLV1）的Topk数值。其实理解起来也不难，因为所有数值和为1，如果分布非常尖锐的话，Topk这几个数通常就会很大；反之Topk就会比较小。选择Topk还有一个重要的原因就是它可以使得我们的特征与对象的scale尽可能无关，如下图所示：<br><img src="/img/gflv2_topk.png" alt="img"><br>简单来说就是长得差不多形状的分布要出差不多结果的数值，不管它峰值时落在小scale还是大scale。我们把4条边的分布的Topk concat在一起形成一个维度非常低的输入特征向量（可能只有10+或20+），用这个向量再接一个非常小的fc层（通常维度为32、64)，最后再变成一个Sigmoid之后的scalar乘到原来的分类表征中。具体model参考上图，其中红色框就是比GFLV1多出来的Distribution-Guided Quality Predictor部分，这也就是本文的核心。</p><h4 id="实验结果-1"><a href="#实验结果-1" class="headerlink" title="实验结果"></a>实验结果</h4><p><img src="/img/gflv2_exp.png" alt="img"></p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;strong&gt;论文信息：&lt;/strong&gt; &lt;a href=&quot;https://arxiv.org/pdf/2006.04388.pdf&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Generalized Focal Loss&lt;/a&gt; &amp;amp;&amp;amp; &lt;a href=&quot;https://arxiv.org/pdf/2011.12885.pdf&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Generalized Focal Loss V2&lt;/a&gt;&lt;br&gt;&lt;strong&gt;代码链接：&lt;/strong&gt; &lt;a href=&quot;https://github.com/implus/GFocal&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://github.com/implus/GFocal&lt;/a&gt; &amp;amp;&amp;amp; &lt;a href=&quot;https://github.com/implus/GFocalV2&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://github.com/implus/GFocalV2&lt;/a&gt;&lt;br&gt;&lt;strong&gt;整体信息：&lt;/strong&gt;这倆篇论文都是出自南理工的李翔，从定位质量估计和边框表示的角度上对现有检测方法进行改进。在任意one-stage检测器上都能涨1-2点。GFLv1解决的是目前检测方法存在的两个问题：1）在训练和推理的时候，分类和质量估计的不一致性；2）狄拉克分布针对复杂场景下（模糊和不确定性边界）存在不灵活的问题。GFLv2是在v1的基础上，进一步地，使用概率分布的方式评估检测框质量，相比v1更有效，v2在ATSS上可以无痛涨点2-3点。&lt;/p&gt;
     
     </summary>
     

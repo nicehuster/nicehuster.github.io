@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://blog.nicehuster.cn/2022/06/09/DeCLIP/</loc>
+    <lastmod>2022-06-13</lastmod>
+  </url>
+  <url>
     <loc>https://blog.nicehuster.cn/2022/06/05/VLP/</loc>
     <lastmod>2022-06-07</lastmod>
   </url>
@@ -349,11 +353,11 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://blog.nicehuster.cn/2018/03/09/dl_environ/</loc>
+    <loc>https://blog.nicehuster.cn/2018/07/08/caffe/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/08/caffe/</loc>
+    <loc>https://blog.nicehuster.cn/2018/03/09/dl_environ/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
@@ -365,11 +369,11 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/25/tensorRT_install/</loc>
+    <loc>https://blog.nicehuster.cn/2018/07/29/tensorRT_customlayer/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/29/tensorRT_customlayer/</loc>
+    <loc>https://blog.nicehuster.cn/2018/07/25/tensorRT_install/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
@@ -377,11 +381,11 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/26/tensorRT_introduce/</loc>
+    <loc>https://blog.nicehuster.cn/2019/05/16/zero-game/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://blog.nicehuster.cn/2019/05/16/zero-game/</loc>
+    <loc>https://blog.nicehuster.cn/2018/07/26/tensorRT_introduce/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
 </urlset> 

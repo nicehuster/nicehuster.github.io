@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://blog.nicehuster.cn/"/>
-  <updated>2022-06-13T03:56:00.801Z</updated>
+  <updated>2022-06-15T03:22:11.133Z</updated>
   <id>https://blog.nicehuster.cn/</id>
   
   <author>
@@ -15,6 +15,28 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>基于CLIP模型的zero-shot目标检测方法</title>
+    <link href="https://blog.nicehuster.cn/2022/06/13/ViLD/"/>
+    <id>https://blog.nicehuster.cn/2022/06/13/ViLD/</id>
+    <published>2022-06-13T11:13:39.000Z</published>
+    <updated>2022-06-15T03:22:11.133Z</updated>
+    
+    <content type="html"><![CDATA[<p><strong>论文信息</strong>：<a href="https://arxiv.org/pdf/2104.13921.pdf" target="_blank" rel="noopener">Open-vocabulary Object Detection via Vision and Language Knowledge Distillation</a><br><strong>代码链接</strong>：<a href="https://github.com/tensorflow/tpu/tree/master/models/official/detection/projects/vild" target="_blank" rel="noopener">https://github.com/tensorflow/tpu/tree/master/models/official/detection/projects/vild</a><br><strong>整体信息</strong>：这是google research 发表在ICLR2022上有关CLIP在下游任务-目标检测任务上的应用。使用CLIP模型实现zero-shot场景下的目标检测任务。比较有想象意义的是，通过一句话就可以检测出图像中需要的指定目标。在之前<a href="https://nicehuster.github.io/2022/06/03/CLIP/#more" target="_blank" rel="noopener">CLIP图文多模态对比预训练方法详解</a>中也有提及过这篇工作。</p><a id="more"></a><p><img src="https://camo.githubusercontent.com/238affd721b73ef2ff8f95114352188693623796bcc57b83f94747a7d2b6ff3a/68747470733a2f2f73746f726167652e676f6f676c65617069732e636f6d2f636c6f75642d7470752d636865636b706f696e74732f646574656374696f6e2f70726f6a656374732f76696c642f6173736574732f6e65775f7465617365722e706e67" alt></p><p>上图展示的是ViLD的检测结果。其中只有toy类别是训练过程中见到的类别，但zero-shot detection还检测到其他的属性，比如toy种类和颜色等。</p><h3 id="zero-shot-detection"><a href="#zero-shot-detection" class="headerlink" title="zero-shot detection"></a>zero-shot detection</h3><p>顾名思义，这个任务就是，对于任意一个新类别，一张训练图像都不给的情况下，训练出来的检测器也能检测这个类别。zero-shot detection的setting通常是，将数据集依据类别划分为俩部分：base类别和novel类别，base类别用于训练，novel类别在训练过程中不可见。该任务的目标在于，在novel类别上获得较好性能的同时还需要保持base类别的性能；在这篇文章中使用的是LVIS数据集进行实验对比分析，将common和frequency俩类别作为base类，将rare类别作为novel类。</p><h3 id="常规方法"><a href="#常规方法" class="headerlink" title="常规方法"></a>常规方法</h3><p><img src="/img/vild-Vanilla.png" alt="vild-Vanilla"></p><p>如上图展示的是zero-shot detection with cropped regions，具体地，使用在二阶段检测方法比如Mask-RCNN获得proposal之后，对每个proposal都crop &amp; resize 然后输入到CLIP-image-encoder中获得image-embedding，与对应类别的text-embedding进行对比，获取类别信息。该方法的的缺点是比较慢，需要one-by-one地处理每个object proposal，而且CLIP-text-encoder没有充分利用base类别的文本信息。</p><h3 id="ViLD方法"><a href="#ViLD方法" class="headerlink" title="ViLD方法"></a>ViLD方法</h3><p><img src="/img/vild-pipeline.png" alt="vild-pipeline"></p><p>上图展示的是ViLD方法的pipeline。具体地，在ViLD中包含俩部分：<strong>ViLD-text</strong>用于学习文本embedding和<strong>ViLD-image</strong>用于学习图像embedding。在ViLD-text中，将base类别文本送入CLIP-text-encoder中获得text embedding，然后用于classify目标区域，在ViLD-image中会将对应的proposal送入CLIP-image-encoder中获得图像embedding，对经过roi align之后的region embedding 进行知识蒸馏；相比于ViLD-text，ViLD-image蒸馏了base+novel的信息，因为proposal网络输出的proposal可能会包含novel，而ViLD-text只使用了base类的文本信息；</p><p><img src="/img/vild-overview.png" alt="vild-overview"></p><p>上图展示的是ViLD的训练和推理流程。相比于mask-rcnn，修改地是rcnn的分类分支；具体地，在训练过程中，在获取分类监督信号上包括俩部分：用CLIP获得image embedding蒸馏region embedding，以及用CLIP获得text embedding监督region embedding；总的损失如下公式所示：</p><script type="math/tex; mode=display">\mathcal{L}_{\mathrm{ViLD}}=\mathcal{L}_{\text {ViLD-text }}+w \cdot \mathcal{L}_{\mathrm{ViLD}-\mathrm{image}}</script><p>在推理过程，只需要将region embedding和text embedding(base+novel)进行对比即可得到类别信息。</p><h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><p><strong>数据集</strong>：实验使用的是LVIS v1.0（1203类别），其中frequent(f: 405个类别)和common(c: 461个类别)作为base类，其余rare(r: 337个类别)作为novel类。</p><p><strong>目标proposal</strong>：由于训练过程中只使用了base类训练，下表展示的是仅使用base类训练时的RPN召回率和使用base+novel时的RPN召回率，从上可以看出二者相差1-2个点。因此可以看出RPN是具备从base类上泛化到novel。</p><p><img src="/img/vild-recall.png" alt="vild-recall"></p><p><strong>Ablation</strong>：作者在paper中做了较为详尽的ablation study实验，这里只提及一些证明idea有效的关键实验分析。</p><p><img src="/img/vild-ensemble.png" alt="vild-ensemble"></p><p>上表格中，CLIP on cropped regions就是前面介绍的常规方法，该方法在APr上可以达到13.0，ViLD-text和ViLD-image表示分别使用单一监督信号。ViLD(w=0.5)表示同时使用ViLD-text和ViLD-image监督训练。ViLD-text相比CLIP on cropped regions在APr上下降了3个点，说明使用base类信息监督ViLD-text在novel上的泛化性有所下降。ViLD(w=0.5)相比于ViLD-text和ViLD-image都提升幅度明显。ViLD-ensemble(w=0.5)表示同时使用ViLD-text和ViLD-image监督训练同时，在base预测上，倾向于ViLD-text，在novel预测上使用vice versa投票决定。可以看出ViLD-ensemble(w=0.5)方式在base类别上提升明显。</p><p><strong>Transfer to other detection datasets</strong>：这个是证明在不同数据集之间的一个迁移有效性。只需要替换类别 text embedding，无需进行fine-tune。</p><p><img src="/img/vild-transfer.png" alt="vild-transfer"></p><p>在不进行任何fine-tune下，ViLD在COCO数据集上就可以取得36.6AP，与fine-tune条件下AP只相差不到3个点。</p><h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p>作者也在离线交互式检测上也做过一些实验，输入文本信息，就可以检测出对应的目标。这个还挺有意思的，随意说一句话就能检测到图像的指定目标。</p><p><img src="/img/vild-interactive detection.png" alt="vild-interactive detection"></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;&lt;strong&gt;论文信息&lt;/strong&gt;：&lt;a href=&quot;https://arxiv.org/pdf/2104.13921.pdf&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Open-vocabulary Object Detection via Vision and Language Knowledge Distillation&lt;/a&gt;&lt;br&gt;&lt;strong&gt;代码链接&lt;/strong&gt;：&lt;a href=&quot;https://github.com/tensorflow/tpu/tree/master/models/official/detection/projects/vild&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://github.com/tensorflow/tpu/tree/master/models/official/detection/projects/vild&lt;/a&gt;&lt;br&gt;&lt;strong&gt;整体信息&lt;/strong&gt;：这是google research 发表在ICLR2022上有关CLIP在下游任务-目标检测任务上的应用。使用CLIP模型实现zero-shot场景下的目标检测任务。比较有想象意义的是，通过一句话就可以检测出图像中需要的指定目标。在之前&lt;a href=&quot;https://nicehuster.github.io/2022/06/03/CLIP/#more&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;CLIP图文多模态对比预训练方法详解&lt;/a&gt;中也有提及过这篇工作。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
+    
+    
+      <category term="multi-model" scheme="https://blog.nicehuster.cn/tags/multi-model/"/>
+    
+  </entry>
   
   <entry>
     <title>DeCLIP一种数据高效的CLIP训练方法</title>
@@ -439,28 +461,6 @@
       
         &lt;p&gt;&lt;strong&gt;论文信息：&lt;/strong&gt; &lt;a href=&quot;https://openaccess.thecvf.com/content/CVPR2021/papers/Zhang_VarifocalNet_An_IoU-Aware_Dense_Object_Detect
       
-    
-    </summary>
-    
-      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
-    
-    
-      <category term="detection" scheme="https://blog.nicehuster.cn/tags/detection/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>TTFNet 快速训练版的CenterNet</title>
-    <link href="https://blog.nicehuster.cn/2021/03/13/ttfnet/"/>
-    <id>https://blog.nicehuster.cn/2021/03/13/ttfnet/</id>
-    <published>2021-03-13T11:13:39.000Z</published>
-    <updated>2022-04-12T03:54:50.000Z</updated>
-    
-    <content type="html"><![CDATA[<p><strong>论文信息：</strong> <a href="https://arxiv.org/pdf/1909.00700.pdf" target="_blank" rel="noopener">Training-Time-Friendly Network for Real-Time Object Detection</a><br><strong>代码链接：</strong><a href="https://github.com/ZJULearning/ttfnet" target="_blank" rel="noopener">https://github.com/ZJULearning/ttfnet</a><br><strong>问题</strong>： 这篇论文主要是解决CenterNet存在的一些问题，CenterNet在推理速度精度上表现不差，但存在训练耗时的问题，CenterNet官方代码训练coco需要2.5天，因此这篇论文主要是如何改进CenterNet训练耗时长的问题。作者基于CenterNet，在回归box时，作者认为由于CenterNet进行回归时仅仅使用中心点的那些目标是次优的选择，同时作者借助了FCOS是使用Ground Truth回归所有样本的思想，这里作者想到使用高斯核来选择回归样本，一方面可以增加回归的信息量，提升检测精度，同时作者指出这样有增加batch size的效果，可以使用更大的学习率以及有更短的训练时间。并且没有引入FCOS中耗时的NMS后处理过程，使得Inference时间减小。</p><a id="more"></a><p>该方法优势：</p><blockquote><ol><li>使用高斯核编码训练样本，使得网络能够更快地收敛；</li><li>能够在不引入其他组件，比如FPN的基础上，降低ambiguous 以及low-quality的样本;</li><li>不需要any offset predictions来矫正结果;<br><img src="https://github.com/ZJULearning/ttfnet/raw/master/imgs/structure.png" alt="undefined"><br>具体思路：<br>给定一张图片，利用网络分别预测物体中心在什么位置 $\hat{H} \in R^{N \times C \times \frac{H}{r} \times \frac{W}{r}}$和回归box size的向量 $\hat{S} \in R^{N \times 4 \times \frac{\dot{H}}{r} \times \frac{W}{r}}$ 在分类和回归时同时使用高斯核，并通过 $\alpha$ 和 $\beta$  控制高斯核的尺寸。这里和CenterNet一样，将目标检测分为两个部分：object localization和 size regression；</li></ol></blockquote><h3 id="1-object-localization"><a href="#1-object-localization" class="headerlink" title="1.object  localization"></a>1.object  localization</h3><p>假设一张图上有M个annotated box，其中第m个标注box属于$c_m$  类别，二维的高斯核：</p><script type="math/tex; mode=display">K_{m}(x, y)=\exp \left(-\frac{\left(x-x_{0}^{2}\right)}{2 \sigma_{2}^{x}}-\frac{\left(y-y_{0}^{2}\right)}{2 \sigma_{2}^{y}}\right)</script><p>高斯分布的峰值，也就是box中心，被视为正目标，而任何其他像素被视为负目标。对那些与较大的分配值对应的负目标的惩罚将会减轻。使用修正 focal loss.</p><h3 id="2-size-regression"><a href="#2-size-regression" class="headerlink" title="2. size regression"></a>2. size regression</h3><p><img src="/img/ttfnet_sample_define.png" alt="img"><br>给定特征图尺度上的m个ground truth box，采用另一个高斯核生成 $S_{m} \in R^{1 \times \frac{H}{r} \times \frac{W}{r}}$,核大小是由β 如上所述控制。Sm中的非零部分称为高斯区域Am，如图3所示。由于Am总是在它们的框中，所以在本文的其余部分中，它也被称为子区域。将子区域中的每个像素作为训练样本。损失函数部分使用的是GIOU loss。</p><h3 id="3-experiment"><a href="#3-experiment" class="headerlink" title="3. experiment"></a>3. experiment</h3><p><img src="/img/ttfnet_exp.png" alt="img"></p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;strong&gt;论文信息：&lt;/strong&gt; &lt;a href=&quot;https://arxiv.org/pdf/1909.00700.pdf&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Training-Time-Friendly Network for Real-Time Object Detection&lt;/a&gt;&lt;br&gt;&lt;strong&gt;代码链接：&lt;/strong&gt;&lt;a href=&quot;https://github.com/ZJULearning/ttfnet&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://github.com/ZJULearning/ttfnet&lt;/a&gt;&lt;br&gt;&lt;strong&gt;问题&lt;/strong&gt;： 这篇论文主要是解决CenterNet存在的一些问题，CenterNet在推理速度精度上表现不差，但存在训练耗时的问题，CenterNet官方代码训练coco需要2.5天，因此这篇论文主要是如何改进CenterNet训练耗时长的问题。作者基于CenterNet，在回归box时，作者认为由于CenterNet进行回归时仅仅使用中心点的那些目标是次优的选择，同时作者借助了FCOS是使用Ground Truth回归所有样本的思想，这里作者想到使用高斯核来选择回归样本，一方面可以增加回归的信息量，提升检测精度，同时作者指出这样有增加batch size的效果，可以使用更大的学习率以及有更短的训练时间。并且没有引入FCOS中耗时的NMS后处理过程，使得Inference时间减小。&lt;/p&gt;
     
     </summary>
     

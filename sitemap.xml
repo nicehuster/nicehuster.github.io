@@ -9,6 +9,13 @@
   </url>
   
   <url>
+    <loc>https://blog.nicehuster.cn/2022/06/03/Diffusion/</loc>
+    
+    <lastmod>2022-07-05T01:16:08.179Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://blog.nicehuster.cn/2022/06/13/ViLD/</loc>
     
     <lastmod>2022-06-15T03:23:56.100Z</lastmod>
@@ -653,6 +660,13 @@
   </url>
   
   <url>
+    <loc>https://blog.nicehuster.cn/2018/03/09/dl_environ/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://blog.nicehuster.cn/2019/04/02/docker/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
@@ -667,7 +681,7 @@
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/2018/03/09/dl_environ/</loc>
+    <loc>https://blog.nicehuster.cn/2018/07/25/tensorRT_install/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -696,13 +710,6 @@
   
   <url>
     <loc>https://blog.nicehuster.cn/2019/05/16/zero-game/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://blog.nicehuster.cn/2018/07/25/tensorRT_install/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     

@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="seq2seq,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="本文分享seq2seq learning相关的两篇论文，单位是google brain，一作均为Ting Chen（自监督学习方法SimCLR的作者），论文地址：pix2seq: A Language Modeling Framework for Object Detection,[ICLR2022接收]；A Unified Sequence Interface for Vision Tasks,">
+<meta name="keywords" content="seq2seq">
+<meta property="og:type" content="article">
+<meta property="og:title" content="pix2seq方法详解">
+<meta property="og:url" content="https://blog.nicehuster.cn/2022/07/18/pix2seq/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="本文分享seq2seq learning相关的两篇论文，单位是google brain，一作均为Ting Chen（自监督学习方法SimCLR的作者），论文地址：pix2seq: A Language Modeling Framework for Object Detection,[ICLR2022接收]；A Unified Sequence Interface for Vision Tasks,">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/image-20220718111615345.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/image-20220718112047122.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/image-20220718112842096.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/image-20220718211018875.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/image-20220719094051172.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/image-20220719094807354.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/image-20220719095713926.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/image-20220719100348972.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/image-20220719103500099.png">
+<meta property="og:updated_time" content="2022-07-19T02:46:10.103Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="pix2seq方法详解">
+<meta name="twitter:description" content="本文分享seq2seq learning相关的两篇论文，单位是google brain，一作均为Ting Chen（自监督学习方法SimCLR的作者），论文地址：pix2seq: A Language Modeling Framework for Object Detection,[ICLR2022接收]；A Unified Sequence Interface for Vision Tasks,">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/image-20220718111615345.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2022/07/18/pix2seq/">
+
+
+
+
+
+  <title>pix2seq方法详解 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2022/07/18/pix2seq/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">pix2seq方法详解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-07-18T19:13:39+08:00">
+                2022-07-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文分享seq2seq learning相关的两篇论文，单位是google brain，一作均为Ting Chen（自监督学习方法SimCLR的作者），论文地址：<a href="https://arxiv.org/pdf/2109.10852.pdf" target="_blank" rel="noopener">pix2seq: A Language Modeling Framework for Object Detection</a>,[ICLR2022接收]；<a href="https://arxiv.org/pdf/2206.07669.pdf" target="_blank" rel="noopener">A Unified Sequence Interface for Vision Tasks</a>,[上星期挂arxiv]，后者是对前者在多个视觉任务上的拓展。下面大致的介绍一下两篇论文的具体工作。</p>
+<a id="more"></a>
+<p><img src="/img/image-20220718111615345.png" alt="image-20220718111615345"></p>
+<h3 id="Pix2seq"><a href="#Pix2seq" class="headerlink" title="Pix2seq"></a>Pix2seq</h3><h4 id="主要方法"><a href="#主要方法" class="headerlink" title="主要方法"></a>主要方法</h4><p>pix2seq将目标检测任务转换为语言建模来处理，以往目标检测任务基于属性进行预测，通常会分为分类预测+回归预测。而该方法是通过将object的类别和box信息构造成序列，对序列进行预测。pix2seq的结构和学习过程由四个部分组成，如下图所示：</p>
+<p><img src="/img/image-20220718112047122.png" alt="image-20220718112047122"></p>
+<p>Pix2seq主要包含四部分：</p>
+<blockquote>
+<ol>
+<li>Image augmentation：图像数据增强，包括random scale+crops;</li>
+<li>Sequence construction &amp; augmentation：构造序列和序列增强，将bbox和label转换为离散的token;</li>
+<li>Architecture：使用encoder-decoder结构将输入图像pixel转换为序列；</li>
+<li>Objective/loss function：常用的softmax 交叉熵损失；</li>
+</ol>
+</blockquote>
+<h4 id="序列化"><a href="#序列化" class="headerlink" title="序列化"></a>序列化</h4><p><img src="/img/image-20220718112842096.png" alt="image-20220718112842096"></p>
+<p>这里详细介绍一下box+cls序列化方法，为了和自然语言对齐，它把坐标框（4个值）和类别（1）都拼成一个序列，意味着100个目标对应着长度为500的序列。因为坐标是连续值，作者这里用了一个分桶的机制，把坐标分到n个桶里(bin)，就构成了离散值。具体地，一个目标被表示为一个由五个离散的[token]组成的序列，即[ymin, xmin, ymax, xmax, c]，其中每个连续的角坐标被均匀地离散为[1, nbins]之间的一个整数，c是类索引。我们对所有标记使用共享词汇表，因此词汇量大小等于 bin 数+类别数。对于600x600的图片而言，使用600个bin就可以实现零量化误差，其实整个离散值的范围比起nlp里的字典而言，还是非常非常小的。</p>
+<h4 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h4><p>在构建好序列之后，使用Resnet + 6层transformer encoder + 6层transformer decoder对输入图像进行序列化，然后使用交叉熵计算损失。作者分别在train from scratch和finetune两种setting下进行了一些实验对比。</p>
+<p><img src="/img/image-20220718211018875.png" alt="image-20220718211018875"></p>
+<p>从上面结果来看，相比较而言，在指标上优势并不明显，但足矣证明本文的idea是可行的。在train from scratch的setting下，pix2seq是训练了300epoch，表格上之所以并没表明对比方法训练的epoch数，可能这正是pix2seq的一个缺点，训练收敛慢。</p>
+<h3 id="PixSeq-v2"><a href="#PixSeq-v2" class="headerlink" title="PixSeq v2"></a>PixSeq v2</h3><h4 id="主要方法-1"><a href="#主要方法-1" class="headerlink" title="主要方法"></a>主要方法</h4><p>Pixseq v2是上周Ting Chen挂在arxiv的对pix2seq在多个视觉任务上拓展的一个工作，总的来说，作者并没有对模型层面做进一步改进，但对不同视觉task的输入输出接口做了统一。如下图所示，</p>
+<p><img src="/img/image-20220719094051172.png" alt="image-20220719094051172"></p>
+<p>以往的视觉任务比如，目标检测、实例分割、关键点检测和图像描述等任务都是单独设计不同模型、不同输入、不同损失函数来解决，而本文将每个任务的输出形式化为具有一个统一接口的一个离散的token序列，可以做到在所有这些任务上仅训练一个具有单一模型结构和损失函数的神经网络，而不需要针对特定任务进行模型结构或损失函数的定制。为了解决一个特定的任务，本文使用一个简短的prompt作为该任务的描述，网络的输出序列适应于该prompt，因此模型能够产生特定于任务的输出。</p>
+<blockquote>
+<ol>
+<li>对于目标检测任务，遵循pix2seq做法，通过量化连续图像坐标，将box和cls转换为一系列离散token;</li>
+<li>对于实例分割任务，以图像坐标序列形式预测polygon，与检测任务一样，对坐标进行量化离散为token；</li>
+<li>对于关键点预测任务，给定一个人体实例，将关键点预测为一个量化的图像坐标序列；</li>
+<li>对于图像描述，直接预测文本token。</li>
+</ol>
+</blockquote>
+<p><img src="/img/image-20220719094807354.png" alt="image-20220719094807354"></p>
+<p>值得注意的是，所有四个任务都使用同一个词汇表。 具体的prompt和输出序列如上图所示</p>
+<h4 id="训练"><a href="#训练" class="headerlink" title="训练"></a>训练</h4><p>每个任务都有自己的成对图像序列训练数据。有两种方法可以将任务结合起来进行联合训练。作者提出了data mixing和batch mixing两种数据混合方式。</p>
+<p><img src="/img/image-20220719095713926.png" alt="image-20220719095713926"></p>
+<p>data mixing在概念上简单，但是因为数据格式不同，图像增强很难合并比较麻烦，相比较而言，batch mixing对单个任务采样图像后进行相应增强后转换为图像-序列对，模型分别计算每个任务的损失和梯度。作者认为可以将特定任务的每一批数据的梯度以适当的形式加权组合起来。</p>
+<p><img src="/img/image-20220719100348972.png" alt="image-20220719100348972"></p>
+<p>在损失函数上，与pix2seq一样，训练目标是最大化基于图像的token和之前的token的似然性。</p>
+<script type="math/tex; mode=display">
+\operatorname{maximize} \sum_{j=1}^{L} \boldsymbol{w}_{j} \log P\left(\boldsymbol{y}_{j} \mid \boldsymbol{x}, \boldsymbol{y}_{1: j-1}\right)</script><p>其中，x表示输入图像，y是长度为L的编码序列(监督信号)，序列y的初始部分是一个prompt，为此作者将权重wi设置为零，损失计算时不包括该部分。</p>
+<h4 id="实验结果-1"><a href="#实验结果-1" class="headerlink" title="实验结果"></a>实验结果</h4><p><img src="/img/image-20220719103500099.png" alt="image-20220719103500099"></p>
+<p>从上述表格可以看出，在模型结构和损失函数都没有针对特定任务进行设计的前提下，本文所提出的模型对于每个单独的任务仍然可以获得与专门定制化的baseline相比，依然具有一定的可比性(即使输入图像的尺寸更小)。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/seq2seq/" rel="tag"># seq2seq</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/06/13/ViLD/" rel="next" title="ViLD基于CLIP模型的zero-shot目标检测方法">
+                <i class="fa fa-chevron-left"></i> ViLD基于CLIP模型的zero-shot目标检测方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">100</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">49</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Pix2seq"><span class="nav-number">1.</span> <span class="nav-text">Pix2seq</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#主要方法"><span class="nav-number">1.1.</span> <span class="nav-text">主要方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#序列化"><span class="nav-number">1.2.</span> <span class="nav-text">序列化</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实验结果"><span class="nav-number">1.3.</span> <span class="nav-text">实验结果</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PixSeq-v2"><span class="nav-number">2.</span> <span class="nav-text">PixSeq v2</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#主要方法-1"><span class="nav-number">2.1.</span> <span class="nav-text">主要方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#训练"><span class="nav-number">2.2.</span> <span class="nav-text">训练</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#实验结果-1"><span class="nav-number">2.3.</span> <span class="nav-text">实验结果</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

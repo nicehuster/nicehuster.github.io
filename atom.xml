@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://blog.nicehuster.cn/"/>
-  <updated>2022-06-15T03:23:56.100Z</updated>
+  <updated>2022-07-19T02:46:10.103Z</updated>
   <id>https://blog.nicehuster.cn/</id>
   
   <author>
@@ -15,6 +15,28 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>pix2seq方法详解</title>
+    <link href="https://blog.nicehuster.cn/2022/07/18/pix2seq/"/>
+    <id>https://blog.nicehuster.cn/2022/07/18/pix2seq/</id>
+    <published>2022-07-18T11:13:39.000Z</published>
+    <updated>2022-07-19T02:46:10.103Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文分享seq2seq learning相关的两篇论文，单位是google brain，一作均为Ting Chen（自监督学习方法SimCLR的作者），论文地址：<a href="https://arxiv.org/pdf/2109.10852.pdf" target="_blank" rel="noopener">pix2seq: A Language Modeling Framework for Object Detection</a>,[ICLR2022接收]；<a href="https://arxiv.org/pdf/2206.07669.pdf" target="_blank" rel="noopener">A Unified Sequence Interface for Vision Tasks</a>,[上星期挂arxiv]，后者是对前者在多个视觉任务上的拓展。下面大致的介绍一下两篇论文的具体工作。</p><a id="more"></a><p><img src="/img/image-20220718111615345.png" alt="image-20220718111615345"></p><h3 id="Pix2seq"><a href="#Pix2seq" class="headerlink" title="Pix2seq"></a>Pix2seq</h3><h4 id="主要方法"><a href="#主要方法" class="headerlink" title="主要方法"></a>主要方法</h4><p>pix2seq将目标检测任务转换为语言建模来处理，以往目标检测任务基于属性进行预测，通常会分为分类预测+回归预测。而该方法是通过将object的类别和box信息构造成序列，对序列进行预测。pix2seq的结构和学习过程由四个部分组成，如下图所示：</p><p><img src="/img/image-20220718112047122.png" alt="image-20220718112047122"></p><p>Pix2seq主要包含四部分：</p><blockquote><ol><li>Image augmentation：图像数据增强，包括random scale+crops;</li><li>Sequence construction &amp; augmentation：构造序列和序列增强，将bbox和label转换为离散的token;</li><li>Architecture：使用encoder-decoder结构将输入图像pixel转换为序列；</li><li>Objective/loss function：常用的softmax 交叉熵损失；</li></ol></blockquote><h4 id="序列化"><a href="#序列化" class="headerlink" title="序列化"></a>序列化</h4><p><img src="/img/image-20220718112842096.png" alt="image-20220718112842096"></p><p>这里详细介绍一下box+cls序列化方法，为了和自然语言对齐，它把坐标框（4个值）和类别（1）都拼成一个序列，意味着100个目标对应着长度为500的序列。因为坐标是连续值，作者这里用了一个分桶的机制，把坐标分到n个桶里(bin)，就构成了离散值。具体地，一个目标被表示为一个由五个离散的[token]组成的序列，即[ymin, xmin, ymax, xmax, c]，其中每个连续的角坐标被均匀地离散为[1, nbins]之间的一个整数，c是类索引。我们对所有标记使用共享词汇表，因此词汇量大小等于 bin 数+类别数。对于600x600的图片而言，使用600个bin就可以实现零量化误差，其实整个离散值的范围比起nlp里的字典而言，还是非常非常小的。</p><h4 id="实验结果"><a href="#实验结果" class="headerlink" title="实验结果"></a>实验结果</h4><p>在构建好序列之后，使用Resnet + 6层transformer encoder + 6层transformer decoder对输入图像进行序列化，然后使用交叉熵计算损失。作者分别在train from scratch和finetune两种setting下进行了一些实验对比。</p><p><img src="/img/image-20220718211018875.png" alt="image-20220718211018875"></p><p>从上面结果来看，相比较而言，在指标上优势并不明显，但足矣证明本文的idea是可行的。在train from scratch的setting下，pix2seq是训练了300epoch，表格上之所以并没表明对比方法训练的epoch数，可能这正是pix2seq的一个缺点，训练收敛慢。</p><h3 id="PixSeq-v2"><a href="#PixSeq-v2" class="headerlink" title="PixSeq v2"></a>PixSeq v2</h3><h4 id="主要方法-1"><a href="#主要方法-1" class="headerlink" title="主要方法"></a>主要方法</h4><p>Pixseq v2是上周Ting Chen挂在arxiv的对pix2seq在多个视觉任务上拓展的一个工作，总的来说，作者并没有对模型层面做进一步改进，但对不同视觉task的输入输出接口做了统一。如下图所示，</p><p><img src="/img/image-20220719094051172.png" alt="image-20220719094051172"></p><p>以往的视觉任务比如，目标检测、实例分割、关键点检测和图像描述等任务都是单独设计不同模型、不同输入、不同损失函数来解决，而本文将每个任务的输出形式化为具有一个统一接口的一个离散的token序列，可以做到在所有这些任务上仅训练一个具有单一模型结构和损失函数的神经网络，而不需要针对特定任务进行模型结构或损失函数的定制。为了解决一个特定的任务，本文使用一个简短的prompt作为该任务的描述，网络的输出序列适应于该prompt，因此模型能够产生特定于任务的输出。</p><blockquote><ol><li>对于目标检测任务，遵循pix2seq做法，通过量化连续图像坐标，将box和cls转换为一系列离散token;</li><li>对于实例分割任务，以图像坐标序列形式预测polygon，与检测任务一样，对坐标进行量化离散为token；</li><li>对于关键点预测任务，给定一个人体实例，将关键点预测为一个量化的图像坐标序列；</li><li>对于图像描述，直接预测文本token。</li></ol></blockquote><p><img src="/img/image-20220719094807354.png" alt="image-20220719094807354"></p><p>值得注意的是，所有四个任务都使用同一个词汇表。 具体的prompt和输出序列如上图所示</p><h4 id="训练"><a href="#训练" class="headerlink" title="训练"></a>训练</h4><p>每个任务都有自己的成对图像序列训练数据。有两种方法可以将任务结合起来进行联合训练。作者提出了data mixing和batch mixing两种数据混合方式。</p><p><img src="/img/image-20220719095713926.png" alt="image-20220719095713926"></p><p>data mixing在概念上简单，但是因为数据格式不同，图像增强很难合并比较麻烦，相比较而言，batch mixing对单个任务采样图像后进行相应增强后转换为图像-序列对，模型分别计算每个任务的损失和梯度。作者认为可以将特定任务的每一批数据的梯度以适当的形式加权组合起来。</p><p><img src="/img/image-20220719100348972.png" alt="image-20220719100348972"></p><p>在损失函数上，与pix2seq一样，训练目标是最大化基于图像的token和之前的token的似然性。</p><script type="math/tex; mode=display">\operatorname{maximize} \sum_{j=1}^{L} \boldsymbol{w}_{j} \log P\left(\boldsymbol{y}_{j} \mid \boldsymbol{x}, \boldsymbol{y}_{1: j-1}\right)</script><p>其中，x表示输入图像，y是长度为L的编码序列(监督信号)，序列y的初始部分是一个prompt，为此作者将权重wi设置为零，损失计算时不包括该部分。</p><h4 id="实验结果-1"><a href="#实验结果-1" class="headerlink" title="实验结果"></a>实验结果</h4><p><img src="/img/image-20220719103500099.png" alt="image-20220719103500099"></p><p>从上述表格可以看出，在模型结构和损失函数都没有针对特定任务进行设计的前提下，本文所提出的模型对于每个单独的任务仍然可以获得与专门定制化的baseline相比，依然具有一定的可比性(即使输入图像的尺寸更小)。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文分享seq2seq learning相关的两篇论文，单位是google brain，一作均为Ting Chen（自监督学习方法SimCLR的作者），论文地址：&lt;a href=&quot;https://arxiv.org/pdf/2109.10852.pdf&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;pix2seq: A Language Modeling Framework for Object Detection&lt;/a&gt;,[ICLR2022接收]；&lt;a href=&quot;https://arxiv.org/pdf/2206.07669.pdf&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;A Unified Sequence Interface for Vision Tasks&lt;/a&gt;,[上星期挂arxiv]，后者是对前者在多个视觉任务上的拓展。下面大致的介绍一下两篇论文的具体工作。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
+    
+    
+      <category term="seq2seq" scheme="https://blog.nicehuster.cn/tags/seq2seq/"/>
+    
+  </entry>
   
   <entry>
     <title>ViLD基于CLIP模型的zero-shot目标检测方法</title>
@@ -101,6 +123,28 @@
     
     
       <category term="multi-model" scheme="https://blog.nicehuster.cn/tags/multi-model/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Diffusion Model详解</title>
+    <link href="https://blog.nicehuster.cn/2022/06/03/Diffusion/"/>
+    <id>https://blog.nicehuster.cn/2022/06/03/Diffusion/</id>
+    <published>2022-06-03T11:13:39.000Z</published>
+    <updated>2022-07-05T01:16:08.179Z</updated>
+    
+    <content type="html"><![CDATA[<p>扩散模型(Diffusion Model)是一种新的图像生成范式，有着与其他生成方法比如GAN、VAE以及Flow-based models不同而且有意思的特性。最近也有许多基于diffusion model的图像生成方法涌现出来，比如DALLE2、Imagen、GLIDE，    CogView1&amp;2，本文主要依据<a href="https://lilianweng.github.io/" target="_blank" rel="noopener">Lil’Log</a> 的博客进行翻译整理，方便学习记录。可以先看一下基于diffusion model的一些下游方法基于text-to-image图像生成结果。<br><a id="more"></a></p><h3 id="图像生成-text2image"><a href="#图像生成-text2image" class="headerlink" title="图像生成(text2image)"></a>图像生成(text2image)</h3><p>上面各类基于diffusion模型生成的图片都非常真实，而且有些生成出来的风格画很有意境。接下来就开始介绍diffusion model，在介绍diffusion model之前首先看一下各类生成模型的对比：</p><p><img src="https://lilianweng.github.io/posts/2021-07-11-diffusion-models/generative-overview.png" alt></p><p>上图对比了GAN，VAE、以及基于Flow的模型，它们在生成高质量样本方面显示出巨大的成功，但每一种都有其自身的一些局限性。GAN模型由于其对抗性训练的性质，以潜在的不稳定的训练和较少的生成多样性而闻名。VAE依赖于代用损失。基于Flow的模型必须使用专门的架构来构建可逆变换。</p><h3 id="什么是Diffusion-Models"><a href="#什么是Diffusion-Models" class="headerlink" title="什么是Diffusion Models?"></a>什么是Diffusion Models?</h3><p><img src="https://lilianweng.github.io/posts/2021-07-11-diffusion-models/DDPM.png" alt></p><p>如图所示，diffusion model通常包含俩个过程，从信号到噪声的正向过程/扩散过程(forward/diffusion process)以及从噪声逐步到信号的逆向/重建过程(reverse process)，这里主要介绍Google 的DDPM(Denoising Diffusion Probabilistic Model)，近些面出来的基于diffusion model的方法大都是基于DDPM的框架所设计。</p><h4 id="正向-扩散过程"><a href="#正向-扩散过程" class="headerlink" title="正向/扩散过程"></a>正向/扩散过程</h4><p>正向过程采用的是一个固定的Markov chain形式(每个时刻$t$只与$t-1$时刻有关)，即逐步地向图片中添加高斯噪声的过程：</p><script type="math/tex; mode=display">q\left(x_{t} \mid x_{t-1}\right)=\mathcal{N}\left(x_{t} ; \sqrt{1-\beta_{t}} x_{t-1}, \beta_{t} \mathbf{I}\right), q\left(x_{1: T} \mid x_{0}\right)=\prod_{t=1}^{T} q\left(x_{t} \mid x_{t-1}\right)</script><p>上面公式表示的是，$x_t$ 采样自 $x_{t-1}$并服从高斯分布$N(\sqrt{1-\beta_{t}},\beta_{t})$，在这个过程中随着$t$的增大，$x_t$ 越来越接近纯噪声，当$T \rightarrow \infty$ ，$x_T$ 是完全的高斯噪声(isotropic Gaussian distribution)。在实际应用中$\beta_{t}$是随着t增大而递增的，在DDPM中，$\beta_{t}$是预先设置的常量参数。在介绍diffusion的实现和推导过程中需要了解俩个重要特性：</p><blockquote><p><strong>特性1：重参数技巧（re-parameterization trick）</strong></p><p>如果我们要从某个分布中随机采样(高斯分布)一个样本，这个过程是无法反传梯度的。而这个通过高斯噪声采样得到$x_t$的过程在diffusion中到处都是，因此我们需要通过重参数技巧来使得他可微。最通常的做法是把随机性通过一个独立的随机变量$\epsilon$引导过去。举个例子，如果要从高斯分布$z \sim \mathcal{N}\left(z ; \mu_{\theta}, \sigma_{\theta}^{2} \mathbf{I}\right)$采样一个z，我们可以写成:$z=\mu_{\theta}+\sigma_{\theta} \odot \epsilon, \epsilon \sim \mathcal{N}(0, \mathbf{I})$；</p><p>上式的z依旧是有随机性的， 且满足均值$\mu_{\theta}$为方差为$\sigma_{\theta}^{2}$的高斯分布。这里的($\mu_{\theta}$,$\sigma_{\theta}^{2}$)可以是由参数 $\theta$ 的神经网络推断得到的。整个“采样”过程依旧梯度可导，随机性被转嫁到了$\epsilon$上。</p><p><strong>特性2：任意时刻的$x_t$可以有$x_0$和$\beta$ 表示</strong></p><p>将$\alpha_{t}=1-\beta_{t}$以及$\bar{\alpha}_{t}=\prod_{t=1}^{T} \alpha_{t}$ ，则可以得到：$q\left(x_{t} \mid x_{0}\right):=\mathcal{N}\left(x_{t} ; \sqrt{\bar{\alpha}_{t}} x_{0},\left(1-\bar{\alpha}_{t}\right) \boldsymbol{I}\right)$</p><p>该公式意味着我们可以直接获得任意程度的加噪图片，方便后续的训练。</p></blockquote><p>扩散过程有一个重要的特性是，可以直接采样任意时刻t下的加噪结果$x_t$。</p><p><a href="https://zhuanlan.zhihu.com/p/525106459" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/525106459</a></p><p><a href="https://zhuanlan.zhihu.com/p/449284962" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/449284962</a></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;扩散模型(Diffusion Model)是一种新的图像生成范式，有着与其他生成方法比如GAN、VAE以及Flow-based models不同而且有意思的特性。最近也有许多基于diffusion model的图像生成方法涌现出来，比如DALLE2、Imagen、GLIDE，    CogView1&amp;amp;2，本文主要依据&lt;a href=&quot;https://lilianweng.github.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Lil’Log&lt;/a&gt; 的博客进行翻译整理，方便学习记录。可以先看一下基于diffusion model的一些下游方法基于text-to-image图像生成结果。&lt;br&gt;
+    
+    </summary>
+    
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
+    
+    
+      <category term="Diffusion" scheme="https://blog.nicehuster.cn/tags/Diffusion/"/>
     
   </entry>
   
@@ -421,53 +465,6 @@
     
     
       <category term="self-supervised learning" scheme="https://blog.nicehuster.cn/tags/self-supervised-learning/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>长尾目标检测-Seesaw Loss[转载]</title>
-    <link href="https://blog.nicehuster.cn/2021/05/30/seesaw-loss/"/>
-    <id>https://blog.nicehuster.cn/2021/05/30/seesaw-loss/</id>
-    <published>2021-05-30T11:13:39.000Z</published>
-    <updated>2022-04-22T09:06:44.000Z</updated>
-    
-    <content type="html"><![CDATA[<p><strong>论文信息：</strong> <a href="https://arxiv.org/abs/2008.10032" target="_blank" rel="noopener">Seesaw Loss for Long-Tailed Instance Segmentation</a><br><strong>代码链接：</strong><a href="https://github.com/open-mmlab/mmdetection/tree/master/configs/seesaw_loss" target="_blank" rel="noopener">https://github.com/open-mmlab/mmdetection/tree/master/configs/seesaw_loss</a><br><strong>整体信息：</strong>这是 MMDet 团队参加 LVIS 2020 竞赛获得rank1时提出地损失函数，这篇文章指出了限制检测器在长尾分布数据上性能的一个关键原因：施加在尾部类别（tail class上的<strong>正负样本梯度的比例</strong>是不均衡的。因此，我们提出 <strong>Seesaw Loss</strong> <strong>来动态地抑制尾部类别上过量的负样本梯度，同时补充对误分类样本的惩罚</strong>。 Seesaw Loss 显著提升了尾部类别的分类准确率，进而为检测器在长尾数据集上的整体性能带来可观的增益。由于原作在<a href="https://zhuanlan.zhihu.com/p/339126633" target="_blank" rel="noopener">知乎</a>上已有讲解，我就不班门弄斧，直接搬运过来，侵权删。</p><a id="more"></a><h2 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h2><p>在长尾分布的数据集中（例如：LVIS），大部分训练样本来自头部类别（head class），而只有少量样本来自尾部类别（tail class）。因此在训练过程中，来自头部类别的样本会对尾部类别施加过量的负样本梯度，淹没了来自尾部类别自身的正样本梯度。这种不平衡的学习过程导致分类器倾向于给予尾部类别很低的响应，以降低训练的loss。如下图所示，我们统计了在 LVIS v1.0 上训练Mask R-CNN过程中，施加在每个类别的分类器上正负样本累计梯度的分布。</p><p><img src="/img/seesaw-distribution.png" alt="img"></p><p>显然，头部类别获得的正负样本梯度比例接近1.0，而越是稀有的尾部类别，其获得的正负样本梯度的比例就越小。由此带来的结果就是分类的准确率随着样本数的减少而急剧下降，进而严重影响了检测器的性能。</p><h3 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h3><p>为了方便直观理解，我们可以把正负样本梯度不均衡的问题，类比于一个一边放有较重物体而另一边放有较轻物体的跷跷板（Seesaw），如下图所示。为了平衡这个跷跷板，一个简单可行的方案就是缩短重物一侧跷跷板的臂长，即减少重物的重量在平衡过程中的权重。回到正负样本梯度不均衡的问题，我们提出了 Seesaw Loss 来动态地减少由头部类别施加在尾部类别上过量的负样本梯度的权重，从而达到正负样本梯度相对平衡的效果。</p><p><img src="/img/seesaw-ce.png" alt="img"></p><p>Seesaw Loss的数学表达如下，</p><script type="math/tex; mode=display">\begin{aligned}&L_{\text {seesaw }}(\mathbf{z})=-\sum_{i=1}^{C} y_{i} \log \left(\widehat{\sigma}_{i}\right) \\&\text { with } \widehat{\sigma}_{i}=\frac{e^{z_{i}}}{\sum_{j \neq i}^{C} \mathcal{S}_{i j} e^{z_{j}}+e^{z_{i}}}\end{aligned}</script><p>$y_{i} \in\{0,1\}$ 是one-hot label, $\mathbf{z}=\left[z_{1}, z_{2}, \ldots, z_{C}\right]$ ,是每一类预测的 logit。此时，对于一个第 i类的样本，它施加在第 j类上的负样本梯度为</p><script type="math/tex; mode=display">\frac{\partial L_{\text {seesaw }}(\mathbf{z})}{\partial z_{j}}=\mathcal{S}_{i j} \frac{e^{z_{j}}}{e^{z_{i}}} \widehat{\sigma}_{i}</script><p>这里我们可以发现 $S_{ij}$就像一个平衡系数，通过调节 $S_{ij}$，我们可以达到放大或者缩小第 i类施加在第 j 类上的负样本梯度的效果。这样，我们就可以通过选择合适 $S_{ij}$来达到平衡正负样本梯度的目的。</p><p>在 Seesaw Loss 的设计中，我们考虑了两方面的因素，一方面我们需要考虑类别间样本分布的关系（class-wise），并据此减少头部类别对尾部类别的”惩罚” （负样本梯度）；另一方面，盲目减少对尾部类别的惩罚会增加错误分类的风险，因为部分误分类的样本受到的惩罚变小了，因此对于那些在训练过程中误分类的样本我们需要保证其受到足够的”惩罚”。据此， $S_{ij}$由两项相乘得到，</p><script type="math/tex; mode=display">\mathcal{S}_{i j}=\mathcal{M}_{i j} \cdot \mathcal{C}_{i j}</script><p>$M_{ij}$ <strong>（Mitigation Factor）</strong>用来缓解尾部类别上过量的负样本梯度, $C_{ij}$ (<strong>Compensation Factor）</strong>用来补充那些错误分类样本上的”惩罚”。</p><h4 id="1-Mitigation-Factor"><a href="#1-Mitigation-Factor" class="headerlink" title="1. Mitigation Factor"></a>1. Mitigation Factor</h4><p><img src="/img/seesaw-mitigation.png" alt="img"></p><p>既然正负样本梯度不平衡的问题来自于样本数量的不平衡，那么一种直接有效的办法就是根据不同类别之间样本数量的相对比例来进行调节。在训练过程中，Seesaw Loss在线地统计每一类的累计训练样本数量 $N_{ij}$ 并根据如下公式计算$M_{ij}$ ,</p><script type="math/tex; mode=display">\mathcal{M}_{i j}=\left\{\begin{array}{cc}1, & \text { if } N_{i} \leq N_{j} \\\left(\frac{N_{j}}{N_{i}}\right)^{p}, & \text { if } N_{i}>N_{j}\end{array}\right.</script><p>也就是说当第 i类比第j类出现地 就会自动根据两类之间不平衡的程度来减少第 i类对第j类施加的负样本梯度。此外，我们在线地累计样本数量，而非使用预先统计的数据集样本分布，这样的设计主要是因为一些高级的样本 sampling 方式会改变数据集的分布（例如：repeat factor sampler, class balanced sampler 等)。在这种情况下，预先统计的方式无法反映训练过程中数据的真实分布。</p><h4 id="2-Compensation-Factor"><a href="#2-Compensation-Factor" class="headerlink" title="2. Compensation Factor"></a>2. Compensation Factor</h4><p><img src="/img/seesaw-compensation.png" alt="img"></p><p>为了防止过度减少负样本梯度而带来的分类错误，Seesaw Loss会增加对那些错误分类样本的惩罚。具体来说，如果一个第i 类的样本错误分给了第 j类，Seesaw Loss会根据两类之间的分类置信度的相对比值来适当的增加对第 j类的惩罚。$C_{ij}$的计算如下，</p><script type="math/tex; mode=display">\mathcal{C}_{i j}=\left\{\begin{array}{cc}1, & \text { if } \sigma_{j} \leq \sigma_{i} \\\left(\frac{\sigma_{j}}{\sigma_{i}}\right)^{q}, & \text { if } \sigma_{j}>\sigma_{i}\end{array}\right.</script><h4 id="3-Normalized-Linear-Activation"><a href="#3-Normalized-Linear-Activation" class="headerlink" title="3. Normalized Linear Activation"></a>3. Normalized Linear Activation</h4><p>受到face recognition，few-shot learning等领域的启发，Seesaw Loss在预测分类logit的时候对weight和feature进行了归一化处理，即</p><script type="math/tex; mode=display">\begin{gathered}z=\tau \widetilde{\mathcal{W}}^{T} \tilde{x}+b \\\widetilde{\mathcal{W}}_{i}=\frac{\mathcal{W}_{i}}{\left\|\mathcal{W}_{i}\right\|_{2}}, i \in C, \tilde{x}=\frac{x}{\|x\|_{2}}\end{gathered}</script><h3 id="实验"><a href="#实验" class="headerlink" title="实验"></a>实验</h3><p><img src="/img/seesaw-exp.png" alt="img"></p><p>Seesaw相比于 EQL 和 BAGS 两种专门为 LVIS 数据设计的方法取得了显著的性能优势，在 end-to-end 训练的情况下在 test-dev 上取得高达30.0 AP的精度。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;&lt;strong&gt;论文信息：&lt;/strong&gt; &lt;a href=&quot;https://arxiv.org/abs/2008.10032&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Seesaw Loss for Long-Tailed Instance Segmentation&lt;/a&gt;&lt;br&gt;&lt;strong&gt;代码链接：&lt;/strong&gt;&lt;a href=&quot;https://github.com/open-mmlab/mmdetection/tree/master/configs/seesaw_loss&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://github.com/open-mmlab/mmdetection/tree/master/configs/seesaw_loss&lt;/a&gt;&lt;br&gt;&lt;strong&gt;整体信息：&lt;/strong&gt;这是 MMDet 团队参加 LVIS 2020 竞赛获得rank1时提出地损失函数，这篇文章指出了限制检测器在长尾分布数据上性能的一个关键原因：施加在尾部类别（tail class上的&lt;strong&gt;正负样本梯度的比例&lt;/strong&gt;是不均衡的。因此，我们提出 &lt;strong&gt;Seesaw Loss&lt;/strong&gt; &lt;strong&gt;来动态地抑制尾部类别上过量的负样本梯度，同时补充对误分类样本的惩罚&lt;/strong&gt;。 Seesaw Loss 显著提升了尾部类别的分类准确率，进而为检测器在长尾数据集上的整体性能带来可观的增益。由于原作在&lt;a href=&quot;https://zhuanlan.zhihu.com/p/339126633&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;知乎&lt;/a&gt;上已有讲解，我就不班门弄斧，直接搬运过来，侵权删。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
-    
-    
-      <category term="Long-tailed object detection" scheme="https://blog.nicehuster.cn/tags/Long-tailed-object-detection/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>VFNet高性能的密集目标检测器</title>
-    <link href="https://blog.nicehuster.cn/2021/04/12/vfnet/"/>
-    <id>https://blog.nicehuster.cn/2021/04/12/vfnet/</id>
-    <published>2021-04-12T11:13:39.000Z</published>
-    <updated>2022-04-12T04:03:06.000Z</updated>
-    
-    <content type="html"><![CDATA[<p><strong>论文信息：</strong> <a href="https://openaccess.thecvf.com/content/CVPR2021/papers/Zhang_VarifocalNet_An_IoU-Aware_Dense_Object_Detector_CVPR_2021_paper.pdf" target="_blank" rel="noopener">VarifocalNet  An IoU-aware Dense Object Detector</a><br><strong>代码链接：</strong><a href="https://github.com/hyz-xmaster/VarifocalNet" target="_blank" rel="noopener">https://github.com/hyz-xmaster/VarifocalNet</a></p><p><img src="/img/vfnet.png" alt="vfnet"></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;&lt;strong&gt;论文信息：&lt;/strong&gt; &lt;a href=&quot;https://openaccess.thecvf.com/content/CVPR2021/papers/Zhang_VarifocalNet_An_IoU-Aware_Dense_Object_Detect
-      
-    
-    </summary>
-    
-      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
-    
-    
-      <category term="detection" scheme="https://blog.nicehuster.cn/tags/detection/"/>
     
   </entry>
   

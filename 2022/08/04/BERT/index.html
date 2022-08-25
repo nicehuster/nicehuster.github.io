@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="bert,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="最近在做一些图文理解相关的工作，顺带了解了一下BERT，自BERT（Bidirectional Encoder Representations from Transformer）出现后，NLP界开启了一个全新的范式。本文主要介绍BERT的原理，以及如何使用HuggingFace提供的 transformers 库完成基于BERT的微调任务。">
+<meta name="keywords" content="bert">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BERT原理详解与HuggingFace使用[转载]">
+<meta property="og:url" content="https://blog.nicehuster.cn/2022/08/04/BERT/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="最近在做一些图文理解相关的工作，顺带了解了一下BERT，自BERT（Bidirectional Encoder Representations from Transformer）出现后，NLP界开启了一个全新的范式。本文主要介绍BERT的原理，以及如何使用HuggingFace提供的 transformers 库完成基于BERT的微调任务。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://aixingqiu-1258949597.cos.ap-beijing.myqcloud.com/2021-12-18-pretrain.png">
+<meta property="og:image" content="http://aixingqiu-1258949597.cos.ap-beijing.myqcloud.com/2021-12-18-single-classification.jpeg">
+<meta property="og:image" content="http://aixingqiu-1258949597.cos.ap-beijing.myqcloud.com/2021-12-18-pair-classification.jpeg">
+<meta property="og:image" content="http://aixingqiu-1258949597.cos.ap-beijing.myqcloud.com/2021-12-18-seq-tagging.jpeg">
+<meta property="og:image" content="http://aixingqiu-1258949597.cos.ap-beijing.myqcloud.com/2021-12-18-transformer-encoder.jpeg">
+<meta property="og:updated_time" content="2022-08-25T07:35:29.745Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BERT原理详解与HuggingFace使用[转载]">
+<meta name="twitter:description" content="最近在做一些图文理解相关的工作，顺带了解了一下BERT，自BERT（Bidirectional Encoder Representations from Transformer）出现后，NLP界开启了一个全新的范式。本文主要介绍BERT的原理，以及如何使用HuggingFace提供的 transformers 库完成基于BERT的微调任务。">
+<meta name="twitter:image" content="http://aixingqiu-1258949597.cos.ap-beijing.myqcloud.com/2021-12-18-pretrain.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2022/08/04/BERT/">
+
+
+
+
+
+  <title>BERT原理详解与HuggingFace使用[转载] | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2022/08/04/BERT/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">BERT原理详解与HuggingFace使用[转载]</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-08-04T19:13:39+08:00">
+                2022-08-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近在做一些图文理解相关的工作，顺带了解了一下BERT，自BERT（Bidirectional Encoder Representations from Transformer）出现后，NLP界开启了一个全新的范式。本文主要介绍BERT的原理，以及如何使用HuggingFace提供的 <code>transformers</code> 库完成基于BERT的微调任务。</p>
+<a id="more"></a>
+<h4 id="预训练"><a href="#预训练" class="headerlink" title="预训练"></a>预训练</h4><p>BERT在一个较大的语料上进行预训练（Pre-train）。预训练主要是在数据和算力充足的条件下，训练一个大模型，在其他任务上可以利用预训练好的模型进行微调（Fine-tune）。</p>
+<h4 id="训练目标"><a href="#训练目标" class="headerlink" title="训练目标"></a>训练目标</h4><p>BERT使用了维基百科等语料库数据，共几十GB，这是一个庞大的语料库。对于一个GB级的语料库，雇佣人力进行标注成本极高。BERT使用了两个巧妙方法来无监督地训练模型：<strong>Masked Language Modeling</strong>和<strong>Next Sentence Prediction</strong>。这两个方法可以无需花费时间和人力标注数据，以较低成本无监督地得到训练数据。图1就是一个输入输出样例。</p>
+<p>对于Masked Language Modeling，给定一些输入句子（图1中最下面的输入层），BERT将输入句子中的一些单词盖住（图1中Masked层），经过中间的词向量和BERT层后，BERT的目标是让模型能够预测那些刚刚被盖住的词。还记得英语考试中，我们经常遇到“完形填空”题型吗？能把完形填空做对，说明已经理解了文章背后的语言逻辑。BERT的Masked Language Modeling本质上就是在做“完形填空”：预训练时，先将一部分词随机地盖住，经过模型的拟合，如果能够很好地预测那些盖住的词，模型就学到了文本的内在逻辑。</p>
+<p><img src="http://aixingqiu-1258949597.cos.ap-beijing.myqcloud.com/2021-12-18-pretrain.png" alt="img">图1 BERT预训练的输入和输出</p>
+<p>除了“完形填空”，BERT还需要做Next Sentence Prediction任务：预测句子B是否为句子A的下一句。Next Sentence Prediction有点像英语考试中的“段落排序”题，只不过简化到只考虑两句话。如果模型无法正确地基于当前句子预测Next Sentence，而是生硬地把两个不相关的句子拼到一起，两个句子在语义上是毫不相关的，说明模型没有读懂文本背后的意思。</p>
+<h4 id="词向量"><a href="#词向量" class="headerlink" title="词向量"></a>词向量</h4><p>在基于深度学习的NLP方法中，文本中的词通常都用一维向量来表示。某两个词向量的 Cosine 距离较小，说明两个词在语义上相似。</p>
+<p>信息</p>
+<p>词向量一般由Token转换而成。英文中，一个句子中的词由空格、句号等标点隔开，我们很容易从句子中获得词。英文的词通常有前缀、后缀、词根等，在获得英文的词后，还需要抽出词根，比如图1所展示的，将“playing”切分为“play”和“##ing”。如果不对英文词进行类似词根抽取，词表过大，不容易拟合。对于英文，“play”和“##ing”分别对应两个Token。</p>
+<p>中文一般由多个字组成一个词，传统的中文文本任务通常使用一些分词工具，得到严格意义上的词。在原始的BERT中，对于中文，并没有使用分词工具，而是直接以字为粒度得到词向量的。所以，原始的中文BERT（bert-base-chinese）输入到BERT模型的是字向量，Token就是字。后续有专门的研究去探讨，是否应该对中文进行必要的分词，以词的形式进行切分，得到向量放入BERT模型。</p>
+<p>为了方面说明，本文不明确区分字向量还是词向量，都统称为词向量。</p>
+<p>我们首先需要将文本中每个Token都转换成一维词向量。假如词向量的维度为<code>hidden_size</code>，句子的Token长度为<code>seq_len</code>，或者说句子共包含<code>seq_len</code>个Token，那么上图中，输入就是<code>seq_len * hidden_size</code>。再加上<code>batch_size</code>，那么输入就是<code>batch_size * seq_len * hidden_size</code>。上图只展示了一个样本，未体现出<code>batch_size</code>，或者可以理解成<code>batch_size = 1</code>，即每次只处理一条文本。</p>
+<p>词向量经过BERT模型一系列复杂的转换后，模型最后仍然以词向量的形式输出，用以对文本进行语义表示。输入的词向量是<code>seq_len * hidden_size</code>，句子共<code>seq_len</code>个Token，将每个Token都转换成词向量，送入BERT模型。经过BERT模型后，得到的输出仍然是<code>seq_len * hidden_size</code>维度。输出仍然是<code>seq_len</code>的长度，其中输出的<code>i</code> 个位置（0 &lt; <code>i</code> &lt; <code>seq_len</code>）的词向量，表示经过了拟合后的第<code>i</code>个Token的语义表示。后续可以用输出中每个位置的词向量来进行一些其他任务，比如命名实体识别等。</p>
+<p>除了使用Masked方法故意盖住一些词外，BERT还加了一些特殊的符号：<code>[CLS]</code>和<code>[SEP]</code>。<code>[CLS]</code>用在句首，是句子序列中<code>i = 0</code>位置的Token。BERT认为输出序列的<code>i = 0</code>位置的Token对应的词向量包含了整个句子的信息，可对整个句子进行分类。<code>[SEP]</code>用在分割前后两个句子上。</p>
+<h4 id="微调"><a href="#微调" class="headerlink" title="微调"></a>微调</h4><p>经过预训练后，得到的模型可以用来微调各类任务。</p>
+<ul>
+<li>单文本分类任务。刚才提到，BERT模型在文本前插入一个<code>[CLS]</code>符号，并将该符号对应的输出向量作为整篇文本的语义表示，用于文本分类，如图2所示。对于<code>[CLS]</code>符号，可以理解为：与文本中已有的其它字/词相比，这个无明显语义信息的符号会更“公平”地融合文本中各个字/词的语义信息。</li>
+</ul>
+<p><img src="http://aixingqiu-1258949597.cos.ap-beijing.myqcloud.com/2021-12-18-single-classification.jpeg" alt="img">图2 单文本分类</p>
+<ul>
+<li>语句对分类任务。语句对分类任务的实际应用场景包括：问答（判断一个问题与一个答案是否匹配）、语句匹配（两句话是否表达同一个意思）等。对于该任务，BERT模型除了添加<code>[CLS]</code>符号并将对应的输出作为文本的语义表示，输入两句话之间用<code>[SEP]</code>符号作分割。</li>
+</ul>
+<p><img src="http://aixingqiu-1258949597.cos.ap-beijing.myqcloud.com/2021-12-18-pair-classification.jpeg" alt="img">图3 语句对分类</p>
+<ul>
+<li>序列标注任务。序列标注任务的实际应用场景包括：命名实体识别、中文分词、新词发现（标注每个字是词的首字、中间字或末字）、答案抽取（答案的起止位置）等。对于该任务，BERT模型利用文本中每个Token对应的输出向量对该Token进行标注（分类），如下图所示(B（Begin）、I（Inside）、E（End）分别表示一个词的第一个字、中间字和最后一个字)。</li>
+</ul>
+<p><img src="http://aixingqiu-1258949597.cos.ap-beijing.myqcloud.com/2021-12-18-seq-tagging.jpeg" alt="img">图4 序列标注</p>
+<h4 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h4><p>Transformer是BERT的核心模块，Attention注意力机制又是Transformer中最关键的部分。BERT用到的主要是Transformer的Encoder，没有使用Transformer Decoder。把多个Transformer Encoder组装起来，就构成了BERT。在论文中，作者分别用12个和24个Transformer Encoder组装了两套BERT模型，两套模型的参数总数分别为110M和340M。</p>
+<p><img src="http://aixingqiu-1258949597.cos.ap-beijing.myqcloud.com/2021-12-18-transformer-encoder.jpeg" alt="img"></p>
+<h4 id="HuggingFace-Transformers"><a href="#HuggingFace-Transformers" class="headerlink" title="HuggingFace Transformers"></a>HuggingFace Transformers</h4><p>使用BERT和其他各类Transformer模型，绕不开<a href="https://huggingface.co/" target="_blank" rel="noopener">HuggingFace</a>提供的Transformers生态。HuggingFace提供了各类BERT的API（<code>transformers</code>库）、训练好的模型（HuggingFace Hub）还有数据集（<code>datasets</code>）。最初，HuggingFace用PyTorch实现了BERT，并提供了预训练的模型，后来。越来越多的人直接使用HuggingFace提供好的模型进行微调，将自己的模型共享到HuggingFace社区。HuggingFace的社区越来越庞大，不仅覆盖了PyTorch版，还提供TensorFlow版，主流的预训练模型都会提交到HuggingFace社区，供其他人使用。</p>
+<p>使用<code>transformers</code>库进行微调，主要包括：</p>
+<ul>
+<li>Tokenizer：使用提供好的Tokenizer对原始文本处理，得到Token序列；</li>
+<li>构建模型：在提供好的模型结构上，增加下游任务所需预测接口，构建所需模型；</li>
+<li>微调：将Token序列送入构建的模型，进行训练。</li>
+</ul>
+<h4 id="Tokenizer"><a href="#Tokenizer" class="headerlink" title="Tokenizer"></a>Tokenizer</h4><p>下面两行代码会创建 <code>BertTokenizer</code>，并将所需的词表加载进来。首次使用这个模型时，<code>transformers</code> 会帮我们将模型从HuggingFace Hub下载到本地。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> transformers <span class="keyword">import</span> BertTokenizer</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>tokenizer = BertTokenizer.from_pretrained(<span class="string">'bert-base-cased'</span>)</span><br></pre></td></tr></table></figure>
+<p>用得到的<code>tokenizer</code>进行分词：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>encoded_input = tokenizer(<span class="string">"我是一句话"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(encoded_input)</span><br><span class="line">&#123;<span class="string">'input_ids'</span>: [<span class="number">101</span>, <span class="number">2769</span>, <span class="number">3221</span>, <span class="number">671</span>, <span class="number">1368</span>, <span class="number">6413</span>, <span class="number">102</span>], </span><br><span class="line"><span class="string">'token_type_ids'</span>: [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>], </span><br><span class="line"><span class="string">'attention_mask'</span>: [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]&#125;</span><br></pre></td></tr></table></figure>
+<p>得到的一个Python <code>dict</code>。其中，<code>input_ids</code>最容易理解，它表示的是句子中的每个Token在词表中的索引数字。词表（Vocabulary）是一个Token到索引数字的映射。可以使用<code>decode()</code>方法，将索引数字转换为Token。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>tokenizer.decode(encoded_input[<span class="string">"input_ids"</span>])</span><br><span class="line"><span class="string">'[CLS] 我 是 一 句 话 [SEP]'</span></span><br></pre></td></tr></table></figure>
+<p>可以看到，<code>BertTokenizer</code>在给原始文本处理时，自动给文本加上了<code>[CLS]</code>和<code>[SEP]</code>这两个符号，分别对应在词表中的索引数字为101和102。<code>decode()</code>之后，也将这两个符号反向解析出来了。</p>
+<p><code>token_type_ids</code>主要用于句子对，比如下面的例子，两个句子通过<code>[SEP]</code>分割，0表示Token对应的<code>input_ids</code>属于第一个句子，1表示Token对应的<code>input_ids</code>属于第二个句子。不是所有的模型和场景都用得上<code>token_type_ids</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>encoded_input = tokenizer(<span class="string">"您贵姓?"</span>, <span class="string">"免贵姓李"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(encoded_input)</span><br><span class="line">&#123;<span class="string">'input_ids'</span>: [<span class="number">101</span>, <span class="number">2644</span>, <span class="number">6586</span>, <span class="number">1998</span>, <span class="number">136</span>, <span class="number">102</span>, <span class="number">1048</span>, <span class="number">6586</span>, <span class="number">1998</span>, <span class="number">3330</span>, <span class="number">102</span>], </span><br><span class="line"><span class="string">'token_type_ids'</span>: [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>], </span><br><span class="line"><span class="string">'attention_mask'</span>: [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]&#125;</span><br></pre></td></tr></table></figure>
+<p>句子通常是变长的，多个句子组成一个Batch时，<code>attention_mask</code>就起了至关重要的作用。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>batch_sentences = [<span class="string">"我是一句话"</span>, <span class="string">"我是另一句话"</span>, <span class="string">"我是最后一句话"</span>]</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>batch = tokenizer(batch_sentences, padding=<span class="keyword">True</span>, return_tensors=<span class="string">"pt"</span>)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(batch)</span><br><span class="line">&#123;<span class="string">'input_ids'</span>: </span><br><span class="line"> tensor([[ <span class="number">101</span>, <span class="number">2769</span>, <span class="number">3221</span>,  <span class="number">671</span>, <span class="number">1368</span>, <span class="number">6413</span>,  <span class="number">102</span>,    <span class="number">0</span>,    <span class="number">0</span>],</span><br><span class="line">        [ <span class="number">101</span>, <span class="number">2769</span>, <span class="number">3221</span>, <span class="number">1369</span>,  <span class="number">671</span>, <span class="number">1368</span>, <span class="number">6413</span>,  <span class="number">102</span>,    <span class="number">0</span>],</span><br><span class="line">        [ <span class="number">101</span>, <span class="number">2769</span>, <span class="number">3221</span>, <span class="number">3297</span>, <span class="number">1400</span>,  <span class="number">671</span>, <span class="number">1368</span>, <span class="number">6413</span>,  <span class="number">102</span>]]), </span><br><span class="line"> <span class="string">'token_type_ids'</span>: </span><br><span class="line"> tensor([[<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],</span><br><span class="line">        [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>],</span><br><span class="line">        [<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>]]), </span><br><span class="line"> <span class="string">'attention_mask'</span>: </span><br><span class="line"> tensor([[<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>],</span><br><span class="line">        [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">0</span>],</span><br><span class="line">        [<span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>, <span class="number">1</span>]])&#125;</span><br></pre></td></tr></table></figure>
+<p>对于这种<code>batch_size = 3</code>的场景，不同句子的长度是不同的，<code>padding=True</code>表示短句子的结尾会被填充<code>[PAD]</code>符号，<code>return_tensors=&quot;pt&quot;</code>表示返回PyTorch格式的<code>Tensor</code>。<code>attention_mask</code>告诉模型，哪些Token需要被模型关注而加入到模型训练中，哪些Token是被填充进去的无意义的符号，模型无需关注。</p>
+<h4 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h4><p>下面两行代码会创建<code>BertModel</code>，并将所需的模型参数加载进来。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">from</span> transformers <span class="keyword">import</span> BertModel</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>model = BertModel.from_pretrained(<span class="string">"bert-base-chinese"</span>)</span><br></pre></td></tr></table></figure>
+<p><code>BertModel</code>是一个PyTorch中用来包裹网络结构的<code>torch.nn.Module</code>，<code>BertModel</code>里有<code>forward()</code>方法，<code>forward()</code>方法中实现了将Token转化为词向量，再将词向量进行多层的Transformer Encoder的复杂变换。<code>forward()</code>方法的入参有<code>input_ids</code>、<code>attention_mask</code>、<code>token_type_ids</code>等等，这些参数基本上是刚才Tokenizer部分的输出。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>bert_output = model(input_ids=batch[<span class="string">'input_ids'</span>])</span><br></pre></td></tr></table></figure>
+<p><code>forward()</code>方法返回模型预测的结果，返回结果是一个<code>tuple(torch.FloatTensor)</code>，即多个<code>Tensor</code>组成的<code>tuple</code>。<code>tuple</code>默认返回两个重要的<code>Tensor</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>len(bert_output)</span><br><span class="line"><span class="number">2</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>last_hidden_state</strong>：输出序列每个位置的语义向量，形状为：(batch_size, sequence_length, hidden_size)。</li>
+<li><strong>pooler_output</strong>：<code>[CLS]</code>符号对应的语义向量，经过了全连接层和tanh激活；该向量可用于下游分类任务。</li>
+</ul>
+<h4 id="下游任务"><a href="#下游任务" class="headerlink" title="下游任务"></a>下游任务</h4><p>BERT可以进行很多下游任务，<code>transformers</code>库中实现了一些下游任务，我们也可以参考<code>transformers</code>中的实现，来做自己想做的任务。比如单文本分类，<code>transformers</code>库提供了<code>BertForSequenceClassification</code>类。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BertForSequenceClassification</span><span class="params">(BertPreTrainedModel)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, config)</span>:</span></span><br><span class="line">        super().__init__(config)</span><br><span class="line">        self.num_labels = config.num_labels</span><br><span class="line">        self.config = config</span><br><span class="line"></span><br><span class="line">        self.bert = BertModel(config)</span><br><span class="line">        classifier_dropout = ...</span><br><span class="line">        self.dropout = nn.Dropout(classifier_dropout)</span><br><span class="line">        self.classifier = nn.Linear(config.hidden_size, config.num_labels)</span><br><span class="line"></span><br><span class="line">        ...</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">        ...</span></span></span><br><span class="line"><span class="function"><span class="params">    )</span>:</span></span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">        outputs = self.bert(...)</span><br><span class="line">        pooled_output = outputs[<span class="number">1</span>]</span><br><span class="line">        pooled_output = self.dropout(pooled_output)</span><br><span class="line">        logits = self.classifier(pooled_output)</span><br><span class="line"></span><br><span class="line">        ...</span><br></pre></td></tr></table></figure>
+<p>在这段代码中，<code>BertForSequenceClassification</code>在<code>BertModel</code>基础上，增加了<code>nn.Dropout</code>和<code>nn.Linear</code>层，在预测时，将<code>BertModel</code>的输出放入<code>nn.Linear</code>，完成一个分类任务。除了<code>BertForSequenceClassification</code>，还有<code>BertForQuestionAnswering</code>用于问答，<code>BertForTokenClassification</code>用于序列标注，比如命名实体识别。<code>transformers</code> 中的各个API还有很多其他参数设置，比如得到每一层Transformer Encoder的输出等等，可以访问他们的<a href="https://huggingface.co/docs/transformers/" target="_blank" rel="noopener">文档</a>查看使用方法。</p>
+<p>注：以上内容均转载自 <a href="https://lulaoshi.info/machine-learning/attention/bert" target="_blank" rel="noopener">BERT原理解析及HuggingFace transformers使用入门</a>，侵权删</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/bert/" rel="tag"># bert</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/08/02/Deformable DETR/" rel="next" title="Deformable-DETR详解与代码解读">
+                <i class="fa fa-chevron-left"></i> Deformable-DETR详解与代码解读
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/08/18/ALBEF/" rel="prev" title="ALBEF方法详解">
+                ALBEF方法详解 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">103</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#预训练"><span class="nav-number">1.</span> <span class="nav-text">预训练</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#训练目标"><span class="nav-number">2.</span> <span class="nav-text">训练目标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#词向量"><span class="nav-number">3.</span> <span class="nav-text">词向量</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#微调"><span class="nav-number">4.</span> <span class="nav-text">微调</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#模型结构"><span class="nav-number">5.</span> <span class="nav-text">模型结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HuggingFace-Transformers"><span class="nav-number">6.</span> <span class="nav-text">HuggingFace Transformers</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Tokenizer"><span class="nav-number">7.</span> <span class="nav-text">Tokenizer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Model"><span class="nav-number">8.</span> <span class="nav-text">Model</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#下游任务"><span class="nav-number">9.</span> <span class="nav-text">下游任务</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

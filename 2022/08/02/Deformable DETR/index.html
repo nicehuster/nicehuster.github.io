@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="目标检测,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="DETR是第一个end2end的目标检测器，不需要众多手工设计组件（anchor，iou匹配，nms后处理等），但也存在收敛慢，能处理的特征分辨率有限等缺陷。原因大概存在如下：   transformer在初始化时，分配给所有特征像素的注意力权重几乎均等；这就造成了模型需要长时间去学习关注真正有意义的位置，这些位置应该是稀疏的； transformer在计算注意力权重时，伴随着高计算量与空间复杂度">
+<meta name="keywords" content="目标检测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Deformable-DETR详解与代码解读">
+<meta property="og:url" content="https://blog.nicehuster.cn/2022/08/02/Deformable DETR/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="DETR是第一个end2end的目标检测器，不需要众多手工设计组件（anchor，iou匹配，nms后处理等），但也存在收敛慢，能处理的特征分辨率有限等缺陷。原因大概存在如下：   transformer在初始化时，分配给所有特征像素的注意力权重几乎均等；这就造成了模型需要长时间去学习关注真正有意义的位置，这些位置应该是稀疏的； transformer在计算注意力权重时，伴随着高计算量与空间复杂度">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/deformAttn.png">
+<meta property="og:updated_time" content="2022-08-25T07:32:18.328Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Deformable-DETR详解与代码解读">
+<meta name="twitter:description" content="DETR是第一个end2end的目标检测器，不需要众多手工设计组件（anchor，iou匹配，nms后处理等），但也存在收敛慢，能处理的特征分辨率有限等缺陷。原因大概存在如下：   transformer在初始化时，分配给所有特征像素的注意力权重几乎均等；这就造成了模型需要长时间去学习关注真正有意义的位置，这些位置应该是稀疏的； transformer在计算注意力权重时，伴随着高计算量与空间复杂度">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/deformAttn.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2022/08/02/Deformable DETR/">
+
+
+
+
+
+  <title>Deformable-DETR详解与代码解读 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2022/08/02/Deformable DETR/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Deformable-DETR详解与代码解读</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-08-02T19:13:39+08:00">
+                2022-08-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>DETR是第一个end2end的目标检测器，不需要众多手工设计组件（anchor，iou匹配，nms后处理等），但也存在收敛慢，能处理的特征分辨率有限等缺陷。原因大概存在如下：</p>
+<blockquote>
+<ul>
+<li>transformer在初始化时，分配给所有特征像素的注意力权重几乎均等；这就造成了模型需要长时间去学习关注真正有意义的位置，这些位置应该是稀疏的；</li>
+<li>transformer在计算注意力权重时，伴随着高计算量与空间复杂度。特别是在编码器部分，与特征像素点的数量成平方级关系，因此难以处理高分辨率的特征;</li>
+</ul>
+</blockquote>
+<a id="more"></a>
+<p>Deformable DETR的工作就在于解决DETR收敛慢以及高计算复杂度问题。具体做法有：</p>
+<h4 id="多尺度特征-amp-多尺度Embedding"><a href="#多尺度特征-amp-多尺度Embedding" class="headerlink" title="多尺度特征 &amp; 多尺度Embedding"></a>多尺度特征 &amp; 多尺度Embedding</h4><p>在DETR中，由于计算复杂度的问题，仅仅只使用了<strong>单尺度特征</strong>，对于特征点位置信息编码使用三角函数，不同位置对应不同编码值。而在多尺度特征中，位于不同特征层的特征点可能拥有相同的(h,w)坐标，使用一套位置编码是无法区分。因此作者使用多尺度特征时，增加了scale-level embedding，用于区分不同特征层。不同于三角函数使用固定公式计算编码，scale-level embedding是可学习的。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DeformableTransformer</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, d_model=<span class="number">256</span>, nhead=<span class="number">8</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                 num_encoder_layers=<span class="number">6</span>, num_decoder_layers=<span class="number">6</span>, dim_feedforward=<span class="number">1024</span>, dropout=<span class="number">0.1</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                 activation=<span class="string">"relu"</span>, return_intermediate_dec=False,</span></span></span><br><span class="line"><span class="function"><span class="params">                 num_feature_levels=<span class="number">4</span>, dec_n_points=<span class="number">4</span>,  enc_n_points=<span class="number">4</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                 two_stage=False, two_stage_num_proposals=<span class="number">300</span>)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment"># scale level embedding，对4个特征层分别附加d_model维度的embedding，用于区分query对应的具体特征层</span></span><br><span class="line">        self.level_embed = nn.Parameter(torch.Tensor(num_feature_levels, d_model))</span><br><span class="line">        ...</span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, srcs, masks, pos_embeds, query_embed=None)</span>:</span></span><br><span class="line">            ...</span><br><span class="line">            <span class="keyword">for</span> lvl, (src, mask, pos_embed) <span class="keyword">in</span> enumerate(zip(srcs, masks, pos_embeds)):</span><br><span class="line">                ...</span><br><span class="line">                <span class="comment"># (bs,c,h,w) --&gt; (bs,h*w,c)</span></span><br><span class="line">                pos_embed = pos_embed.flatten(<span class="number">2</span>).transpose(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line">                <span class="comment">#与position embedding相加，且同一特征层，所有query的scale-level embedding是相同的</span></span><br><span class="line">                lvl_pos_embed = pos_embed + self.level_embed[lvl].view(<span class="number">1</span>, <span class="number">1</span>, <span class="number">-1</span>)</span><br><span class="line">                ...</span><br></pre></td></tr></table></figure>
+<h4 id="Deformable-Attention"><a href="#Deformable-Attention" class="headerlink" title="Deformable Attention"></a>Deformable Attention</h4><p>通俗地来讲，可变性注意力即，query不是和全局每个位置的key都计算注意力权重，而仅在全局位置中采样部分位置的key，并且value也是基于这些位置进行采样插值得到，最后将局部&amp;稀疏的注意力权重施加在对应的value上。</p>
+<p><img src="/img/deformAttn.png" alt></p>
+<p>如上图所示，每个query在每个head上采样K个位置，只需和这些位置的特征进行交互，不同于detr那样，每个query需要与全局位置进行交互。需要注意的是，位置偏移量$\Delta p_{mqx}$ 是由query经过全连接得到的，注意力权重也是由query经全连接层得到的，同时在K个采样点之间进行权重归一化。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MSDeformAttn</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, d_model=<span class="number">256</span>, n_levels=<span class="number">4</span>, n_heads=<span class="number">8</span>, n_points=<span class="number">4</span>)</span>:</span></span><br><span class="line">        ...</span><br><span class="line">        self.n_points = n_points</span><br><span class="line">		<span class="comment"># 采样点的坐标偏移量，每个query在每个head，level上都需要采样n_points个点（x,y）。</span></span><br><span class="line">        self.sampling_offsets = nn.Linear(d_model, n_heads * n_levels * n_points * <span class="number">2</span>)</span><br><span class="line">        <span class="comment"># 每个query对应的所有采样点的注意力权重</span></span><br><span class="line">        self.attention_weights = nn.Linear(d_model, n_heads * n_levels * n_points)</span><br><span class="line">        <span class="comment"># 线性变换得到value</span></span><br><span class="line">        self.value_proj = nn.Linear(d_model, d_model)</span><br><span class="line">        self.output_proj = nn.Linear(d_model, d_model)</span><br><span class="line">        ...</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, query, reference_points, input_flatten, input_spatial_shapes, input_level_start_index, input_padding_mask=None)</span>:</span></span><br><span class="line">        </span><br><span class="line">       	...</span><br><span class="line">        <span class="comment"># (N,len_in, d_model=256)</span></span><br><span class="line">        value = self.value_proj(input_flatten)</span><br><span class="line">        <span class="comment"># 将原图padding的部分用0填充</span></span><br><span class="line">        <span class="keyword">if</span> input_padding_mask <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">            value = value.masked_fill(input_padding_mask[..., <span class="keyword">None</span>], float(<span class="number">0</span>))</span><br><span class="line">        <span class="comment"># 拆分成多个head,(N,Len_in,8,64)</span></span><br><span class="line">        value = value.view(N, Len_in, self.n_heads, self.d_model // self.n_heads)</span><br><span class="line">        <span class="comment"># 预测采样点偏移量，(N,Len_in,8,4,4,2)</span></span><br><span class="line">        sampling_offsets = self.sampling_offsets(query).view(N, Len_q, self.n_heads, self.n_levels, self.n_points, <span class="number">2</span>)</span><br><span class="line">        <span class="comment"># 预测采样点注意力权重，(N,Len_in,8,4*4)</span></span><br><span class="line">        attention_weights = self.attention_weights(query).view(N, Len_q, self.n_heads, self.n_levels * self.n_points)</span><br><span class="line">        <span class="comment"># 权重归一化，对4个特征层分别采样的4个特征点，合计16个点，进行归一化</span></span><br><span class="line">        attention_weights = F.softmax(attention_weights, <span class="number">-1</span>).view(N, Len_q, self.n_heads, self.n_levels, self.n_points)</span><br><span class="line">        <span class="comment"># N, Len_q, n_heads, n_levels, n_points, 2</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> reference_points.shape[<span class="number">-1</span>] == <span class="number">2</span>: </span><br><span class="line">            <span class="comment"># (4，2) 其中每个是w,h</span></span><br><span class="line">            offset_normalizer = torch.stack([input_spatial_shapes[..., <span class="number">1</span>], input_spatial_shapes[..., <span class="number">0</span>]], <span class="number">-1</span>)</span><br><span class="line">            <span class="comment"># 对坐标偏移量使用对应特征层的宽高进行归一化然后和参考点坐标相加得到采样点坐标</span></span><br><span class="line">            sampling_locations = reference_points[:, :, <span class="keyword">None</span>, :, <span class="keyword">None</span>, :] \</span><br><span class="line">                                 + sampling_offsets / offset_normalizer[<span class="keyword">None</span>, <span class="keyword">None</span>, <span class="keyword">None</span>, :, <span class="keyword">None</span>, :]</span><br><span class="line">        <span class="keyword">elif</span> reference_points.shape[<span class="number">-1</span>] == <span class="number">4</span>:</span><br><span class="line">            <span class="comment"># 最后一维度是4表示(cx,cy,w,h)</span></span><br><span class="line">            sampling_locations = reference_points[:, :, <span class="keyword">None</span>, :, <span class="keyword">None</span>, :<span class="number">2</span>] \</span><br><span class="line">                                 + sampling_offsets / self.n_points * reference_points[:, :, <span class="keyword">None</span>, :, <span class="keyword">None</span>, <span class="number">2</span>:] * <span class="number">0.5</span></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">raise</span> ValueError(</span><br><span class="line">                <span class="string">'Last dim of reference_points must be 2 or 4, but get &#123;&#125; instead.'</span>.format(reference_points.shape[<span class="number">-1</span>]))</span><br><span class="line">        <span class="comment"># 将注意力权重与value进行计算，是调用的self.im2col_step函数</span></span><br><span class="line">        output = MSDeformAttnFunction.apply(</span><br><span class="line">            value, input_spatial_shapes, input_level_start_index, sampling_locations, attention_weights, self.im2col_step)</span><br><span class="line">        <span class="comment"># 做线性变换得到最终输出结果</span></span><br><span class="line">        output = self.output_proj(output)</span><br><span class="line">        <span class="keyword">return</span> output</span><br></pre></td></tr></table></figure>
+<h4 id="Deformable-Transformer"><a href="#Deformable-Transformer" class="headerlink" title="Deformable Transformer"></a>Deformable Transformer</h4><p>与DETR大体一致，主要区别在于用Deformable Attention替换了Encoder中的self-attn和Decoder中的cross-attn。</p>
+<h5 id="Encoder前处理"><a href="#Encoder前处理" class="headerlink" title="Encoder前处理"></a>Encoder前处理</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DeformableTransformer</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    </span><br><span class="line">    ...</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, srcs, masks, pos_embeds, query_embed=None)</span>:</span></span><br><span class="line">        <span class="keyword">assert</span> self.two_stage <span class="keyword">or</span> query_embed <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># prepare input for encoder</span></span><br><span class="line">        src_flatten = []</span><br><span class="line">        mask_flatten = []</span><br><span class="line">        lvl_pos_embed_flatten = []</span><br><span class="line">        spatial_shapes = []</span><br><span class="line">        <span class="keyword">for</span> lvl, (src, mask, pos_embed) <span class="keyword">in</span> enumerate(zip(srcs, masks, pos_embeds)):</span><br><span class="line">            bs, c, h, w = src.shape</span><br><span class="line">            spatial_shape = (h, w)</span><br><span class="line">            spatial_shapes.append(spatial_shape)</span><br><span class="line">            src = src.flatten(<span class="number">2</span>).transpose(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line">            mask = mask.flatten(<span class="number">1</span>)</span><br><span class="line">            pos_embed = pos_embed.flatten(<span class="number">2</span>).transpose(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line">            lvl_pos_embed = pos_embed + self.level_embed[lvl].view(<span class="number">1</span>, <span class="number">1</span>, <span class="number">-1</span>)</span><br><span class="line">            lvl_pos_embed_flatten.append(lvl_pos_embed)</span><br><span class="line">            src_flatten.append(src)</span><br><span class="line">            mask_flatten.append(mask)</span><br><span class="line">        </span><br><span class="line">        <span class="comment">#多尺度特征flatten后进行拼接</span></span><br><span class="line">        src_flatten = torch.cat(src_flatten, <span class="number">1</span>)</span><br><span class="line">        <span class="comment">#多尺度mask图flatten后进行拼接</span></span><br><span class="line">        mask_flatten = torch.cat(mask_flatten, <span class="number">1</span>)</span><br><span class="line">        <span class="comment"># 多尺度位置信息flatten后进行拼接</span></span><br><span class="line">        lvl_pos_embed_flatten = torch.cat(lvl_pos_embed_flatten, <span class="number">1</span>)</span><br><span class="line">        <span class="comment"># 记录每个特征图的尺度信息</span></span><br><span class="line">        spatial_shapes = torch.as_tensor(spatial_shapes, dtype=torch.long, device=src_flatten.device)</span><br><span class="line">        <span class="comment"># 记录每个尺度特征图拼接后的起始索引</span></span><br><span class="line">        level_start_index = torch.cat((spatial_shapes.new_zeros((<span class="number">1</span>, )), spatial_shapes.prod(<span class="number">1</span>).cumsum(<span class="number">0</span>)[:<span class="number">-1</span>]))</span><br><span class="line">        <span class="comment"># 计算各个尺度特征图中非padding部分的边长占其边长的比例</span></span><br><span class="line">        valid_ratios = torch.stack([self.get_valid_ratio(m) <span class="keyword">for</span> m <span class="keyword">in</span> masks], <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># encoder</span></span><br><span class="line">        memory = self.encoder(src_flatten, spatial_shapes, level_start_index, valid_ratios, lvl_pos_embed_flatten, mask_flatten)</span><br><span class="line">        ...</span><br></pre></td></tr></table></figure>
+<p>在DeformableTransformer的前向处理过程中，首先会对多尺度相关的元素进行flatten，这些输入元素包括：多尺度特征图、各尺度特征图对应的mask（指示哪些部分属于padding）、各尺度特征图对应的位置信息（<strong>position embedding + scale-level embedding</strong>），另外还有些辅助信息，比如：各尺度特征图的宽高、不同尺度特征对应于被flatten的那个维度的起始索引、各尺度特征图中非padding部分的边长占其边长的比例。</p>
+<h5 id="Encoder编码"><a href="#Encoder编码" class="headerlink" title="Encoder编码"></a>Encoder编码</h5><p>经过Encoder前处理之后的信息就会经过Encoder进行编码，输出memory。下面代码展示的是Encoder的处理过程：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DeformableTransformerEncoder</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, encoder_layer, num_layers)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.layers = _get_clones(encoder_layer, num_layers)</span><br><span class="line">        self.num_layers = num_layers</span><br><span class="line"></span><br><span class="line"><span class="meta">    @staticmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_reference_points</span><span class="params">(spatial_shapes, valid_ratios, device)</span>:</span></span><br><span class="line">        reference_points_list = []</span><br><span class="line">        <span class="keyword">for</span> lvl, (H_, W_) <span class="keyword">in</span> enumerate(spatial_shapes):</span><br><span class="line"></span><br><span class="line">            ref_y, ref_x = torch.meshgrid(torch.linspace(<span class="number">0.5</span>, H_ - <span class="number">0.5</span>, H_, dtype=torch.float32, device=device),</span><br><span class="line">                                          torch.linspace(<span class="number">0.5</span>, W_ - <span class="number">0.5</span>, W_, dtype=torch.float32, device=device))</span><br><span class="line">            ref_y = ref_y.reshape(<span class="number">-1</span>)[<span class="keyword">None</span>] / (valid_ratios[:, <span class="keyword">None</span>, lvl, <span class="number">1</span>] * H_)</span><br><span class="line">            ref_x = ref_x.reshape(<span class="number">-1</span>)[<span class="keyword">None</span>] / (valid_ratios[:, <span class="keyword">None</span>, lvl, <span class="number">0</span>] * W_)</span><br><span class="line">            ref = torch.stack((ref_x, ref_y), <span class="number">-1</span>)</span><br><span class="line">            reference_points_list.append(ref)</span><br><span class="line">        reference_points = torch.cat(reference_points_list, <span class="number">1</span>)</span><br><span class="line">        reference_points = reference_points[:, :, <span class="keyword">None</span>] * valid_ratios[:, <span class="keyword">None</span>]</span><br><span class="line">        <span class="keyword">return</span> reference_points</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, src, spatial_shapes, level_start_index, valid_ratios, pos=None, padding_mask=None)</span>:</span></span><br><span class="line">        output = src</span><br><span class="line">        <span class="comment"># 参考点初始化，以0.5为步长，在特征图上密集采样所有点作为初始参考点</span></span><br><span class="line">        reference_points = self.get_reference_points(spatial_shapes, valid_ratios, device=src.device)</span><br><span class="line">        <span class="keyword">for</span> _, layer <span class="keyword">in</span> enumerate(self.layers):</span><br><span class="line">            output = layer(output, pos, reference_points, spatial_shapes, level_start_index, padding_mask)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> output</span><br></pre></td></tr></table></figure>
+<p>输出memory（编码后的特征表示），shape是 (bs, h_lvl1<em>w_lvl1+h_lvl2</em>w_lvl2+.., c=256)，其中h_lvli和w_lvli分别代表第i层特征图的高和宽，于是第二个维度就是所有特征点的数量。编码后，特征的最后一个维度hidden_dim=256.</p>
+<h5 id="Decoder前处理"><a href="#Decoder前处理" class="headerlink" title="Decoder前处理"></a>Decoder前处理</h5><p>对encoder的输出进行处理，得到参考点reference_points，需要说明下，在2-stage模式下，参考点和输入到Decoder的object query及query embedding的生成方式和形式会有所不同。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DeformableTransformer</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">   	...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">gen_encoder_output_proposals</span><span class="params">(self, memory, memory_padding_mask, spatial_shapes)</span>:</span></span><br><span class="line">        N_, S_, C_ = memory.shape</span><br><span class="line">        base_scale = <span class="number">4.0</span></span><br><span class="line">        proposals = []</span><br><span class="line">        _cur = <span class="number">0</span></span><br><span class="line">        <span class="keyword">for</span> lvl, (H_, W_) <span class="keyword">in</span> enumerate(spatial_shapes):</span><br><span class="line">            mask_flatten_ = memory_padding_mask[:, _cur:(_cur + H_ * W_)].view(N_, H_, W_, <span class="number">1</span>)</span><br><span class="line">            valid_H = torch.sum(~mask_flatten_[:, :, <span class="number">0</span>, <span class="number">0</span>], <span class="number">1</span>)</span><br><span class="line">            valid_W = torch.sum(~mask_flatten_[:, <span class="number">0</span>, :, <span class="number">0</span>], <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">            grid_y, grid_x = torch.meshgrid(torch.linspace(<span class="number">0</span>, H_ - <span class="number">1</span>, H_, dtype=torch.float32, device=memory.device),</span><br><span class="line">                                            torch.linspace(<span class="number">0</span>, W_ - <span class="number">1</span>, W_, dtype=torch.float32, device=memory.device))</span><br><span class="line">            grid = torch.cat([grid_x.unsqueeze(<span class="number">-1</span>), grid_y.unsqueeze(<span class="number">-1</span>)], <span class="number">-1</span>)</span><br><span class="line"></span><br><span class="line">            scale = torch.cat([valid_W.unsqueeze(<span class="number">-1</span>), valid_H.unsqueeze(<span class="number">-1</span>)], <span class="number">1</span>).view(N_, <span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line">            grid = (grid.unsqueeze(<span class="number">0</span>).expand(N_, <span class="number">-1</span>, <span class="number">-1</span>, <span class="number">-1</span>) + <span class="number">0.5</span>) / scale</span><br><span class="line">            wh = torch.ones_like(grid) * <span class="number">0.05</span> * (<span class="number">2.0</span> ** lvl)</span><br><span class="line">            proposal = torch.cat((grid, wh), <span class="number">-1</span>).view(N_, <span class="number">-1</span>, <span class="number">4</span>)</span><br><span class="line">            proposals.append(proposal)</span><br><span class="line">            _cur += (H_ * W_)</span><br><span class="line">        output_proposals = torch.cat(proposals, <span class="number">1</span>)</span><br><span class="line">        output_proposals_valid = ((output_proposals &gt; <span class="number">0.01</span>) &amp; (output_proposals &lt; <span class="number">0.99</span>)).all(<span class="number">-1</span>, keepdim=<span class="keyword">True</span>)</span><br><span class="line">        output_proposals = torch.log(output_proposals / (<span class="number">1</span> - output_proposals))</span><br><span class="line">        output_proposals = output_proposals.masked_fill(memory_padding_mask.unsqueeze(<span class="number">-1</span>), float(<span class="string">'inf'</span>))</span><br><span class="line">        output_proposals = output_proposals.masked_fill(~output_proposals_valid, float(<span class="string">'inf'</span>))</span><br><span class="line"></span><br><span class="line">        output_memory = memory</span><br><span class="line">        output_memory = output_memory.masked_fill(memory_padding_mask.unsqueeze(<span class="number">-1</span>), float(<span class="number">0</span>))</span><br><span class="line">        output_memory = output_memory.masked_fill(~output_proposals_valid, float(<span class="number">0</span>))</span><br><span class="line">        output_memory = self.enc_output_norm(self.enc_output(output_memory))</span><br><span class="line">        <span class="keyword">return</span> output_memory, output_proposals</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, srcs, masks, pos_embeds, query_embed=None)</span>:</span></span><br><span class="line">        ...</span><br><span class="line">        <span class="comment"># encoder</span></span><br><span class="line">        memory = self.encoder(src_flatten, spatial_shapes, level_start_index, valid_ratios, lvl_pos_embed_flatten, mask_flatten)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># prepare input for decoder</span></span><br><span class="line">        bs, _, c = memory.shape</span><br><span class="line">        <span class="keyword">if</span> self.two_stage:</span><br><span class="line">            <span class="comment"># 生成proposal，对encoder的输出进行处理（全连接层+归一化），output_proposals对应于特征图上各个初始参考点位置(固定的)</span></span><br><span class="line">            output_memory, output_proposals = self.gen_encoder_output_proposals(memory, mask_flatten, spatial_shapes)</span><br><span class="line">            </span><br><span class="line"></span><br><span class="line">            <span class="comment"># hack implementation for two-stage Deformable DETR</span></span><br><span class="line">            <span class="comment"># 借助于decoder的最后一层的class_embed和bbox_embed获取分数和proposal</span></span><br><span class="line">            enc_outputs_class = self.decoder.class_embed[self.decoder.num_layers](output_memory)</span><br><span class="line">            <span class="comment"># bbox_embed预测的是相对于初始参考点位置的偏移量，所以需要加上初始参考点位置</span></span><br><span class="line">            enc_outputs_coord_unact = self.decoder.bbox_embed[self.decoder.num_layers](output_memory) + output_proposals</span><br><span class="line"></span><br><span class="line">            topk = self.two_stage_num_proposals</span><br><span class="line">            <span class="comment"># 选取分数topk的proposal</span></span><br><span class="line">            topk_proposals = torch.topk(enc_outputs_class[..., <span class="number">0</span>], topk, dim=<span class="number">1</span>)[<span class="number">1</span>]</span><br><span class="line">            topk_coords_unact = torch.gather(enc_outputs_coord_unact, <span class="number">1</span>, topk_proposals.unsqueeze(<span class="number">-1</span>).repeat(<span class="number">1</span>, <span class="number">1</span>, <span class="number">4</span>))</span><br><span class="line">            topk_coords_unact = topk_coords_unact.detach()</span><br><span class="line">            reference_points = topk_coords_unact.sigmoid()</span><br><span class="line">            init_reference_out = reference_points</span><br><span class="line">            pos_trans_out = self.pos_trans_norm(self.pos_trans(self.get_proposal_pos_embed(topk_coords_unact)))</span><br><span class="line">            query_embed, tgt = torch.split(pos_trans_out, c, dim=<span class="number">2</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            query_embed, tgt = torch.split(query_embed, c, dim=<span class="number">1</span>)</span><br><span class="line">            query_embed = query_embed.unsqueeze(<span class="number">0</span>).expand(bs, <span class="number">-1</span>, <span class="number">-1</span>)</span><br><span class="line">            tgt = tgt.unsqueeze(<span class="number">0</span>).expand(bs, <span class="number">-1</span>, <span class="number">-1</span>)</span><br><span class="line">            reference_points = self.reference_points(query_embed).sigmoid()</span><br><span class="line">            init_reference_out = reference_points</span><br><span class="line"></span><br><span class="line">        <span class="comment"># decoder</span></span><br><span class="line">        hs, inter_references = self.decoder(tgt, reference_points, memory,</span><br><span class="line">                                            spatial_shapes, level_start_index, valid_ratios, query_embed, mask_flatten)</span><br><span class="line"></span><br><span class="line">        inter_references_out = inter_references</span><br><span class="line">        <span class="keyword">if</span> self.two_stage:</span><br><span class="line">            <span class="keyword">return</span> hs, init_reference_out, inter_references_out, enc_outputs_class, enc_outputs_coord_unact</span><br><span class="line">        <span class="keyword">return</span> hs, init_reference_out, inter_references_out, <span class="keyword">None</span>, <span class="keyword">None</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li>如果是two-stage 模式下，参考点由Encoder预测topk得分最高的proposal box（这时的参考点是4d，bbox形式），然后对参考点进行position embedding来生成Decoder需要的object query和对应的query embedding；</li>
+<li>非two-stage模式下，Decoder的 object query(target )和 query embedding 就是预设的embedding，然后将query embedding经过全连接层输出2d参考点，这时的参考点是归一化的中心坐标形式。</li>
+</ul>
+</blockquote>
+<p>另外，两种情况下生成的参考点数量可能不同：2-stage时是有top-k（作者设置为300）个，而1-stage时是<em>num_queries</em>(作者也设置为300)个，也就是和object query的数量一致(可以理解为，此时参考点就是object query本身的位置)。</p>
+<h5 id="Decoder解码"><a href="#Decoder解码" class="headerlink" title="Decoder解码"></a>Decoder解码</h5><p>这里与Transformer中主要的区别在于使用可变形注意力替代了原生的交叉注意力。类似地，每层的解码过程是self-attention+cross-attention+ffn，下一层输入的object query是上一层输出的解码特征。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DeformableTransformerDecoder</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, tgt, reference_points, src, src_spatial_shapes, src_level_start_index, src_valid_ratios,</span></span></span><br><span class="line"><span class="function"><span class="params">                query_pos=None, src_padding_mask=None)</span>:</span></span><br><span class="line">        output = tgt</span><br><span class="line"></span><br><span class="line">        intermediate = []</span><br><span class="line">        intermediate_reference_points = []</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> lid, layer <span class="keyword">in</span> enumerate(self.layers):</span><br><span class="line">            <span class="keyword">if</span> reference_points.shape[<span class="number">-1</span>] == <span class="number">4</span>:</span><br><span class="line">                reference_points_input = reference_points[:, :, <span class="keyword">None</span>] \</span><br><span class="line">                                         * torch.cat([src_valid_ratios, src_valid_ratios], <span class="number">-1</span>)[:, <span class="keyword">None</span>]</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">assert</span> reference_points.shape[<span class="number">-1</span>] == <span class="number">2</span></span><br><span class="line">                reference_points_input = reference_points[:, :, <span class="keyword">None</span>] * src_valid_ratios[:, <span class="keyword">None</span>]</span><br><span class="line">            output = layer(output, query_pos, reference_points_input, src, src_spatial_shapes, src_level_start_index, src_padding_mask)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># hack implementation for iterative bounding box refinement</span></span><br><span class="line">            <span class="comment"># 使用iterative bbox refinement</span></span><br><span class="line">            <span class="keyword">if</span> self.bbox_embed <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">                <span class="comment"># 得到相对初始参考点的偏移量</span></span><br><span class="line">                tmp = self.bbox_embed[lid](output)</span><br><span class="line">                <span class="comment"># 得到归一化坐标点</span></span><br><span class="line">                <span class="keyword">if</span> reference_points.shape[<span class="number">-1</span>] == <span class="number">4</span>:</span><br><span class="line">                    new_reference_points = tmp + inverse_sigmoid(reference_points)</span><br><span class="line">                    new_reference_points = new_reference_points.sigmoid()</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    <span class="keyword">assert</span> reference_points.shape[<span class="number">-1</span>] == <span class="number">2</span></span><br><span class="line">                    new_reference_points = tmp</span><br><span class="line">                    new_reference_points[..., :<span class="number">2</span>] = tmp[..., :<span class="number">2</span>] + inverse_sigmoid(reference_points)</span><br><span class="line">                    new_reference_points = new_reference_points.sigmoid()</span><br><span class="line">                <span class="comment"># 在输入下一层之前取消梯度，将当前层的预测bbox作为下一层的初始参考点</span></span><br><span class="line">                reference_points = new_reference_points.detach()</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> self.return_intermediate:</span><br><span class="line">                intermediate.append(output)</span><br><span class="line">                intermediate_reference_points.append(reference_points)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> self.return_intermediate:</span><br><span class="line">            <span class="keyword">return</span> torch.stack(intermediate), torch.stack(intermediate_reference_points)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> output, reference_points</span><br></pre></td></tr></table></figure>
+<p>进行Decoder解码完之后就是接class_embed和bbox_embed得到最后box分数和坐标。在上面需要注意的一点是，<strong>每次refine后的bbox梯度是不会传递到下一层</strong>。</p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><ol>
+<li>相比于DETR，使用了多尺度特征+scale-level embedding，用于区分不同特征层;</li>
+<li>使用了多尺度可变形注意力替代Encoder中的selfattn和Decoder中的crossattn，减小计算量；</li>
+<li>引入了参考点，类似引入先验知识；</li>
+<li>设计了两阶段模式和iteraitive box refinement策略；</li>
+<li>检测头回归分支预测是bbox相对参考点的偏移量而非绝对坐标值；</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/目标检测/" rel="tag"># 目标检测</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/07/18/pix2seq/" rel="next" title="pix2seq方法详解">
+                <i class="fa fa-chevron-left"></i> pix2seq方法详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/08/04/BERT/" rel="prev" title="BERT原理详解与HuggingFace使用[转载]">
+                BERT原理详解与HuggingFace使用[转载] <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">103</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#多尺度特征-amp-多尺度Embedding"><span class="nav-number">1.</span> <span class="nav-text">多尺度特征 &amp; 多尺度Embedding</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Deformable-Attention"><span class="nav-number">2.</span> <span class="nav-text">Deformable Attention</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Deformable-Transformer"><span class="nav-number">3.</span> <span class="nav-text">Deformable Transformer</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Encoder前处理"><span class="nav-number">3.1.</span> <span class="nav-text">Encoder前处理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Encoder编码"><span class="nav-number">3.2.</span> <span class="nav-text">Encoder编码</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Decoder前处理"><span class="nav-number">3.3.</span> <span class="nav-text">Decoder前处理</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Decoder解码"><span class="nav-number">3.4.</span> <span class="nav-text">Decoder解码</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

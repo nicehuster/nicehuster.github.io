@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://blog.nicehuster.cn/2022/08/18/ALBEF/</loc>
+    <lastmod>2022-08-25</lastmod>
+  </url>
+  <url>
     <loc>https://blog.nicehuster.cn/2022/07/18/pix2seq/</loc>
     <lastmod>2022-07-19</lastmod>
   </url>
@@ -365,6 +369,10 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
+    <loc>https://blog.nicehuster.cn/2018/07/08/caffe/</loc>
+    <lastmod>2020-09-13</lastmod>
+  </url>
+  <url>
     <loc>https://blog.nicehuster.cn/2018/03/09/dl_environ/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
@@ -377,10 +385,6 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/08/caffe/</loc>
-    <lastmod>2020-09-13</lastmod>
-  </url>
-  <url>
     <loc>https://blog.nicehuster.cn/2018/07/29/tensorRT_customlayer/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
@@ -389,11 +393,11 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/26/tensorRT_introduce/</loc>
+    <loc>https://blog.nicehuster.cn/2018/07/27/tensorRT_usage/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/27/tensorRT_usage/</loc>
+    <loc>https://blog.nicehuster.cn/2018/07/26/tensorRT_introduce/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>

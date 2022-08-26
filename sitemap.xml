@@ -2,16 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://blog.nicehuster.cn/2022/08/04/BERT/</loc>
+    <loc>https://blog.nicehuster.cn/2022/07/24/DETR%E4%BB%A3%E7%A0%81%E8%A7%A3%E8%AF%BB/</loc>
     
-    <lastmod>2022-08-25T07:35:29.745Z</lastmod>
+    <lastmod>2022-08-26T02:16:49.016Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/2022/08/02/Deformable%20DETR/</loc>
+    <loc>https://blog.nicehuster.cn/2022/07/26/Deformable%20DETR/</loc>
     
-    <lastmod>2022-08-25T07:32:18.328Z</lastmod>
+    <lastmod>2022-08-26T02:16:35.536Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.nicehuster.cn/2022/08/04/BERT/</loc>
+    
+    <lastmod>2022-08-25T07:35:29.745Z</lastmod>
     
   </url>
   
@@ -702,6 +709,13 @@
   </url>
   
   <url>
+    <loc>https://blog.nicehuster.cn/2018/07/29/tensorRT_customlayer/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://blog.nicehuster.cn/2018/07/25/tensorRT_install/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
@@ -709,7 +723,7 @@
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/29/tensorRT_customlayer/</loc>
+    <loc>https://blog.nicehuster.cn/2018/07/27/tensorRT_usage/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -730,13 +744,6 @@
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/27/tensorRT_usage/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://blog.nicehuster.cn/google2de9dded6acbc4e8.html</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
@@ -744,14 +751,14 @@
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/categories/index.html</loc>
+    <loc>https://blog.nicehuster.cn/tags/index.html</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/tags/index.html</loc>
+    <loc>https://blog.nicehuster.cn/categories/index.html</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     

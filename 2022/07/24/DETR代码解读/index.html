@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="transformer,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="transformer由encoder和decoder俩部分组成。">
+<meta name="keywords" content="transformer">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DETR源码解读">
+<meta property="og:url" content="https://blog.nicehuster.cn/2022/07/24/DETR代码解读/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="transformer由encoder和decoder俩部分组成。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/detr-trans.png">
+<meta property="og:updated_time" content="2022-08-26T02:16:49.016Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="DETR源码解读">
+<meta name="twitter:description" content="transformer由encoder和decoder俩部分组成。">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/detr-trans.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2022/07/24/DETR代码解读/">
+
+
+
+
+
+  <title>DETR源码解读 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2022/07/24/DETR代码解读/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">DETR源码解读</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-07-24T19:13:39+08:00">
+                2022-07-24
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>transformer由encoder和decoder俩部分组成。</p>
+<a id="more"></a>
+<h4 id="Encoder"><a href="#Encoder" class="headerlink" title="Encoder"></a>Encoder</h4><p>一个encoder由多个encoder_layer组成，在detr中默认是6层。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TransformerEncoder</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, encoder_layer, num_layers, norm=None)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.layers = _get_clones(encoder_layer, num_layers) <span class="comment"># Encoder包含num层，每层具有相同结构encoder_layer</span></span><br><span class="line">        self.num_layers = num_layers</span><br><span class="line"></span><br><span class="line">        self.norm = norm <span class="comment"># 归一化</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, src,</span></span></span><br><span class="line"><span class="function"><span class="params">                mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                src_key_padding_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                pos: Optional[Tensor] = None)</span>:</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># src 对应backbone最后一层输出的feature maps,并且维度已经映射到(h*w,bs, hidden_dim)</span></span><br><span class="line">        <span class="comment"># mask 一般为空</span></span><br><span class="line">        <span class="comment"># pos 对应backbone最后一层输出的feature maps对应的位置编码，shape是(h*w,bs,c)</span></span><br><span class="line">        <span class="comment"># src_key_padding_mask 对应backbone最后一层输出的feature maps对应的mask，shape是(bs,h*w)</span></span><br><span class="line"></span><br><span class="line">        output = src</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> layer <span class="keyword">in</span> self.layers:</span><br><span class="line">            output = layer(output, src_mask=mask,</span><br><span class="line">                           src_key_padding_mask=src_key_padding_mask, pos=pos)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> self.norm <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">            output = self.norm(output)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> output</span><br></pre></td></tr></table></figure>
+<p>EncoderLayer 的前向过程分为两种情况，一种是在输入多头自注意力层和前向反馈层前先进行归一化，另一种则是在这两个层输出后再进行归一化操作。对应实现可以参考如下图左侧部分：</p>
+<p><img src="/img/detr-trans.png" alt="detr"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TransformerEncoderLayer</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, d_model, nhead, dim_feedforward=<span class="number">2048</span>, dropout=<span class="number">0.1</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                 activation=<span class="string">"relu"</span>, normalize_before=False)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line"></span><br><span class="line">        <span class="comment">#多头自注意力模块</span></span><br><span class="line">        self.self_attn = nn.MultiheadAttention(d_model, nhead, dropout=dropout)</span><br><span class="line">        <span class="comment"># Implementation of Feedforward model</span></span><br><span class="line">        self.linear1 = nn.Linear(d_model, dim_feedforward)</span><br><span class="line">        self.dropout = nn.Dropout(dropout)</span><br><span class="line">        self.linear2 = nn.Linear(dim_feedforward, d_model)</span><br><span class="line"></span><br><span class="line">        self.norm1 = nn.LayerNorm(d_model)</span><br><span class="line">        self.norm2 = nn.LayerNorm(d_model)</span><br><span class="line">        self.dropout1 = nn.Dropout(dropout)</span><br><span class="line">        self.dropout2 = nn.Dropout(dropout)</span><br><span class="line"></span><br><span class="line">        self.activation = _get_activation_fn(activation)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 是否需要在输入多头自注意力层之前进行归一化</span></span><br><span class="line">        self.normalize_before = normalize_before</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">with_pos_embed</span><span class="params">(self, tensor, pos: Optional[Tensor])</span>:</span></span><br><span class="line">        <span class="keyword">return</span> tensor <span class="keyword">if</span> pos <span class="keyword">is</span> <span class="keyword">None</span> <span class="keyword">else</span> tensor + pos</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward_post</span><span class="params">(self,</span></span></span><br><span class="line"><span class="function"><span class="params">                     src,</span></span></span><br><span class="line"><span class="function"><span class="params">                     src_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                     src_key_padding_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                     pos: Optional[Tensor] = None)</span>:</span></span><br><span class="line">        q = k = self.with_pos_embed(src, pos)</span><br><span class="line">        src2 = self.self_attn(q, k, value=src, attn_mask=src_mask,</span><br><span class="line">                              key_padding_mask=src_key_padding_mask)[<span class="number">0</span>]</span><br><span class="line">        src = src + self.dropout1(src2)</span><br><span class="line">        src = self.norm1(src)</span><br><span class="line">        src2 = self.linear2(self.dropout(self.activation(self.linear1(src))))</span><br><span class="line">        src = src + self.dropout2(src2)</span><br><span class="line">        src = self.norm2(src)</span><br><span class="line">        <span class="keyword">return</span> src</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward_pre</span><span class="params">(self, src,</span></span></span><br><span class="line"><span class="function"><span class="params">                    src_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                    src_key_padding_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                    pos: Optional[Tensor] = None)</span>:</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 输入多头自注意力层前进行归一化</span></span><br><span class="line">        src2 = self.norm1(src)</span><br><span class="line">        <span class="comment"># q,k在输入attn之前需要结合位置编码</span></span><br><span class="line">        q = k = self.with_pos_embed(src2, pos)</span><br><span class="line">        <span class="comment"># self.self_attn是nn.MultiheadAttention的实例，其前向过程返回两部分，第一个是自注意力层的输出，第二个是自注意力权重，因此这里取了输出索引为0的部分即代表自注意力层的输出。</span></span><br><span class="line">        src2 = self.self_attn(q, k, value=src2, attn_mask=src_mask,</span><br><span class="line">                              key_padding_mask=src_key_padding_mask)[<span class="number">0</span>]</span><br><span class="line">                              </span><br><span class="line">        src = src + self.dropout1(src2)</span><br><span class="line">        src2 = self.norm2(src)</span><br><span class="line">        src2 = self.linear2(self.dropout(self.activation(self.linear1(src2))))</span><br><span class="line">        src = src + self.dropout2(src2)</span><br><span class="line">        <span class="keyword">return</span> src</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, src,</span></span></span><br><span class="line"><span class="function"><span class="params">                src_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                src_key_padding_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                pos: Optional[Tensor] = None)</span>:</span></span><br><span class="line">                </span><br><span class="line">         <span class="comment"># 俩种不同的前向过程</span></span><br><span class="line">        <span class="keyword">if</span> self.normalize_before:</span><br><span class="line">            <span class="keyword">return</span> self.forward_pre(src, src_mask, src_key_padding_mask, pos)</span><br><span class="line">        <span class="keyword">return</span> self.forward_post(src, src_mask, src_key_padding_mask, pos)</span><br></pre></td></tr></table></figure>
+<p>需要注意的是，在输入多头自注意力层时需要先进行位置嵌入，即结合位置编码。注意仅对query和key实施，而value不需要。query和key是在图像特征中各个位置之间计算相关性，而value作为原图像特征，使用计算出来的相关性加权上去，得到各位置结合了全局相关性（增强/削弱）后的特征表示。</p>
+<h4 id="Query-Embedding"><a href="#Query-Embedding" class="headerlink" title="Query Embedding"></a>Query Embedding</h4><p>在解析Decoder前，有必要先简要地谈谈query embedding，因为它是Decoder的主要输入之一。query embedding 有点anchor的味道，而且是自学习的anchor，作者使用了<em>nn.Embedding</em>实现：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">self.query_embed = nn.Embedding(num_queries, hidden_dim)</span><br></pre></td></tr></table></figure>
+<p>其中num_queries 代表图像中有多少个目标（位置），默认是100个，对这些目标（位置）全部进行嵌入，维度映射到 <em>hidden_dim</em>，将 <strong>query_embedding 的权重</strong>作为参数输入到Transformer的前向过程，使用时与position encoding的方式相同：直接相加。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hs = self.transformer(self.input_proj(src), mask, self.query_embed.weight, pos[<span class="number">-1</span>])[<span class="number">0</span>]</span><br></pre></td></tr></table></figure>
+<p>而这个query embedding应该加在哪呢？当然是我们需要预测的目标（query object）咯！可是网络一开始还没有输出，我们都不知道预测目标在哪里呀，如何将它实体化？作者也不知道，于是就简单粗暴地直接将它初始化为全0，shape和query embedding 的权重一致（从而可以element-wise add）。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Transformer</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, d_model=<span class="number">512</span>, nhead=<span class="number">8</span>, num_encoder_layers=<span class="number">6</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                 num_decoder_layers=<span class="number">6</span>, dim_feedforward=<span class="number">2048</span>, dropout=<span class="number">0.1</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                 activation=<span class="string">"relu"</span>, normalize_before=False,</span></span></span><br><span class="line"><span class="function"><span class="params">                 return_intermediate_dec=False)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, src, mask, query_embed, pos_embed)</span>:</span></span><br><span class="line">        </span><br><span class="line">		...</span><br><span class="line">        <span class="comment"># (num_queries,bs,hidden_dim)</span></span><br><span class="line">        tgt = torch.zeros_like(query_embed) <span class="comment">#</span></span><br><span class="line">        memory = self.encoder(src, src_key_padding_mask=mask, pos=pos_embed)</span><br><span class="line">        hs = self.decoder(tgt, memory, memory_key_padding_mask=mask,</span><br><span class="line">                          pos=pos_embed, query_pos=query_embed)</span><br><span class="line">        <span class="keyword">return</span> hs.transpose(<span class="number">1</span>, <span class="number">2</span>), memory.permute(<span class="number">1</span>, <span class="number">2</span>, <span class="number">0</span>).view(bs, c, h, w)</span><br></pre></td></tr></table></figure>
+<h4 id="Decoder"><a href="#Decoder" class="headerlink" title="Decoder"></a>Decoder</h4><p>Decoder的结构和Encoder十分类似。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TransformerDecoder</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, decoder_layer, num_layers, norm=None, return_intermediate=False)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.layers = _get_clones(decoder_layer, num_layers)</span><br><span class="line">        self.num_layers = num_layers</span><br><span class="line">        self.norm = norm</span><br><span class="line">        self.return_intermediate = return_intermediate</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, tgt, memory,</span></span></span><br><span class="line"><span class="function"><span class="params">                tgt_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                memory_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                tgt_key_padding_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                memory_key_padding_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                pos: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                query_pos: Optional[Tensor] = None)</span>:</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># tgt 是query embedding，shape是(num_queries,bs,hidden_dim)</span></span><br><span class="line">        <span class="comment"># query_pos 是对应tgt的位置编码，shape和tgt一致</span></span><br><span class="line">        <span class="comment"># memory是encoder的输出，shape是(h*w,bs,hidden_dim)</span></span><br><span class="line">        <span class="comment"># memory_key_padding_mask是对应encoder的src_key_padding_mask，shape是(bs,h*w)</span></span><br><span class="line">        <span class="comment"># pos 对应输入到encoder的位置编码，这里代表memory的位置编码，shape和memory一致</span></span><br><span class="line">        </span><br><span class="line">        output = tgt</span><br><span class="line"></span><br><span class="line">        intermediate = []</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> layer <span class="keyword">in</span> self.layers:</span><br><span class="line">            output = layer(output, memory, tgt_mask=tgt_mask,</span><br><span class="line">                           memory_mask=memory_mask,</span><br><span class="line">                           tgt_key_padding_mask=tgt_key_padding_mask,</span><br><span class="line">                           memory_key_padding_mask=memory_key_padding_mask,</span><br><span class="line">                           pos=pos, query_pos=query_pos)</span><br><span class="line">            <span class="keyword">if</span> self.return_intermediate:</span><br><span class="line">                intermediate.append(self.norm(output))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> self.norm <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span>:</span><br><span class="line">            output = self.norm(output)</span><br><span class="line">            <span class="keyword">if</span> self.return_intermediate:</span><br><span class="line">                intermediate.pop()</span><br><span class="line">                intermediate.append(output)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> self.return_intermediate:</span><br><span class="line">            <span class="keyword">return</span> torch.stack(intermediate)</span><br><span class="line">        <span class="keyword">return</span> output.unsqueeze(<span class="number">0</span>)</span><br></pre></td></tr></table></figure>
+<p>注意，在detr中，tgt_mask和memory_mask并未使用。需要注意的是intermediate中记录的是每层输出后的归一化结果，而每一层的输入是前一层输出（没有归一化）的结果。</p>
+<p>DecoderLayer与Encoder的实现类似，只不过多了一层cross attention，其实质也是多头自注意力层，但是key和value来自于Encoder的输出。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TransformerDecoderLayer</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, d_model, nhead, dim_feedforward=<span class="number">2048</span>, dropout=<span class="number">0.1</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                 activation=<span class="string">"relu"</span>, normalize_before=False)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.self_attn = nn.MultiheadAttention(d_model, nhead, dropout=dropout)</span><br><span class="line">        self.multihead_attn = nn.MultiheadAttention(d_model, nhead, dropout=dropout)</span><br><span class="line">        <span class="comment"># Implementation of Feedforward model</span></span><br><span class="line">        self.linear1 = nn.Linear(d_model, dim_feedforward)</span><br><span class="line">        self.dropout = nn.Dropout(dropout)</span><br><span class="line">        self.linear2 = nn.Linear(dim_feedforward, d_model)</span><br><span class="line"></span><br><span class="line">        self.norm1 = nn.LayerNorm(d_model)</span><br><span class="line">        self.norm2 = nn.LayerNorm(d_model)</span><br><span class="line">        self.norm3 = nn.LayerNorm(d_model)</span><br><span class="line">        self.dropout1 = nn.Dropout(dropout)</span><br><span class="line">        self.dropout2 = nn.Dropout(dropout)</span><br><span class="line">        self.dropout3 = nn.Dropout(dropout)</span><br><span class="line"></span><br><span class="line">        self.activation = _get_activation_fn(activation)</span><br><span class="line">        self.normalize_before = normalize_before</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">with_pos_embed</span><span class="params">(self, tensor, pos: Optional[Tensor])</span>:</span></span><br><span class="line">        <span class="keyword">return</span> tensor <span class="keyword">if</span> pos <span class="keyword">is</span> <span class="keyword">None</span> <span class="keyword">else</span> tensor + pos</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward_post</span><span class="params">(self, tgt, memory,</span></span></span><br><span class="line"><span class="function"><span class="params">                     tgt_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                     memory_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                     tgt_key_padding_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                     memory_key_padding_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                     pos: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                     query_pos: Optional[Tensor] = None)</span>:</span></span><br><span class="line">        q = k = self.with_pos_embed(tgt, query_pos)</span><br><span class="line">        tgt2 = self.self_attn(q, k, value=tgt, attn_mask=tgt_mask,</span><br><span class="line">                              key_padding_mask=tgt_key_padding_mask)[<span class="number">0</span>]</span><br><span class="line">        tgt = tgt + self.dropout1(tgt2)</span><br><span class="line">        tgt = self.norm1(tgt)</span><br><span class="line">        tgt2 = self.multihead_attn(query=self.with_pos_embed(tgt, query_pos),</span><br><span class="line">                                   key=self.with_pos_embed(memory, pos),</span><br><span class="line">                                   value=memory, attn_mask=memory_mask,</span><br><span class="line">                                   key_padding_mask=memory_key_padding_mask)[<span class="number">0</span>]</span><br><span class="line">        tgt = tgt + self.dropout2(tgt2)</span><br><span class="line">        tgt = self.norm2(tgt)</span><br><span class="line">        tgt2 = self.linear2(self.dropout(self.activation(self.linear1(tgt))))</span><br><span class="line">        tgt = tgt + self.dropout3(tgt2)</span><br><span class="line">        tgt = self.norm3(tgt)</span><br><span class="line">        <span class="keyword">return</span> tgt</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward_pre</span><span class="params">(self, tgt, memory,</span></span></span><br><span class="line"><span class="function"><span class="params">                    tgt_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                    memory_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                    tgt_key_padding_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                    memory_key_padding_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                    pos: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                    query_pos: Optional[Tensor] = None)</span>:</span></span><br><span class="line">        </span><br><span class="line">        tgt2 = self.norm1(tgt)</span><br><span class="line">        <span class="comment"># 进行位置嵌入</span></span><br><span class="line">        q = k = self.with_pos_embed(tgt2, query_pos)</span><br><span class="line">        <span class="comment"># 多头自注意力层，输入不包含encoder的输出</span></span><br><span class="line">        tgt2 = self.self_attn(q, k, value=tgt2, attn_mask=tgt_mask,</span><br><span class="line">                              key_padding_mask=tgt_key_padding_mask)[<span class="number">0</span>]</span><br><span class="line">        tgt = tgt + self.dropout1(tgt2)</span><br><span class="line">        tgt2 = self.norm2(tgt)</span><br><span class="line">        <span class="comment"># cross attention，key,value来自encoder，query来自上一层输出</span></span><br><span class="line">        <span class="comment"># key,query均需进行位置嵌入</span></span><br><span class="line">        tgt2 = self.multihead_attn(query=self.with_pos_embed(tgt2, query_pos),</span><br><span class="line">                                   key=self.with_pos_embed(memory, pos),</span><br><span class="line">                                   value=memory, attn_mask=memory_mask,</span><br><span class="line">                                   key_padding_mask=memory_key_padding_mask)[<span class="number">0</span>]</span><br><span class="line">        tgt = tgt + self.dropout2(tgt2)</span><br><span class="line">        tgt2 = self.norm3(tgt)</span><br><span class="line">        tgt2 = self.linear2(self.dropout(self.activation(self.linear1(tgt2))))</span><br><span class="line">        tgt = tgt + self.dropout3(tgt2)</span><br><span class="line">        <span class="keyword">return</span> tgt</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, tgt, memory,</span></span></span><br><span class="line"><span class="function"><span class="params">                tgt_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                memory_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                tgt_key_padding_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                memory_key_padding_mask: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                pos: Optional[Tensor] = None,</span></span></span><br><span class="line"><span class="function"><span class="params">                query_pos: Optional[Tensor] = None)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> self.normalize_before:</span><br><span class="line">            <span class="keyword">return</span> self.forward_pre(tgt, memory, tgt_mask, memory_mask,</span><br><span class="line">                                    tgt_key_padding_mask, memory_key_padding_mask, pos, query_pos)</span><br><span class="line">        <span class="keyword">return</span> self.forward_post(tgt, memory, tgt_mask, memory_mask,</span><br><span class="line">                                 tgt_key_padding_mask, memory_key_padding_mask, pos, query_pos)</span><br></pre></td></tr></table></figure>
+<p>注意，在tgt在输入到self_attn之前，需要经过position embedding，tgt+query_pos。在第二个多头注意力模块multihead_attn上，key和value均来自Encoder的输出。同样地，query和key要进行位置嵌入（而value不用）。这里cross attention计算的相关性是目标物体与图像特征各位置的相关性，然后再把这个相关性系数加权到Encoder编码后的图像特征（value）上，相当于获得了object features的意思，更好地表征了图像中的各个物体。从上面encoder和decoder的实现可以看出，作者非常强调位置嵌入的作用，每次进行attention计算前都需要进行position embedding，究其原因是因为transformer的转置不变性，即对排列和位置是不care的，然而在detection任务中却是十分重要的。</p>
+<h4 id="Transformer"><a href="#Transformer" class="headerlink" title="Transformer"></a>Transformer</h4><p>将Encoder和Decoder封装在一起构成Transformer。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Transformer</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, d_model=<span class="number">512</span>, nhead=<span class="number">8</span>, num_encoder_layers=<span class="number">6</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                 num_decoder_layers=<span class="number">6</span>, dim_feedforward=<span class="number">2048</span>, dropout=<span class="number">0.1</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                 activation=<span class="string">"relu"</span>, normalize_before=False,</span></span></span><br><span class="line"><span class="function"><span class="params">                 return_intermediate_dec=False)</span>:</span></span><br><span class="line">        super().__init__()</span><br><span class="line">		<span class="comment"># 构建encoder layer</span></span><br><span class="line">        encoder_layer = TransformerEncoderLayer(d_model, nhead, dim_feedforward,</span><br><span class="line">                                                dropout, activation, normalize_before)</span><br><span class="line">        encoder_norm = nn.LayerNorm(d_model) <span class="keyword">if</span> normalize_before <span class="keyword">else</span> <span class="keyword">None</span></span><br><span class="line">        self.encoder = TransformerEncoder(encoder_layer, num_encoder_layers, encoder_norm)</span><br><span class="line">		<span class="comment">#构建decoder layer</span></span><br><span class="line">        decoder_layer = TransformerDecoderLayer(d_model, nhead, dim_feedforward,</span><br><span class="line">                                                dropout, activation, normalize_before)</span><br><span class="line">        decoder_norm = nn.LayerNorm(d_model)</span><br><span class="line">        self.decoder = TransformerDecoder(decoder_layer, num_decoder_layers, decoder_norm,</span><br><span class="line">                                          return_intermediate=return_intermediate_dec)</span><br><span class="line"></span><br><span class="line">        self._reset_parameters()</span><br><span class="line"></span><br><span class="line">        self.d_model = d_model <span class="comment"># 输入的embedding的特征维度</span></span><br><span class="line">        self.nhead = nhead <span class="comment">#</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_reset_parameters</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">for</span> p <span class="keyword">in</span> self.parameters():</span><br><span class="line">            <span class="keyword">if</span> p.dim() &gt; <span class="number">1</span>:</span><br><span class="line">                nn.init.xavier_uniform_(p)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, src, mask, query_embed, pos_embed)</span>:</span></span><br><span class="line">        <span class="comment"># flatten NxCxHxW to HWxNxC</span></span><br><span class="line">        bs, c, h, w = src.shape</span><br><span class="line">        <span class="comment"># 将backbone输入的feature maps进行flatten成序列，</span></span><br><span class="line">        <span class="comment"># src: (h*w,bs,c)</span></span><br><span class="line">        src = src.flatten(<span class="number">2</span>).permute(<span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">        <span class="comment"># pos: (h*w,bs,hidden_dim)</span></span><br><span class="line">        pos_embed = pos_embed.flatten(<span class="number">2</span>).permute(<span class="number">2</span>, <span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">        <span class="comment"># query_embed: (num_queries, bs, hidden_dim)</span></span><br><span class="line">        query_embed = query_embed.unsqueeze(<span class="number">1</span>).repeat(<span class="number">1</span>, bs, <span class="number">1</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># mask: (bs, h*w)</span></span><br><span class="line">        mask = mask.flatten(<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        tgt = torch.zeros_like(query_embed) <span class="comment"># 每次forward时，tgt都会初始化为0</span></span><br><span class="line">        <span class="comment"># memory: (h*w, bs, c)</span></span><br><span class="line">        memory = self.encoder(src, src_key_padding_mask=mask, pos=pos_embed)</span><br><span class="line">        <span class="comment"># TransformerDecoderLayer中return_intermediate设置为true，因此decoder包含了每层的输出结果，因此hs的shape是（6, num_queries,bs,hidden_dim）</span></span><br><span class="line">        hs = self.decoder(tgt, memory, memory_key_padding_mask=mask,</span><br><span class="line">                          pos=pos_embed, query_pos=query_embed)</span><br><span class="line">        <span class="keyword">return</span> hs.transpose(<span class="number">1</span>, <span class="number">2</span>), memory.permute(<span class="number">1</span>, <span class="number">2</span>, <span class="number">0</span>).view(bs, c, h, w)</span><br></pre></td></tr></table></figure>
+<p>注意，tgt是与query embedding形状一直且设置为全0的结果，意为初始化需要预测的目标。因为一开始并不清楚这些目标，所以初始化为全0。其会在Decoder的各层不断被refine，相当于一个coarse-to-fine的过程，但是真正要学习的是query embedding，学习到的是整个数据集中目标物体的统计特征，而tgt在每次迭代训练（一个batch数据刚到来）时会被重新初始化为0。</p>
+<h4 id="DETR"><a href="#DETR" class="headerlink" title="DETR"></a>DETR</h4><p>DETR包含backbone，encoder, decoder, prediction heads四个部分。encoder和decoder通常会用一个transformer来实现。prediction heads部分包括分类和回归。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DETR</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="string">""" This is the DETR module that performs object detection """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, backbone, transformer, num_classes, num_queries, aux_loss=False)</span>:</span></span><br><span class="line">        <span class="string">""" Initializes the model.</span></span><br><span class="line"><span class="string">        Parameters:</span></span><br><span class="line"><span class="string">            backbone: torch module of the backbone to be used. See backbone.py</span></span><br><span class="line"><span class="string">            transformer: torch module of the transformer architecture. See transformer.py</span></span><br><span class="line"><span class="string">            num_classes: number of object classes</span></span><br><span class="line"><span class="string">            num_queries: number of object queries, ie detection slot. This is the maximal number of objects</span></span><br><span class="line"><span class="string">                         DETR can detect in a single image. For COCO, we recommend 100 queries.</span></span><br><span class="line"><span class="string">            aux_loss: True if auxiliary decoding losses (loss at each decoder layer) are to be used.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.num_queries = num_queries</span><br><span class="line">        self.transformer = transformer</span><br><span class="line">        hidden_dim = transformer.d_model</span><br><span class="line">        <span class="comment"># class分类</span></span><br><span class="line">        self.class_embed = nn.Linear(hidden_dim, num_classes + <span class="number">1</span>)</span><br><span class="line">        <span class="comment"># box回归，包含3层nn.linear()，最后一层维度映射为4，代表bbox的中心点横、纵坐标和宽、高。</span></span><br><span class="line">        self.bbox_embed = MLP(hidden_dim, hidden_dim, <span class="number">4</span>, <span class="number">3</span>)</span><br><span class="line">        <span class="comment"># query_embed用于在Transformer中对初始化query以及对其编码生成嵌入</span></span><br><span class="line">        self.query_embed = nn.Embedding(num_queries, hidden_dim)</span><br><span class="line">		<span class="comment"># input_proj是将CNN提取的特征维度映射到Transformer隐层的维度；</span></span><br><span class="line">        self.input_proj = nn.Conv2d(backbone.num_channels, hidden_dim, kernel_size=<span class="number">1</span>)</span><br><span class="line">        self.backbone = backbone</span><br><span class="line">        self.aux_loss = aux_loss</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, samples: NestedTensor)</span>:</span></span><br><span class="line">        <span class="comment"># 将sample转换成nestedTensor类型</span></span><br><span class="line">        <span class="keyword">if</span> isinstance(samples, (list, torch.Tensor)):</span><br><span class="line">            samples = nested_tensor_from_tensor_list(samples)</span><br><span class="line">        <span class="comment"># 输入cnn提取特征，并输出pos encoding  </span></span><br><span class="line">        features, pos = self.backbone(samples)</span><br><span class="line">		<span class="comment"># 取出最后一层特征及对应mask</span></span><br><span class="line">        src, mask = features[<span class="number">-1</span>].decompose()</span><br><span class="line">        <span class="keyword">assert</span> mask <span class="keyword">is</span> <span class="keyword">not</span> <span class="keyword">None</span></span><br><span class="line">        hs = self.transformer(self.input_proj(src), mask, self.query_embed.weight, pos[<span class="number">-1</span>])[<span class="number">0</span>]</span><br><span class="line">		</span><br><span class="line">        <span class="comment"># 生成分类与回归的预测结果</span></span><br><span class="line">        outputs_class = self.class_embed(hs)</span><br><span class="line">        outputs_coord = self.bbox_embed(hs).sigmoid()</span><br><span class="line">        <span class="comment"># 由于hs包含transformer中decoder每层输出，因此索引-1表示取最后一层输出</span></span><br><span class="line">        out = &#123;<span class="string">'pred_logits'</span>: outputs_class[<span class="number">-1</span>], <span class="string">'pred_boxes'</span>: outputs_coord[<span class="number">-1</span>]&#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> self.aux_loss:</span><br><span class="line">            out[<span class="string">'aux_outputs'</span>] = self._set_aux_loss(outputs_class, outputs_coord)</span><br><span class="line">        <span class="keyword">return</span> out</span><br></pre></td></tr></table></figure>
+<h4 id="Postprocess"><a href="#Postprocess" class="headerlink" title="Postprocess"></a>Postprocess</h4><p>一部分DETR的输出并不是最终预测结果的形式，还需要进行简单的后处理。但是这里的后处理并不是NMS哦！DETR预测的是集合，并且在训练过程中经过匈牙利算法与GT一对一匹配学习，因此不存在重复框的情况。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PostProcess</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="string">""" This module converts the model's output into the format expected by the coco api"""</span></span><br><span class="line"><span class="meta">    @torch.no_grad()</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, outputs, target_sizes)</span>:</span></span><br><span class="line">      </span><br><span class="line">        out_logits, out_bbox = outputs[<span class="string">'pred_logits'</span>], outputs[<span class="string">'pred_boxes'</span>]</span><br><span class="line">        <span class="keyword">assert</span> len(out_logits) == len(target_sizes)</span><br><span class="line">        <span class="keyword">assert</span> target_sizes.shape[<span class="number">1</span>] == <span class="number">2</span></span><br><span class="line">		<span class="comment"># out_logits : (bs, num_queries,num_classes)</span></span><br><span class="line">        prob = F.softmax(out_logits, <span class="number">-1</span>)</span><br><span class="line">        scores, labels = prob[..., :<span class="number">-1</span>].max(<span class="number">-1</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># convert to [x0, y0, x1, y1] format</span></span><br><span class="line">        boxes = box_ops.box_cxcywh_to_xyxy(out_bbox)</span><br><span class="line">        <span class="comment"># and from relative [0, 1] to absolute [0, height] coordinates</span></span><br><span class="line">        img_h, img_w = target_sizes.unbind(<span class="number">1</span>)</span><br><span class="line">        scale_fct = torch.stack([img_w, img_h, img_w, img_h], dim=<span class="number">1</span>)</span><br><span class="line">        boxes = boxes * scale_fct[:, <span class="keyword">None</span>, :]</span><br><span class="line"></span><br><span class="line">        results = [&#123;<span class="string">'scores'</span>: s, <span class="string">'labels'</span>: l, <span class="string">'boxes'</span>: b&#125; <span class="keyword">for</span> s, l, b <span class="keyword">in</span> zip(scores, labels, boxes)]</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> results</span><br></pre></td></tr></table></figure>
+<h4 id="Loss-Fuction"><a href="#Loss-Fuction" class="headerlink" title="Loss Fuction"></a>Loss Fuction</h4><p>这一部分主要介绍一下和损失函数相关的部分源码。先看一下与损失函数相关的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">matcher = build_matcher(args)</span><br><span class="line">weight_dict = &#123;<span class="string">'loss_ce'</span>: <span class="number">1</span>, <span class="string">'loss_bbox'</span>: args.bbox_loss_coef&#125;</span><br><span class="line">weight_dict[<span class="string">'loss_giou'</span>] = args.giou_loss_coef</span><br><span class="line"><span class="keyword">if</span> args.masks:</span><br><span class="line">    weight_dict[<span class="string">"loss_mask"</span>] = args.mask_loss_coef</span><br><span class="line">    weight_dict[<span class="string">"loss_dice"</span>] = args.dice_loss_coef</span><br><span class="line"><span class="comment"># TODO this is a hack</span></span><br><span class="line"><span class="keyword">if</span> args.aux_loss:</span><br><span class="line">    aux_weight_dict = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(args.dec_layers - <span class="number">1</span>):</span><br><span class="line">        aux_weight_dict.update(&#123;k + <span class="string">f'_<span class="subst">&#123;i&#125;</span>'</span>: v <span class="keyword">for</span> k, v <span class="keyword">in</span> weight_dict.items()&#125;)</span><br><span class="line">    weight_dict.update(aux_weight_dict)</span><br><span class="line"></span><br><span class="line">losses = [<span class="string">'labels'</span>, <span class="string">'boxes'</span>, <span class="string">'cardinality'</span>]</span><br><span class="line"><span class="keyword">if</span> args.masks:</span><br><span class="line">    losses += [<span class="string">"masks"</span>]</span><br><span class="line">criterion = SetCriterion(num_classes, matcher=matcher, weight_dict=weight_dict,</span><br><span class="line">                         eos_coef=args.eos_coef, losses=losses)</span><br></pre></td></tr></table></figure>
+<p>matcher是将预测结果与gt进行匹配的匈牙利算法，weight_dict是各部分loss设置的权重参数，包括分类与回归损失。分类使用的是CE loss，回归包括l1 loss和giou loss。如果包含分割任务，还有mask相关损失函数，另外如果设置了aux_loss，则代表计算decoder中间层预测结果对应的loss。 loss函数的实例化使用SetCriterion进行构建的。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SetCriterion</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">    <span class="string">""" This class computes the loss for DETR.</span></span><br><span class="line"><span class="string">    The process happens in two steps:</span></span><br><span class="line"><span class="string">        1) we compute hungarian assignment between ground truth boxes and the outputs of the model</span></span><br><span class="line"><span class="string">        2) we supervise each pair of matched ground-truth / prediction (supervise class and box)</span></span><br><span class="line"><span class="string">    """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, num_classes, matcher, weight_dict, eos_coef, losses)</span>:</span></span><br><span class="line">        <span class="string">""" Create the criterion.</span></span><br><span class="line"><span class="string">        Parameters:</span></span><br><span class="line"><span class="string">            num_classes: number of object categories, omitting the special no-object category</span></span><br><span class="line"><span class="string">            matcher: module able to compute a matching between targets and proposals</span></span><br><span class="line"><span class="string">            weight_dict: dict containing as key the names of the losses and as values their relative weight.</span></span><br><span class="line"><span class="string">            eos_coef: relative classification weight applied to the no-object category</span></span><br><span class="line"><span class="string">            losses: list of all the losses to be applied. See get_loss for list of available losses.</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.num_classes = num_classes</span><br><span class="line">        self.matcher = matcher</span><br><span class="line">        self.weight_dict = weight_dict</span><br><span class="line">        <span class="comment"># 针对背景分类的loss权重</span></span><br><span class="line">        self.eos_coef = eos_coef</span><br><span class="line">        self.losses = losses</span><br><span class="line">        empty_weight = torch.ones(self.num_classes + <span class="number">1</span>)</span><br><span class="line">        empty_weight[<span class="number">-1</span>] = self.eos_coef</span><br><span class="line">        self.register_buffer(<span class="string">'empty_weight'</span>, empty_weight)</span><br><span class="line"></span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_loss</span><span class="params">(self, loss, outputs, targets, indices, num_boxes, **kwargs)</span>:</span></span><br><span class="line">        loss_map = &#123;</span><br><span class="line">            <span class="string">'labels'</span>: self.loss_labels,</span><br><span class="line">            <span class="string">'cardinality'</span>: self.loss_cardinality,</span><br><span class="line">            <span class="string">'boxes'</span>: self.loss_boxes,</span><br><span class="line">            <span class="string">'masks'</span>: self.loss_masks</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">assert</span> loss <span class="keyword">in</span> loss_map, <span class="string">f'do you really want to compute <span class="subst">&#123;loss&#125;</span> loss?'</span></span><br><span class="line">        <span class="keyword">return</span> loss_map[loss](outputs, targets, indices, num_boxes, **kwargs)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, outputs, targets)</span>:</span></span><br><span class="line">        <span class="string">""" This performs the loss computation.</span></span><br><span class="line"><span class="string">        Parameters:</span></span><br><span class="line"><span class="string">             outputs: dict of tensors, see the output specification of the model for the format</span></span><br><span class="line"><span class="string">             targets: list of dicts, such that len(targets) == batch_size.</span></span><br><span class="line"><span class="string">                      The expected keys in each dict depends on the losses applied, see each loss' doc</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        </span><br><span class="line">        outputs_without_aux = &#123;k: v <span class="keyword">for</span> k, v <span class="keyword">in</span> outputs.items() <span class="keyword">if</span> k != <span class="string">'aux_outputs'</span>&#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Retrieve the matching between the outputs of the last layer and the targets</span></span><br><span class="line">        <span class="comment"># 将预测结果与GT进行匹配，indices是一个与bs长度相等的多元组的list</span></span><br><span class="line">        <span class="comment"># 每个元组为(ind_i,ind_j),前者是匹配的预测预测索引，后者是gt的索引</span></span><br><span class="line">        indices = self.matcher(outputs_without_aux, targets)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Compute the average number of target boxes accross all nodes, for normalization purposes</span></span><br><span class="line">        num_boxes = sum(len(t[<span class="string">"labels"</span>]) <span class="keyword">for</span> t <span class="keyword">in</span> targets)</span><br><span class="line">        num_boxes = torch.as_tensor([num_boxes], dtype=torch.float, device=next(iter(outputs.values())).device)</span><br><span class="line">        <span class="keyword">if</span> is_dist_avail_and_initialized():</span><br><span class="line">            torch.distributed.all_reduce(num_boxes)</span><br><span class="line">        num_boxes = torch.clamp(num_boxes / get_world_size(), min=<span class="number">1</span>).item()</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Compute all the requested losses</span></span><br><span class="line">        <span class="comment"># 计算所有相关的损失，其中self.losses = ['labels', 'boxes', 'cardinality']</span></span><br><span class="line">        losses = &#123;&#125;</span><br><span class="line">        <span class="keyword">for</span> loss <span class="keyword">in</span> self.losses:</span><br><span class="line">            losses.update(self.get_loss(loss, outputs, targets, indices, num_boxes))</span><br><span class="line">        <span class="string">"""</span></span><br><span class="line"><span class="string">        '''</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        <span class="keyword">return</span> losses</span><br></pre></td></tr></table></figure>
+<p>从forward函数可以看出，首先进行匈牙利匹配的是decoder最后一层的输出，之后再计算匹配后的损失函数包括losses = [‘labels’, ‘boxes’, ‘cardinality’]，具体计算部分可以看get_loss方法中映射的对应计算方法，其中包括self.loss_labels，self.loss_cardinality，self.loss_boxes。</p>
+<h4 id="匈牙利匹配"><a href="#匈牙利匹配" class="headerlink" title="匈牙利匹配"></a>匈牙利匹配</h4><p>匈牙利算法，在这里用于预测集（prediction set）和GT的匹配，<strong>最终匹配方案是选取“loss总和”最小的分配方式。</strong>注意，这里计算的loss与损失函数中计算loss并不相同，在这里是用来作为代价cost，cost大小决定匹配程度。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HungarianMatcher</span><span class="params">(nn.Module)</span>:</span></span><br><span class="line">   </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, cost_class: float = <span class="number">1</span>, cost_bbox: float = <span class="number">1</span>, cost_giou: float = <span class="number">1</span>)</span>:</span></span><br><span class="line">        <span class="string">"""Creates the matcher</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        Params:</span></span><br><span class="line"><span class="string">            cost_class: This is the relative weight of the classification error in the matching cost</span></span><br><span class="line"><span class="string">            cost_bbox: This is the relative weight of the L1 error of the bounding box coordinates in the matching cost</span></span><br><span class="line"><span class="string">            cost_giou: This is the relative weight of the giou loss of the bounding box in the matching cost</span></span><br><span class="line"><span class="string">        """</span></span><br><span class="line">        super().__init__()</span><br><span class="line">        self.cost_class = cost_class</span><br><span class="line">        self.cost_bbox = cost_bbox</span><br><span class="line">        self.cost_giou = cost_giou</span><br><span class="line">        <span class="keyword">assert</span> cost_class != <span class="number">0</span> <span class="keyword">or</span> cost_bbox != <span class="number">0</span> <span class="keyword">or</span> cost_giou != <span class="number">0</span>, <span class="string">"all costs cant be 0"</span></span><br><span class="line"></span><br><span class="line"><span class="meta">    @torch.no_grad()</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span><span class="params">(self, outputs, targets)</span>:</span></span><br><span class="line">        bs, num_queries = outputs[<span class="string">"pred_logits"</span>].shape[:<span class="number">2</span>]</span><br><span class="line"></span><br><span class="line">        <span class="comment"># We flatten to compute the cost matrices in a batch</span></span><br><span class="line">        out_prob = outputs[<span class="string">"pred_logits"</span>].flatten(<span class="number">0</span>, <span class="number">1</span>).softmax(<span class="number">-1</span>)  <span class="comment"># [batch_size * num_queries, num_classes]</span></span><br><span class="line">        out_bbox = outputs[<span class="string">"pred_boxes"</span>].flatten(<span class="number">0</span>, <span class="number">1</span>)  <span class="comment"># [batch_size * num_queries, 4]</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># Also concat the target labels and boxes</span></span><br><span class="line">        tgt_ids = torch.cat([v[<span class="string">"labels"</span>] <span class="keyword">for</span> v <span class="keyword">in</span> targets])</span><br><span class="line">        tgt_bbox = torch.cat([v[<span class="string">"boxes"</span>] <span class="keyword">for</span> v <span class="keyword">in</span> targets])</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Compute the classification cost. Contrary to the loss, we don't use the NLL,</span></span><br><span class="line">        <span class="comment"># but approximate it in 1 - proba[target class].</span></span><br><span class="line">        <span class="comment"># The 1 is a constant that doesn't change the matching, it can be ommitted.</span></span><br><span class="line">        cost_class = -out_prob[:, tgt_ids]</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Compute the L1 cost between boxes</span></span><br><span class="line">        cost_bbox = torch.cdist(out_bbox, tgt_bbox, p=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Compute the giou cost betwen boxes</span></span><br><span class="line">        cost_giou = -generalized_box_iou(box_cxcywh_to_xyxy(out_bbox), box_cxcywh_to_xyxy(tgt_bbox))</span><br><span class="line"></span><br><span class="line">        <span class="comment"># Final cost matrix</span></span><br><span class="line">        C = self.cost_bbox * cost_bbox + self.cost_class * cost_class + self.cost_giou * cost_giou</span><br><span class="line">        C = C.view(bs, num_queries, <span class="number">-1</span>).cpu()</span><br><span class="line"></span><br><span class="line">        sizes = [len(v[<span class="string">"boxes"</span>]) <span class="keyword">for</span> v <span class="keyword">in</span> targets]</span><br><span class="line">        indices = [linear_sum_assignment(c[i]) <span class="keyword">for</span> i, c <span class="keyword">in</span> enumerate(C.split(sizes, <span class="number">-1</span>))]</span><br><span class="line">        <span class="keyword">return</span> [(torch.as_tensor(i, dtype=torch.int64), torch.as_tensor(j, dtype=torch.int64)) <span class="keyword">for</span> i, j <span class="keyword">in</span> indices]</span><br></pre></td></tr></table></figure>
+<p>从上面可以看到，匈牙利匹配在前向计算过程中，是不需要梯度的。其中分类cost是直接采用1减去预测概率的形式，同时由于1是常数，于是作者甚至连1都省去了，在box上计算了l1和giou两种cost，之后对各部分进行加权求和得到总的cost。匹配方法使用的是 <em>scipy</em> 优化模块中的 <em>linear_sum_assignment()</em>，其输入是二分图的度量矩阵，该方法是计算这个二分图度量矩阵的最小权重分配方式，返回的是匹配方案对应的矩阵行索引和列索引。</p>
+<h4 id="End"><a href="#End" class="headerlink" title="End"></a>End</h4><p>至此，DETR所有相关源码均已解读完毕。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/transformer/" rel="tag"># transformer</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/07/18/pix2seq/" rel="next" title="pix2seq方法详解">
+                <i class="fa fa-chevron-left"></i> pix2seq方法详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2022/07/26/Deformable DETR/" rel="prev" title="Deformable-DETR详解与代码解读">
+                Deformable-DETR详解与代码解读 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">104</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Encoder"><span class="nav-number">1.</span> <span class="nav-text">Encoder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Query-Embedding"><span class="nav-number">2.</span> <span class="nav-text">Query Embedding</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Decoder"><span class="nav-number">3.</span> <span class="nav-text">Decoder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Transformer"><span class="nav-number">4.</span> <span class="nav-text">Transformer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DETR"><span class="nav-number">5.</span> <span class="nav-text">DETR</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Postprocess"><span class="nav-number">6.</span> <span class="nav-text">Postprocess</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Loss-Fuction"><span class="nav-number">7.</span> <span class="nav-text">Loss Fuction</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#匈牙利匹配"><span class="nav-number">8.</span> <span class="nav-text">匈牙利匹配</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#End"><span class="nav-number">9.</span> <span class="nav-text">End</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

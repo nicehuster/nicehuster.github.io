@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="多模态,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="本文要介绍的是微软的俩篇有关VLP的工作，Oscar和METER，前者是发表在CVPR2020，后者是发表在CVPR2022。论文链接如下：Oscar: Object-Semantics Aligned Pre-training for Vision-Language Tasks，An Empirical Study of Training End-to-End Vision-and-Langua">
+<meta name="keywords" content="多模态">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Oscar&amp;METER方法详解">
+<meta property="og:url" content="https://blog.nicehuster.cn/2022/08/29/Oscar_METER/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="本文要介绍的是微软的俩篇有关VLP的工作，Oscar和METER，前者是发表在CVPR2020，后者是发表在CVPR2022。论文链接如下：Oscar: Object-Semantics Aligned Pre-training for Vision-Language Tasks，An Empirical Study of Training End-to-End Vision-and-Langua">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/oscar.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/oscar-pipeline.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/oscar-exp.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/meter-overview.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/meter-glossary-of-vlp.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/meter-multimodel-fusion.png">
+<meta property="og:updated_time" content="2022-09-09T08:35:26.613Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Oscar&amp;METER方法详解">
+<meta name="twitter:description" content="本文要介绍的是微软的俩篇有关VLP的工作，Oscar和METER，前者是发表在CVPR2020，后者是发表在CVPR2022。论文链接如下：Oscar: Object-Semantics Aligned Pre-training for Vision-Language Tasks，An Empirical Study of Training End-to-End Vision-and-Langua">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/oscar.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2022/08/29/Oscar_METER/">
+
+
+
+
+
+  <title>Oscar&METER方法详解 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2022/08/29/Oscar_METER/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Oscar&METER方法详解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-08-29T19:13:39+08:00">
+                2022-08-29
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文要介绍的是微软的俩篇有关VLP的工作，Oscar和METER，前者是发表在CVPR2020，后者是发表在CVPR2022。论文链接如下：<a href="https://arxiv.org/pdf/2004.06165.pdf" target="_blank" rel="noopener">Oscar: Object-Semantics Aligned Pre-training for Vision-Language Tasks</a>，<a href="https://arxiv.org/pdf/2111.02387.pdf" target="_blank" rel="noopener">An Empirical Study of Training End-to-End Vision-and-Language Transformers</a>，下面大致介绍这俩篇工作的具体内容。</p>
+<a id="more"></a>
+<h3 id="Oscar"><a href="#Oscar" class="headerlink" title="Oscar"></a>Oscar</h3><p>这篇论文中提出了一种新的多模态预训练方法Oscar，把object用作视觉和语言语义层面上的Anchor Point，以简化图像和文本之间的语义对齐的学习任务，在多个下游任务上刷新了SOTA。</p>
+<p><img src="/img/oscar.png" alt="oscar"></p>
+<h4 id="Motivation"><a href="#Motivation" class="headerlink" title="Motivation"></a>Motivation</h4><p>在此之前，VLP方法都是简单粗暴地将图像区域特征和文本特征连接起来作为模型的输入以进行预训练，并不为模型提供任何线索，希望模型能利用Transformer的自我注意机制，使用蛮力来学习图像文本语义对齐方式。检测器在图像上检测的object通常会出现在对应caption text中，因此作者提出使用检测出来的物体标签对应caption中的词建立一个关联。</p>
+<h4 id="Pipeline"><a href="#Pipeline" class="headerlink" title="Pipeline"></a>Pipeline</h4><p><img src="/img/oscar-pipeline.png" alt="oscar-pipeline"></p>
+<p>上图展示了OSCAR的pipeline，通过将对象标签作为anchor引入，Oscar在两个方面与现有的VLP不同：</p>
+<blockquote>
+<ol>
+<li>输入表示：每个image-text样本定义为一个三元组（单词序列，物体标签，区域特征）。</li>
+<li>目标函数：作者从两个不同的角度设计目标函数： modality视角（Contrastive Loss）和dictionary视角（Masked Token Loss）。</li>
+</ol>
+</blockquote>
+<p>注意，在这里object tag输入的embedding是使用同一词表得到word embedding。</p>
+<h4 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h4><p><img src="/img/oscar-exp.png" alt="oscar-exp"></p>
+<p>Oscar在六项任务上均达到了SOTA。在大多数任务上，Osacr的base model要优于以前方法的large model，其表明Oscar具有很高的参数利用效率，这是因为<strong>object tag的使用大大简化了图像和文本之间语义对齐的学习</strong>。</p>
+<p>在这之后，原班作者在Oscar基础上针对检测模型部分提出了<a href="https://arxiv.org/abs/2101.00529" target="_blank" rel="noopener">VinVL</a>，聚焦于提升检测模型提取视觉语义特征能力。</p>
+<h3 id="METER"><a href="#METER" class="headerlink" title="METER"></a>METER</h3><p>这是微软在CVPR2022上的有关VLP的工作。本文提出了METER，一个end2end的VLP框架，并从visual encoder、text encoder、Multimodal Fusion、结构设计以及与预训练目标函数上对VLP做了详细实验分析。METER在VQAv2上取得sota结果。</p>
+<p><img src="/img/meter-overview.png" alt="meter-overview"></p>
+<h4 id="Glossary-of-VLP-Models"><a href="#Glossary-of-VLP-Models" class="headerlink" title="Glossary of VLP Models"></a>Glossary of VLP Models</h4><p>以往基于OD（object detector）的VLP方法需要freeze object detector，限制了VLP模型能力，而且提取region特征时间代价较大。近期大多使用的ViT做visual encoder的VLP方法相比VinVL(OD)性能存在差距，为缩小差距本文提出METER，探索如何设计VLP模型。作者对现有VLP工作根据visual encoder、text encoder、Multimodal Fusion、Decoder以及预训练目标函数进行分类划分。</p>
+<p><img src="/img/meter-glossary-of-vlp.png" alt="meter-glossary-of-vlp"></p>
+<h4 id="METER-1"><a href="#METER-1" class="headerlink" title="METER"></a>METER</h4><p>总体结构：输入图片和文本对，图片经过visual encoder（CLIP-ViT，Swin，BEiT等）编码，文本经过text encoder（BERT，RoBERTa，DeBERTA等）编码，之后两者经过多模态融合模块（Merged Attention/Co-Attention）进行模态信息交互，最后经过一个可选的解码器输出结果。在论文中，作者对VLP模型各个模块都进行了分类和阐述，在实验部分进行了综合性分析并得到了每个部分最好的一个结构，从和产生METER最终结构。</p>
+<blockquote>
+<p>Vsual Encoder： CLIP-ViT-224/16，Swin Transformer</p>
+<p>Text Encoder：Roberta</p>
+<p>Multimodal Fusion： Co-attention（如下图所示）</p>
+<p>Pre-training Objectives：MLM（masked language modeling ）+ITM（image-text matching）</p>
+</blockquote>
+<p><img src="/img/meter-multimodel-fusion.png" alt="meter-multimodel-fusion"></p>
+<p>上图展示的是多模态融合模块的结构，在METER中，使用的是Co-Attention，Co-Attention中包含了堆叠的6层transformer layers，每层包含了一个self-attention，一个co-attention和一个前馈网络。没有decoder和编码器参数共享。</p>
+<h4 id="Experiments-1"><a href="#Experiments-1" class="headerlink" title="Experiments"></a>Experiments</h4><p>在预训练数据方面，作者仅使用了COCO, Conceptual Captions, SBU Captions and Visual Genome，总共4M图片数据。在多个下游任务上进行验证，其中包括VQAv2，visual reasoning(NLVR2), visual entailment(SNLI-VE)和image-text retrieval(COO, Flickr30k)。作者实验做的非常详细，推荐去看原文。</p>
+<h4 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h4><p>（1）MERTER是Vision transformer + Text transformer结构</p>
+<p>（2）在METER中Vision encoder用CLIP-ViT或者Swim transformer，Text encoder用Roberta，多模态融合用co-attention；</p>
+<p>（3）在目标函数上，MLM+ITM都对VLP模型有帮助，但是MIM会带来负面影响；</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/多模态/" rel="tag"># 多模态</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/08/18/ALBEF/" rel="next" title="ALBEF方法详解">
+                <i class="fa fa-chevron-left"></i> ALBEF方法详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">105</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Oscar"><span class="nav-number">1.</span> <span class="nav-text">Oscar</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Motivation"><span class="nav-number">1.1.</span> <span class="nav-text">Motivation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pipeline"><span class="nav-number">1.2.</span> <span class="nav-text">Pipeline</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Experiments"><span class="nav-number">1.3.</span> <span class="nav-text">Experiments</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#METER"><span class="nav-number">2.</span> <span class="nav-text">METER</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Glossary-of-VLP-Models"><span class="nav-number">2.1.</span> <span class="nav-text">Glossary of VLP Models</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#METER-1"><span class="nav-number">2.2.</span> <span class="nav-text">METER</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Experiments-1"><span class="nav-number">2.3.</span> <span class="nav-text">Experiments</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Conclusion"><span class="nav-number">2.4.</span> <span class="nav-text">Conclusion</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

@@ -401,10 +401,6 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://blog.nicehuster.cn/2019/06/12/fine-grain/</loc>
-    <lastmod>2020-09-13</lastmod>
-  </url>
-  <url>
     <loc>https://blog.nicehuster.cn/2018/03/09/dl_environ/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
@@ -413,7 +409,7 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/29/tensorRT_customlayer/</loc>
+    <loc>https://blog.nicehuster.cn/2019/06/12/fine-grain/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
@@ -422,6 +418,10 @@
   </url>
   <url>
     <loc>https://blog.nicehuster.cn/2018/07/26/tensorRT_introduce/</loc>
+    <lastmod>2020-09-13</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.nicehuster.cn/2018/07/29/tensorRT_customlayer/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>

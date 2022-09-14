@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://blog.nicehuster.cn/"/>
-  <updated>2022-09-09T08:48:21.921Z</updated>
+  <updated>2022-09-14T10:05:36.584Z</updated>
   <id>https://blog.nicehuster.cn/</id>
   
   <author>
@@ -15,6 +15,53 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>通用多模态预训练方法OFA</title>
+    <link href="https://blog.nicehuster.cn/2022/09/09/OFA/"/>
+    <id>https://blog.nicehuster.cn/2022/09/09/OFA/</id>
+    <published>2022-09-09T11:13:39.000Z</published>
+    <updated>2022-09-14T10:05:36.584Z</updated>
+    
+    <content type="html"><![CDATA[<p>OFA是阿里达摩院发表在ICML2022上有关多模态预训练的工作，论文链接：<a href="https://arxiv.org/abs/2202.03052" target="_blank" rel="noopener">OFA: Unifying Architectures, Tasks, and Modalities Through a Simple Sequence-to-Sequence Learning Framework</a>。OFA是通用多模态预训练模型，使用简单的seq2seq的学习框架统一模态（跨模态、视觉、语言等模态）和任务（如图片生成、视觉定位、图片描述、图片分类、文本生成等），OFA通过任务指令即可执行pretrain/finetune，无需引入额外设计任务layer或head，OFA在一系列多模态任务上达到了sota结果。</p><a id="more"></a><p><img src="/img/tasks supported by ofa.png" alt="image-20220914162624793"></p><h3 id="Once-For-All-OFA"><a href="#Once-For-All-OFA" class="headerlink" title="Once For All(OFA)"></a>Once For All(OFA)</h3><p><img src="/img/ofa-framework.png" alt="image-20220914163046310"></p><h4 id="I-O-amp-Architecture"><a href="#I-O-amp-Architecture" class="headerlink" title="I/O &amp; Architecture"></a>I/O &amp; Architecture</h4><p>多模态输入大致分为：图片、文本、位置(坐标)。OFA针对这些不同的输入形式同一成序列形式。对应处理方法如下：</p><blockquote><ul><li>图片输入：使用类似SimVLM和CoAtNet的方式，直接使用ResNet模块将图片卷积成多个patch特征；</li><li>文本输入：使用byte-pair encoding (BPE)进行subword级别分词，然后进行embed；</li><li>位置(坐标)：针对目标框类型的输入，把位置编码成token，每个检测框用<x1,y1,x2,y2>四个token表示，参考pix2seq做法；</x1,y1,x2,y2></li><li>统一的词表：语言和视觉token被统一起来，包括subword、图像token和位置token。</li></ul></blockquote><h4 id="Tasks-amp-Modalities"><a href="#Tasks-amp-Modalities" class="headerlink" title="Tasks &amp; Modalities"></a>Tasks &amp; Modalities</h4><p>OFA将单模态/多模态的理解/生成任务统一成seq2seq任务，每个任务通过任务指令进行区分：</p><blockquote><ul><li>visual grounding (VG)：“Which region does the text $x_t$ describe?” $x_t$ 目标区域的文本描述；</li><li>grounded captioning(GC)：VG的反向任务，“What does the region describe? region: $<x_1,y_1,x_2,y_2>$ ”.</x_1,y_1,x_2,y_2></li><li>image-text matching (ITM)：“Does the image describe  $x_t$ ?” $x_t$ 是图片的描述；</li><li>image captioning (IC)：“What does the image describe?”</li><li>visual question answering (VQA)：使用image和question作为输入，学习正确的答案；</li><li>Detection：“What are the objects in the image?”</li><li>image infilling：“What is the image in the middle part?”</li></ul></blockquote><p>在附录中，列举了针对不同任务数据集下的指令，如下表所示：</p><p><img src="/img/ofa-instructions.png" alt="image-20220914171851379"></p><h3 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h3><p>OFA在image caption、VQA、visual entailment 和 referring expression comprehension 4个跨模态任务中都取得了SOTA。</p><p><img src="/img/ofa-exp-image-captions.png" alt="image-20220914173932416"></p><p>在image-to-text generation任务中，OFA 也超过了DALLE, CogView和微软的NÜWA模型。</p><p><img src="/img/ofa-exps-text2image.png" alt="image-20220914174359855"></p><h3 id="Conclusion"><a href="#Conclusion" class="headerlink" title="Conclusion"></a>Conclusion</h3><p>OFA在整体工作上并没有提出新的框架，也没有给人一种眼前一亮的感觉，但是就是抵不住效果好，而且将多种模态\任务都统一成seq2seq任务，做的实验非常solid，而且还开源了代码，很赞。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;OFA是阿里达摩院发表在ICML2022上有关多模态预训练的工作，论文链接：&lt;a href=&quot;https://arxiv.org/abs/2202.03052&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;OFA: Unifying Architectures, Tasks, and Modalities Through a Simple Sequence-to-Sequence Learning Framework&lt;/a&gt;。OFA是通用多模态预训练模型，使用简单的seq2seq的学习框架统一模态（跨模态、视觉、语言等模态）和任务（如图片生成、视觉定位、图片描述、图片分类、文本生成等），OFA通过任务指令即可执行pretrain/finetune，无需引入额外设计任务layer或head，OFA在一系列多模态任务上达到了sota结果。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
+    
+    
+      <category term="multi-model" scheme="https://blog.nicehuster.cn/tags/multi-model/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>最简单的多模态VLP模型ViLT</title>
+    <link href="https://blog.nicehuster.cn/2022/09/03/ViLT/"/>
+    <id>https://blog.nicehuster.cn/2022/09/03/ViLT/</id>
+    <published>2022-09-03T11:13:39.000Z</published>
+    <updated>2022-09-14T10:08:37.809Z</updated>
+    
+    <content type="html"><![CDATA[<p>本文介绍一篇发表在ICML2021上有关多模态预训练相关的论文，ViLT: Vision-and-Language Transformer Without Convolution or Region Supervision，ViLT不需要使用预训练的ViT来初始化多模态交互的transformer，直接用用交互层来处理视觉特征，无需额外增加视觉encoder，比如提取region features的object detector。</p><h4 id="Taxonomy-of-Vision-and-Language-Models"><a href="#Taxonomy-of-Vision-and-Language-Models" class="headerlink" title="Taxonomy of Vision-and-Language Models"></a>Taxonomy of Vision-and-Language Models</h4><p>在这篇论文中，作者依据：1）在参数或者计算上，俩种模态是否保持平衡；2）俩种模态是否是在深度网络中进行交互；将现有的VLP模型大致划分为以下四种：</p><p><img src="/img/four-cat-vlp.png" alt="image-20220905161210413"></p><p>其中每个圆角矩形的大小表示相对计算量大小，VE、TE和MI分别是visual embedding、text embedding和modality interaction的简写。</p><a id="more"></a><h4 id="Visual-Embedding-Schema"><a href="#Visual-Embedding-Schema" class="headerlink" title="Visual Embedding Schema"></a>Visual Embedding Schema</h4><p><img src="/img/Visual Embedding Schema.png" alt="image-20220905161656563"></p><p>现有的VLP模型的text embedding大多是使用类BERT结构，但是visual embedding存在着差异。在大多数情况下，visual embedding是现有VLP模型的瓶颈。visual embedding的方法总共有三大类，其中region feature方法通常采用Faster R-CNN二阶段检测器提取region的特征，grid feature方法直接使用CNN提取grid的特征，patch projection方法采用类似ViT将输入图片切片投影提取特征。</p><h4 id="Vision-and-Language-Transformer"><a href="#Vision-and-Language-Transformer" class="headerlink" title="Vision-and-Language Transformer"></a>Vision-and-Language Transformer</h4><p><img src="/img/vilt-overview.png" alt="image-20220905162017113"></p><p>上图展示的是ViLT结构，采用的是single-stream结构，对visual和text进行concat后进行交互操作。在文本特征提取部分采用的是word embedding得到text embedding而没有使用类似bert结构，在图像特征提取部分采用的是ViT那套对图像切块然后拼成序列通过线性映射得到visual embedding，最后俩个embedding都会结合各自的position embedding和modal-type embedding输入到transformer encoder中进行交互；其中modal-type embedding用于区分text embedding和visual embedding；此外，需要注意的是，text embedding和visual embedding分别都嵌入了额外的[cls] embedding用于后续的下游任务；</p><h4 id="Pre-training-Objectives"><a href="#Pre-training-Objectives" class="headerlink" title="Pre-training Objectives"></a>Pre-training Objectives</h4><p>ViLT的预训练目标函数包括俩个：image text matching (ITM) and masked language modeling (MLM)；</p><blockquote><p><strong>ImageText Matching</strong>：随机以0.5的概率将文本对应的图片替换成不同的图片，然后对文本标志位对应输出使用一个线性的ITM head将输出feature映射成一个二值logits，用来判断图像文本是否匹配。</p><p><strong>Masked Language Modeling</strong>：MLM的目标是通过文本的上下文信息去预测masked的文本tokens。随机以0.15的概率mask掉tokens；</p></blockquote><p>此外，在ViLT中还使用了whole word masking技巧；将连续的子词tokens进行mask的技巧，避免了只通过单词上下文进行预测。比如，使用bert-base-uncased预训练的tokenizer对“giraffe”进行分词，就会得到[“gi”, “##raf”, “##fe”]，可以mask成[“gi”, “[MASK]”, “##fe”]，模型会通过mask的上下文信息[“gi”，“##fe”]来预测mask的“##raf”，就会导致不利用图像信息。</p><h4 id="Experiments"><a href="#Experiments" class="headerlink" title="Experiments"></a>Experiments</h4><p><img src="/img/vilt-runtime.png" alt="image-20220905163545451"></p><p>如上图所示，相比于基于region feature方法和grid feature方法，在速度上分别快60倍和4倍。在下游任务上也取得不错的性能。</p><p><img src="/img/vilt-cls.png" alt="image-20220905164010026"></p><p><img src="/img/vilt-retrival.png" alt="image-20220905163936444"></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文介绍一篇发表在ICML2021上有关多模态预训练相关的论文，ViLT: Vision-and-Language Transformer Without Convolution or Region Supervision，ViLT不需要使用预训练的ViT来初始化多模态交互的transformer，直接用用交互层来处理视觉特征，无需额外增加视觉encoder，比如提取region features的object detector。&lt;/p&gt;
+&lt;h4 id=&quot;Taxonomy-of-Vision-and-Language-Models&quot;&gt;&lt;a href=&quot;#Taxonomy-of-Vision-and-Language-Models&quot; class=&quot;headerlink&quot; title=&quot;Taxonomy of Vision-and-Language Models&quot;&gt;&lt;/a&gt;Taxonomy of Vision-and-Language Models&lt;/h4&gt;&lt;p&gt;在这篇论文中，作者依据：1）在参数或者计算上，俩种模态是否保持平衡；2）俩种模态是否是在深度网络中进行交互；将现有的VLP模型大致划分为以下四种：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/four-cat-vlp.png&quot; alt=&quot;image-20220905161210413&quot;&gt;&lt;/p&gt;
+&lt;p&gt;其中每个圆角矩形的大小表示相对计算量大小，VE、TE和MI分别是visual embedding、text embedding和modality interaction的简写。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
+    
+    
+      <category term="multi-model" scheme="https://blog.nicehuster.cn/tags/multi-model/"/>
+    
+  </entry>
   
   <entry>
     <title>Oscar&amp;METER方法详解</title>
@@ -423,51 +470,6 @@
     
     
       <category term="self-supervised" scheme="https://blog.nicehuster.cn/tags/self-supervised/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>自监督学习--基于pretext-task方法</title>
-    <link href="https://blog.nicehuster.cn/2021/12/10/self-sup-pretext-task/"/>
-    <id>https://blog.nicehuster.cn/2021/12/10/self-sup-pretext-task/</id>
-    <published>2021-12-10T11:13:39.000Z</published>
-    <updated>2022-04-23T13:11:12.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>自从2019年MoCo横空出世，掀起了一股自监督学习的浪潮，随后SimCLR,MoCo,BYOL,SwAV等一系列优秀的工作被提出，2021年底，何凯明的MAE更是将自监督学习带到另外一个高度。自监督学习的背后一个强大的动机就是，打破目前神经网络训练对于标注数据的依赖，即使在没有标注数据的情况下，也可以高效的训练网络。自监督学习的核心在于合理构建有利于模型学习的任务，其大致可分为三类：</p><p><img src="/img/self-sup-categories.png" alt="img"></p><a id="more"></a><p>基于pretext task的自监督学习方法大概有四篇经典的工作：</p><h3 id="1-Relative-Location-CVPR2015"><a href="#1-Relative-Location-CVPR2015" class="headerlink" title="1. Relative Location(CVPR2015)"></a>1. <a href="https://arxiv.org/abs/1505.05192" target="_blank" rel="noopener">Relative Location(CVPR2015)</a></h3><p><img src="/img/self-sup-rl.png" alt="img"></p><h3 id="2-Colorization-ECCV2016"><a href="#2-Colorization-ECCV2016" class="headerlink" title="2. Colorization(ECCV2016)"></a>2. <a href="https://arxiv.org/abs/1603.08511" target="_blank" rel="noopener">Colorization(ECCV2016)</a></h3><p><img src="/img/self-sup-color.png" alt="img"></p><h3 id="3-Context-Encoders（CVPR2016）"><a href="#3-Context-Encoders（CVPR2016）" class="headerlink" title="3. Context Encoders（CVPR2016）"></a>3. <a href="https://arxiv.org/abs/1604.07379" target="_blank" rel="noopener">Context Encoders（CVPR2016）</a></h3><p><img src="/img/self-sup-ce.png" alt="img"></p><h3 id="4-Rotation-Prediction-ICLR2018"><a href="#4-Rotation-Prediction-ICLR2018" class="headerlink" title="4. Rotation Prediction(ICLR2018)"></a>4. <a href="https://arxiv.org/abs/1803.07728" target="_blank" rel="noopener">Rotation Prediction(ICLR2018)</a></h3><p><img src="/img/self-sup-rp.png" alt="img"></p><p>从上面4种方法可以看出，基于pretext task的自监督学习方法都具备俩个特点：</p><blockquote><ol><li>良好的任务定义，比如预测旋转角度，或者相对位置</li><li>合理的限制条件，避免模型出现无效解</li></ol></blockquote>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;自从2019年MoCo横空出世，掀起了一股自监督学习的浪潮，随后SimCLR,MoCo,BYOL,SwAV等一系列优秀的工作被提出，2021年底，何凯明的MAE更是将自监督学习带到另外一个高度。自监督学习的背后一个强大的动机就是，打破目前神经网络训练对于标注数据的依赖，即使在没有标注数据的情况下，也可以高效的训练网络。自监督学习的核心在于合理构建有利于模型学习的任务，其大致可分为三类：&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/img/self-sup-categories.png&quot; alt=&quot;img&quot;&gt;&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
-    
-    
-      <category term="self-supervised learning" scheme="https://blog.nicehuster.cn/tags/self-supervised-learning/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Transformer 杂记</title>
-    <link href="https://blog.nicehuster.cn/2021/12/05/transformer-soup/"/>
-    <id>https://blog.nicehuster.cn/2021/12/05/transformer-soup/</id>
-    <published>2021-12-05T11:13:39.000Z</published>
-    <updated>2022-04-12T11:39:52.000Z</updated>
-    
-    <content type="html"><![CDATA[<p>近期断断续续的看了一些transformer相关的paper，看的比较杂，有些是对应领域比较有代表性地工作。偷个懒就不详细介绍每篇Paper，简单地记录一下这些paper大致要解决地问题。</p><a id="more"></a><h4 id="1-MAE-Masked-Autoencoders-Are-Scalable-Vision-Learners"><a href="#1-MAE-Masked-Autoencoders-Are-Scalable-Vision-Learners" class="headerlink" title="1. MAE:Masked Autoencoders Are Scalable Vision Learners"></a>1. MAE:Masked Autoencoders Are Scalable Vision Learners</h4><p>自监督学习方法，核心思想是以一定比例随机 mask 掉图片中的一些图像块(patch)然后重建这些部分的像素值</p><h4 id="2-SegFormer-Simple-and-Efficient-Design-for-Semantic-Segmentation-with-Transformers"><a href="#2-SegFormer-Simple-and-Efficient-Design-for-Semantic-Segmentation-with-Transformers" class="headerlink" title="2.SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers"></a>2.SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers</h4><p>设计多层次backbone MIT，丢弃PE，优化self-att加速推理，此外从SETR痛点出发设计轻量级MLP解码器</p><h4 id="3-Early-Convolutions-Help-Transformers-See-Better"><a href="#3-Early-Convolutions-Help-Transformers-See-Better" class="headerlink" title="3.Early Convolutions Help Transformers See Better"></a>3.Early Convolutions Help Transformers See Better</h4><p>Vit训练不稳定在于Patch Embedding时使用大卷积核以及大步长导致，进一步提出使用step-wise conv stem进行替换，以此改进vit训练稳定性问题</p><h4 id="4-Visformer-The-Vision-friendly-Transformer"><a href="#4-Visformer-The-Vision-friendly-Transformer" class="headerlink" title="4.Visformer: The Vision-friendly Transformer"></a>4.Visformer: The Vision-friendly Transformer</h4><p>提升transformer方法的性能下限，即使是小数据集依然可以得到很好的性能</p><h4 id="5-Conditional-Positional-Encodings-for-Vision-Transformers"><a href="#5-Conditional-Positional-Encodings-for-Vision-Transformers" class="headerlink" title="5.Conditional Positional Encodings for Vision Transformers"></a>5.Conditional Positional Encodings for Vision Transformers</h4><p>利用卷积+zero-padding来编码局部位置信息，从而丢弃现有的PE，解决输入大小变化时需要对PE进行插值和fine-tune的问题</p><h4 id="6-MetaFormer-is-Actually-What-You-Need-for-Vision"><a href="#6-MetaFormer-is-Actually-What-You-Need-for-Vision" class="headerlink" title="6.MetaFormer is Actually What You Need for Vision"></a>6.MetaFormer is Actually What You Need for Vision</h4><p>transformer优于cnn在于其结构，而不是attention，即使替换成pooling，也能达到不错的性能</p><h4 id="7-Per-Pixel-Classification-is-Not-All-You-Need-for-Semantic-Segmentation"><a href="#7-Per-Pixel-Classification-is-Not-All-You-Need-for-Semantic-Segmentation" class="headerlink" title="7.Per-Pixel Classification is Not All You Need for Semantic Segmentation"></a>7.Per-Pixel Classification is Not All You Need for Semantic Segmentation</h4><p>提出了一种新的分割范式，解耦分割和分类，统一语义分割和实例分割任务</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;p&gt;近期断断续续的看了一些transformer相关的paper，看的比较杂，有些是对应领域比较有代表性地工作。偷个懒就不详细介绍每篇Paper，简单地记录一下这些paper大致要解决地问题。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="paper reading" scheme="https://blog.nicehuster.cn/categories/paper-reading/"/>
-    
-    
-      <category term="transformer" scheme="https://blog.nicehuster.cn/tags/transformer/"/>
     
   </entry>
   

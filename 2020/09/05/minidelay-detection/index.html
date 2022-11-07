@@ -390,12 +390,12 @@
 <h3 id="低延迟检测思路"><a href="#低延迟检测思路" class="headerlink" title="低延迟检测思路"></a>低延迟检测思路</h3><p>在视频物体检测中，如果使用上一帧的检测结果作为先验，将下一帧的检测结果输入贝叶斯框架，输出后验，那么总体来说，这个后验结果融合了两帧的信息，会比单帧更准。在这个思路下，理论上来说使用的帧数越多，检测越准。如以下单帧和多帧的对比：</p>
 <p><img src="/img/v2-fcf08710643bcb172cb661c687f36fe5_b.webp" alt="img"></p>
 <p>但是同时更多的帧数会造成更长的延迟（延迟 := 物体被检测到的时刻 - 物体出现的时刻）。如何在保证物体检测精度的情况下，尽量降低延迟呢？我们参照QD理论进行如下建模：</p>
-<p>假设一个物体在时刻$t_s$出现在视频中，在 $t_e$离开视频，则这个物体的移动轨迹可以用时序上的一组检测框$b_{t_s,t_e}=(b_{t_s},b_{t_s+1},…,b_{t_e})$表示。这样的一组检测框检测框序列，在目标追踪（Data association / tracking）领域被一些人称作tracklet。简单说，我们的算法目标是以低延迟判断检测框序列内是否含有物体。因此，我们称这样一组检测框序列为一个candidate。在quickest change detection框架下， 可以用如下似然比检验判断$t$时刻物体是否出现在该candidate内：</p>
+<p>假设一个物体在时刻$t<em>s$出现在视频中，在 $t_e$离开视频，则这个物体的移动轨迹可以用时序上的一组检测框$b</em>{t<em>s,t_e}=(b</em>{t<em>s},b</em>{t<em>s+1},…,b</em>{t_e})$表示。这样的一组检测框检测框序列，在目标追踪（Data association / tracking）领域被一些人称作tracklet。简单说，我们的算法目标是以低延迟判断检测框序列内是否含有物体。因此，我们称这样一组检测框序列为一个candidate。在quickest change detection框架下， 可以用如下似然比检验判断$t$时刻物体是否出现在该candidate内：</p>
 <script type="math/tex; mode=display">
 \begin{aligned}
 \Lambda_{t}\left(b_{1, t}\right) &=\max _{i} \frac{\mathrm{p}\left(\Gamma_{0, i}<t \mid D_{1, t}, b_{1, t}\right)}{\mathrm{p}\left(\Gamma_{0, i} \geq t \mid D_{1, t}, b_{1, t}\right)} \\
 &=\max _{i} \max _{t_{c} \geq 1} \frac{\mathrm{p}_{i}\left(D_{t_{c}, t} \mid b_{t_{c}, t}\right)}{\mathrm{p}_{0}\left(D_{t_{c}, t} \mid b_{t_{c}, t}\right)}
-\end{aligned}</script><p>其中$D_t$代表一个单帧检测器在$I_t$上的检测结果，$T_{0,i}$代表candidate中的内容从背景变为第类$i$物体（如行人）这一事件发生的时刻,$p_i(\bullet )=p(\bullet |l=l_i)$ 代表给定类别$i$的时候，$\bullet$ 事件发生的概率。由条件概率的独立性与,$p_i(\bullet |b_t)$类别$i$和检测框独$b_t$立，继而时序上各时刻检测结果的联合概率变成各时刻概率的连乘：</p>
+\end{aligned}</script><p>其中$D<em>t$代表一个单帧检测器在$I_t$上的检测结果，$T</em>{0,i}$代表candidate中的内容从背景变为第类$i$物体（如行人）这一事件发生的时刻,$p_i(\bullet )=p(\bullet |l=l_i)$ 代表给定类别$i$的时候，$\bullet$ 事件发生的概率。由条件概率的独立性与,$p_i(\bullet |b_t)$类别$i$和检测框独$b_t$立，继而时序上各时刻检测结果的联合概率变成各时刻概率的连乘：</p>
 <script type="math/tex; mode=display">
 \Lambda_{t}\left(b_{1, t}\right)=\max _{i} \max _{t_{c} \geq 1} \prod_{j=t_{c}}^{t} \frac{\mathrm{p}_{i}\left(D_{j} \mid b_{j}\right)}{\mathrm{p}_{0}\left(D_{j} \mid b_{j}\right)}</script><p>这里需要明确一下，上边公式中的条件概率并非简单的检测器输出的结果，具体如何计算$p$需要一套比较复杂的建模。由于这里只介绍低延迟检测的整体思路，关于$p$的建模待我有空时会附在文末，有兴趣的朋友可以直接去论文查阅。总之，我们可以对这个似然比取阈值，进行检测。阈值越高，结果越准，但是延迟越大，反之同理。由QD理论中递归算法（CuSum算法），我们可以对上述似然比取log，记为W。最终的检测流程可以参照如下框图。</p>
 <p><img src="/img/v2-bd434876b196828b2db7d14ea5eb8c52_1440w.jpg" alt></p>
@@ -533,7 +533,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">111</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -555,7 +555,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

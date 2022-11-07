@@ -389,13 +389,13 @@
 <p>如图所示，diffusion model通常包含俩个过程，从信号到噪声的正向过程/扩散过程(forward/diffusion process)以及从噪声逐步到信号的逆向/重建过程(reverse process)，这里主要介绍Google 的DDPM(Denoising Diffusion Probabilistic Model)，近些面出来的基于diffusion model的方法大都是基于DDPM的框架所设计。</p>
 <h4 id="正向-扩散过程"><a href="#正向-扩散过程" class="headerlink" title="正向/扩散过程"></a>正向/扩散过程</h4><p>正向过程采用的是一个固定的Markov chain形式(每个时刻$t$只与$t-1$时刻有关)，即逐步地向图片中添加高斯噪声的过程：</p>
 <script type="math/tex; mode=display">
-q\left(x_{t} \mid x_{t-1}\right)=\mathcal{N}\left(x_{t} ; \sqrt{1-\beta_{t}} x_{t-1}, \beta_{t} \mathbf{I}\right), q\left(x_{1: T} \mid x_{0}\right)=\prod_{t=1}^{T} q\left(x_{t} \mid x_{t-1}\right)</script><p>上面公式表示的是，$x_t$ 采样自 $x_{t-1}$并服从高斯分布$N(\sqrt{1-\beta_{t}},\beta_{t})$，在这个过程中随着$t$的增大，$x_t$ 越来越接近纯噪声，当$T \rightarrow \infty$ ，$x_T$ 是完全的高斯噪声(isotropic Gaussian distribution)。在实际应用中$\beta_{t}$是随着t增大而递增的，在DDPM中，$\beta_{t}$是预先设置的常量参数。在介绍diffusion的实现和推导过程中需要了解俩个重要特性：</p>
+q\left(x_{t} \mid x_{t-1}\right)=\mathcal{N}\left(x_{t} ; \sqrt{1-\beta_{t}} x_{t-1}, \beta_{t} \mathbf{I}\right), q\left(x_{1: T} \mid x_{0}\right)=\prod_{t=1}^{T} q\left(x_{t} \mid x_{t-1}\right)</script><p>上面公式表示的是，$x<em>t$ 采样自 $x</em>{t-1}$并服从高斯分布$N(\sqrt{1-\beta<em>{t}},\beta</em>{t})$，在这个过程中随着$t$的增大，$x<em>t$ 越来越接近纯噪声，当$T \rightarrow \infty$ ，$x_T$ 是完全的高斯噪声(isotropic Gaussian distribution)。在实际应用中$\beta</em>{t}$是随着t增大而递增的，在DDPM中，$\beta_{t}$是预先设置的常量参数。在介绍diffusion的实现和推导过程中需要了解俩个重要特性：</p>
 <blockquote>
 <p><strong>特性1：重参数技巧（re-parameterization trick）</strong></p>
-<p>如果我们要从某个分布中随机采样(高斯分布)一个样本，这个过程是无法反传梯度的。而这个通过高斯噪声采样得到$x_t$的过程在diffusion中到处都是，因此我们需要通过重参数技巧来使得他可微。最通常的做法是把随机性通过一个独立的随机变量$\epsilon$引导过去。举个例子，如果要从高斯分布$z \sim \mathcal{N}\left(z ; \mu_{\theta}, \sigma_{\theta}^{2} \mathbf{I}\right)$采样一个z，我们可以写成:$z=\mu_{\theta}+\sigma_{\theta} \odot \epsilon, \epsilon \sim \mathcal{N}(0, \mathbf{I})$；</p>
-<p>上式的z依旧是有随机性的， 且满足均值$\mu_{\theta}$为方差为$\sigma_{\theta}^{2}$的高斯分布。这里的($\mu_{\theta}$,$\sigma_{\theta}^{2}$)可以是由参数 $\theta$ 的神经网络推断得到的。整个“采样”过程依旧梯度可导，随机性被转嫁到了$\epsilon$上。</p>
+<p>如果我们要从某个分布中随机采样(高斯分布)一个样本，这个过程是无法反传梯度的。而这个通过高斯噪声采样得到$x<em>t$的过程在diffusion中到处都是，因此我们需要通过重参数技巧来使得他可微。最通常的做法是把随机性通过一个独立的随机变量$\epsilon$引导过去。举个例子，如果要从高斯分布$z \sim \mathcal{N}\left(z ; \mu</em>{\theta}, \sigma<em>{\theta}^{2} \mathbf{I}\right)$采样一个z，我们可以写成:$z=\mu</em>{\theta}+\sigma_{\theta} \odot \epsilon, \epsilon \sim \mathcal{N}(0, \mathbf{I})$；</p>
+<p>上式的z依旧是有随机性的， 且满足均值$\mu<em>{\theta}$为方差为$\sigma</em>{\theta}^{2}$的高斯分布。这里的($\mu<em>{\theta}$,$\sigma</em>{\theta}^{2}$)可以是由参数 $\theta$ 的神经网络推断得到的。整个“采样”过程依旧梯度可导，随机性被转嫁到了$\epsilon$上。</p>
 <p><strong>特性2：任意时刻的$x_t$可以有$x_0$和$\beta$ 表示</strong></p>
-<p>将$\alpha_{t}=1-\beta_{t}$以及$\bar{\alpha}_{t}=\prod_{t=1}^{T} \alpha_{t}$ ，则可以得到：$q\left(x_{t} \mid x_{0}\right):=\mathcal{N}\left(x_{t} ; \sqrt{\bar{\alpha}_{t}} x_{0},\left(1-\bar{\alpha}_{t}\right) \boldsymbol{I}\right)$</p>
+<p>将$\alpha<em>{t}=1-\beta</em>{t}$以及$\bar{\alpha}<em>{t}=\prod</em>{t=1}^{T} \alpha<em>{t}$ ，则可以得到：$q\left(x</em>{t} \mid x<em>{0}\right):=\mathcal{N}\left(x</em>{t} ; \sqrt{\bar{\alpha}<em>{t}} x</em>{0},\left(1-\bar{\alpha}_{t}\right) \boldsymbol{I}\right)$</p>
 <p>该公式意味着我们可以直接获得任意程度的加噪图片，方便后续的训练。</p>
 </blockquote>
 <p>扩散过程有一个重要的特性是，可以直接采样任意时刻t下的加噪结果$x_t$。</p>
@@ -518,7 +518,7 @@ q\left(x_{t} \mid x_{t-1}\right)=\mathcal{N}\left(x_{t} ; \sqrt{1-\beta_{t}} x_{
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">111</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -540,7 +540,7 @@ q\left(x_{t} \mid x_{t-1}\right)=\mathcal{N}\left(x_{t} ; \sqrt{1-\beta_{t}} x_{
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

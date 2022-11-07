@@ -396,7 +396,7 @@
 <p>这篇文章的撰写风格比较诡异，不是按照正常的网络结构的先后顺序来介绍各个部分。而是先介绍了bipartite matching loss，再介绍transformer的encoder和decoder。为了便于理解，我这里还是按照网络结构的先后顺序来介绍各个模块。</p>
 <h3 id="2-Transformer"><a href="#2-Transformer" class="headerlink" title="2.Transformer"></a>2.Transformer</h3><p><img src="/img/detr-transformer.png" alt="detr-transformer"></p>
 <p>上图展示的是transformer的结构，其中包括encoder、decoder以及FFN三部分。</p>
-<h4 id="2-1-Transformer-Encoder"><a href="#2-1-Transformer-Encoder" class="headerlink" title="2.1 Transformer Encoder"></a>2.1 Transformer Encoder</h4><p>如上图左侧所示，在DETR中，首先输入图片 $x_{\mathrm{img}} \in \mathbb{R}^{3 \times H_{0} \times W_{0}}$ 经过CNN backbone处理后，输出feature map$f \in \mathbb{R}^{C \times H \times W}$ ，一般 $C=2048,H, W=\frac{H_{0}}{32}, \frac{W_{0}}{32}$ 。然后将backbone输出的feature map和position encoding相加，输入Transformer Encoder中处理，得到用于输入到Transformer Decoder的image embedding。由于Transformer的输入为序列化数据，因此会对backbone输出的feature map做进一步处理转化为序列化数据，具体处理包括如下：</p>
+<h4 id="2-1-Transformer-Encoder"><a href="#2-1-Transformer-Encoder" class="headerlink" title="2.1 Transformer Encoder"></a>2.1 Transformer Encoder</h4><p>如上图左侧所示，在DETR中，首先输入图片 $x<em>{\mathrm{img}} \in \mathbb{R}^{3 \times H</em>{0} \times W<em>{0}}$ 经过CNN backbone处理后，输出feature map$f \in \mathbb{R}^{C \times H \times W}$ ，一般 $C=2048,H, W=\frac{H</em>{0}}{32}, \frac{W_{0}}{32}$ 。然后将backbone输出的feature map和position encoding相加，输入Transformer Encoder中处理，得到用于输入到Transformer Decoder的image embedding。由于Transformer的输入为序列化数据，因此会对backbone输出的feature map做进一步处理转化为序列化数据，具体处理包括如下：</p>
 <blockquote>
 <ul>
 <li><strong>维度压缩</strong>：使用1x1卷积将feature map 维度从C压缩为d,生成新的feature map $z_{0} \in \mathbb{R}^{d \times H \times W}$ ；</li>
@@ -412,14 +412,14 @@
 <p>为了解决这个问题，作者人为构造了一个新的物体类别 $\varnothing$ (表示没有物体)并加入image objects中，上面所说到的多出来的N-m个个prediction embedding就会和类别 $\varnothing$ 配对。这样就可以将prediction boxes和image objects的配对看作两个等容量的集合的二分图匹配了。</p>
 <p>设计好匹配的cost，就可以使用<a href="https://www.cxyxiaowu.com/874.html" target="_blank" rel="noopener">匈牙利算法</a>快速地找到使cost最小的二分图匹配方案了。cost计算如下：</p>
 <script type="math/tex; mode=display">
-\hat{\sigma}=\underset{\sigma \in \widetilde{S}_{N}}{\arg \min } \sum_{i}^{N} \mathcal{L}_{\operatorname{match}}\left(y_{i}, \hat{y}_{\sigma(i)}\right)</script><p>对应单个prediction box和image object匹配cost $\mathcal{L}_{\operatorname{match}}\left(y_{i}, \hat{y}_{\sigma(i)}\right)$计算如下：</p>
+\hat{\sigma}=\underset{\sigma \in \widetilde{S}_{N}}{\arg \min } \sum_{i}^{N} \mathcal{L}_{\operatorname{match}}\left(y_{i}, \hat{y}_{\sigma(i)}\right)</script><p>对应单个prediction box和image object匹配cost $\mathcal{L}<em>{\operatorname{match}}\left(y</em>{i}, \hat{y}_{\sigma(i)}\right)$计算如下：</p>
 <script type="math/tex; mode=display">
 -\mathbb{1}_{\left\{c_{i} \neq \varnothing\right\}} \hat{p}_{\sigma(i)}\left(c_{i}\right)+\mathbb{1}_{\left\{c_{i} \neq \varnothing\right\}} \mathcal{L}_{\mathrm{box}}\left(b_{i}, \hat{b}_{\sigma(i)}\right)</script><p>其中，</p>
 <p>$c_i$ 第i个image object的class标签，$\sigma(i)$ 表示与第i个image object匹配的prediction box的index;</p>
-<p>$\mathbb{1}_{c_{i} \neq \varnothing}$ 是一个函数，当 $c_{i} \neq \phi$ 时为1，否则为0；</p>
-<p>$\hat{p}_{\sigma(i)}\left(c_{i}\right)$ 表示Transformer预测第$\sigma(i)$ 个prediction box为类别$c_i$ 的概率；</p>
-<p>$b_{i}, \hat{b}_{\sigma(i)}$ 分别为第i个image object和第$\sigma(i)$ 个prediction box的位置向量；</p>
-<p>$\mathcal{L}_{\mathrm{box}}\left(b_{i}, \hat{b}_{\sigma(i)}\right)$ 计算的是ground truth box和prediction box之间的距离；具体计算方式论文有提及：</p>
+<p>$\mathbb{1}<em>{c</em>{i} \neq \varnothing}$ 是一个函数，当 $c_{i} \neq \phi$ 时为1，否则为0；</p>
+<p>$\hat{p}<em>{\sigma(i)}\left(c</em>{i}\right)$ 表示Transformer预测第$\sigma(i)$ 个prediction box为类别$c_i$ 的概率；</p>
+<p>$b<em>{i}, \hat{b}</em>{\sigma(i)}$ 分别为第i个image object和第$\sigma(i)$ 个prediction box的位置向量；</p>
+<p>$\mathcal{L}<em>{\mathrm{box}}\left(b</em>{i}, \hat{b}_{\sigma(i)}\right)$ 计算的是ground truth box和prediction box之间的距离；具体计算方式论文有提及：</p>
 <script type="math/tex; mode=display">
 \lambda_{\text {iou }} \mathcal{L}_{\text {iou }}\left(b_{i}, \hat{b}_{\sigma(i)}\right)+\lambda_{\mathrm{L} 1}\left\|b_{i}-\hat{b}_{\sigma(i)}\right\|_{1}</script><p>计算box的距离实验的IOU loss以及L1 loss。</p>
 <p>这样，我们就完全定义好了每对prediction box和 image object 配对时的cost。再利用匈牙利算法即可得到二分图最优匹配。</p>
@@ -545,7 +545,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">111</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -567,7 +567,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

@@ -406,7 +406,7 @@ Y_{i, j}^{g}=\sum_{p, q \in \Omega} w_{i, j, g}^{p, q} \cdot X_{i+p, j+q}^{c}</s
 <p>作者分别在分类，检测，分割任务上均有验证其有效性，均能提高1个点左右。具体实验结果可以看原论文，这里就不贴上来了。</p>
 <h3 id="一致性指标"><a href="#一致性指标" class="headerlink" title="一致性指标"></a>一致性指标</h3><p>作者为了验证该方法的有效性，针对不同任务提出了一系列的一致性指标。比如针对分类任务的一致性指标计算如下：</p>
 <script type="math/tex; mode=display">
-\text { Consistency }=\mathbb{E}_{X, h_{1}, w_{1}, h_{2}, w_{2}} \mathbb{I}\left\{F\left(X_{h_{1}, w_{1}}\right)=F\left(X_{h_{2}, w_{2}}\right)\right\}</script><p>X表示输入图像，$h_{1}, w_{1}, h_{2}, w_{2}$ 表示偏移量。$F(\cdot)$ 表示模型输出的top1的类别标签。具体代码实现可以看下面：</p>
+\text { Consistency }=\mathbb{E}_{X, h_{1}, w_{1}, h_{2}, w_{2}} \mathbb{I}\left\{F\left(X_{h_{1}, w_{1}}\right)=F\left(X_{h_{2}, w_{2}}\right)\right\}</script><p>X表示输入图像，$h<em>{1}, w</em>{1}, h<em>{2}, w</em>{2}$ 表示偏移量。$F(\cdot)$ 表示模型输出的top1的类别标签。具体代码实现可以看下面：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">output0 = model(input[:,:,off0[<span class="number">0</span>]:off0[<span class="number">0</span>]+args.size,off0[<span class="number">1</span>]:off0[<span class="number">1</span>]+args.size])</span><br><span class="line">output1 = model(input[:,:,off1[<span class="number">0</span>]:off1[<span class="number">0</span>]+args.size,off1[<span class="number">1</span>]:off1[<span class="number">1</span>]+args.size])</span><br><span class="line">cur_agree = agreement_correct(output0, output1, target).type(torch.FloatTensor).to(output0.device)</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">agreement_correct</span><span class="params">(output0, output1, target)</span>:</span></span><br><span class="line">    pred0 = output0.argmax(dim=<span class="number">1</span>, keepdim=<span class="keyword">False</span>)</span><br><span class="line">    pred1 = output1.argmax(dim=<span class="number">1</span>, keepdim=<span class="keyword">False</span>)</span><br><span class="line"></span><br><span class="line">    agree = pred0.eq(pred1)</span><br><span class="line">    agree_target_pred0 = pred0.eq(target)</span><br><span class="line">    agree_target_pred1 = pred1.eq(target)</span><br><span class="line"></span><br><span class="line">    correct_or = (agree_target_pred0 + agree_target_pred1) &gt; <span class="number">0</span></span><br><span class="line">    agree = agree * correct_or</span><br><span class="line"></span><br><span class="line">    agree = <span class="number">100.</span>*(torch.sum(agree).float() / (torch.sum(correct_or).float() + <span class="number">1e-10</span>)).to(output0.device)</span><br><span class="line">    <span class="keyword">return</span> agree</span><br></pre></td></tr></table></figure>
 <p><code>agreement_correct</code> 是统计一致性指标的函数，具体可看出来统计方法是分别对输入图像随机偏移<code>off0</code>和<code>off1</code> 然后统计在该偏移量下，两者输出一致且和gt一致的比例。对于检测分割任务，作者也提出了相应的一致性指标计算方法：mAISC和mAISC这两个指标。具体计算如下图。</p>
@@ -528,7 +528,7 @@ Y_{i, j}^{g}=\sum_{p, q \in \Omega} w_{i, j, g}^{p, q} \cdot X_{i+p, j+q}^{c}</s
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">111</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -550,7 +550,7 @@ Y_{i, j}^{g}=\sum_{p, q \in \Omega} w_{i, j, g}^{p, q} \cdot X_{i+p, j+q}^{c}</s
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

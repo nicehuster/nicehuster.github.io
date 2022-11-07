@@ -391,7 +391,7 @@
 <a id="more"></a>
 <p><img src="/img/declip-sota.png" alt="declip-sota"></p>
 <h3 id="具体方法"><a href="#具体方法" class="headerlink" title="具体方法"></a>具体方法</h3><p><img src="/img/clip-vs-declip.png" alt="clip-vs-declip"></p>
-<p>上图，直观地，展示的是CLIP和DeCLIP方法的差异。CLIP是直接学习原始图片与对应的文本信息，使用俩个encoder分别编码图像信息和文本信息。图像encoder一般是resnet或者ViT，文本encoder一般使用transformer。之后将俩个embedding映射到相同的空间中，使用对比学习的思想进行训练。从方法上看，其实只使用了图像-文本对匹配的一种监督信号进行训练。假设batch size是N，共计N个图像-文本对$\left\{\left(x_{i}^{I}, x_{i}^{T}\right)\right\}$，损失函数InfoNCE如下：</p>
+<p>上图，直观地，展示的是CLIP和DeCLIP方法的差异。CLIP是直接学习原始图片与对应的文本信息，使用俩个encoder分别编码图像信息和文本信息。图像encoder一般是resnet或者ViT，文本encoder一般使用transformer。之后将俩个embedding映射到相同的空间中，使用对比学习的思想进行训练。从方法上看，其实只使用了图像-文本对匹配的一种监督信号进行训练。假设batch size是N，共计N个图像-文本对$\left{\left(x<em>{i}^{I}, x</em>{i}^{T}\right)\right}$，损失函数InfoNCE如下：</p>
 <script type="math/tex; mode=display">
 L_{I}=-\frac{1}{N} \sum_{i=1}^{N} \log \frac{\exp \left(\operatorname{sim}\left(\boldsymbol{z}_{i}^{I}, \boldsymbol{z}_{i}^{T}\right) / \tau\right)}{\sum_{j=1}^{N} \exp \left(\operatorname{sim}\left(\boldsymbol{z}_{i}^{I}, \boldsymbol{z}_{j}^{T}\right) / \tau\right)}</script><p>不同于CLIP，在DeCLIP方法中，使用了更多的自监督信号：1. 单模态的自监督学习；2. 跨模态的多视角监督学习；3. 最近邻监督学习；具体地，</p>
 <ol>
@@ -542,7 +542,7 @@ L_{D e C L I P}=(1-\alpha-\beta-\gamma) L_{C L I P}+\alpha\left(L_{I S S}+L_{T S
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">111</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -564,7 +564,7 @@ L_{D e C L I P}=(1-\alpha-\beta-\gamma) L_{C L I P}+\alpha\left(L_{I S S}+L_{T S
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

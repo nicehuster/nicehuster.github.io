@@ -412,7 +412,7 @@
 <p>Residual U-blocks有以下三部分组成：</p>
 <blockquote>
 <ul>
-<li>一个输入卷积层，它将输入的feature map x (H × W × $C_{in}$)转换成中间feature map $F_1(x)$，$F_1(x)$通道数为$C_{out}$。这是一个用于局部特征提取的普通卷积层。</li>
+<li>一个输入卷积层，它将输入的feature map x (H × W × $C<em>{in}$)转换成中间feature map $F_1(x)$，$F_1(x)$通道数为$C</em>{out}$。这是一个用于局部特征提取的普通卷积层。</li>
 <li>一个U-like的对称的encoder-decoder结构，高度为L，以中间feature map $F_1(x)$为输入，去学习提取和编码多尺度文本信息$U(F_1(x))$,U表示类U-Net结构。更大L会得到更深层的U-block（RSU），更多的池操作，更大的感受野和更丰富的局部和全局特征。配置此参数允许从具有任意空间分辨率的输入特征图中提取多尺度特征。从逐渐降采样特征映射中提取多尺度特征，并通过渐进上采样、合并和卷积等方法将其编码到高分辨率的特征图中。这一过程减少了大尺度直接上采样造成的细节损失。</li>
 <li>一种残差连接，它通过求和来融合局部特征和多尺度特征：$F_1(x) + U(F_1(x))$。</li>
 </ul>
@@ -426,7 +426,7 @@
 <p>直观上可以发现，U^2-Net的每一个Block都是一个U-Net结构的模块，即上述Residual U-blocks。当然，你也可以继续Going Deeper, 每个Block里面的U-Net的子Block仍然可以是一个U-Net结构，命名为U^3-Net。</p>
 <h3 id="损失函数设计"><a href="#损失函数设计" class="headerlink" title="损失函数设计"></a>损失函数设计</h3><p>类似于HED算法的deep supervision方式，作者设计了如下函数：</p>
 <script type="math/tex; mode=display">
-\mathcal{L}=\sum_{m=1}^{M} w_{\text {side}}^{(m)} \ell_{\text {side}}^{(m)}+w_{\text {fuse}} \ell_{\text {fuse}}</script><p>其中，M=6, 为U2Net 的 Sup1, Sup2, …, Sup6 stage.$w_{\text {side}}^{(m)}$  $l_{\text {side}}^{(m)}$ 为对应的损失函数输出和权重；$w_{f u s e} \ell_{f u s e}$ 为融合的损失函数和权重;对于每一个$l$使用的都是标准的BCE Loss：</p>
+\mathcal{L}=\sum_{m=1}^{M} w_{\text {side}}^{(m)} \ell_{\text {side}}^{(m)}+w_{\text {fuse}} \ell_{\text {fuse}}</script><p>其中，M=6, 为U2Net 的 Sup1, Sup2, …, Sup6 stage.$w<em>{\text {side}}^{(m)}$  $l</em>{\text {side}}^{(m)}$ 为对应的损失函数输出和权重；$w<em>{f u s e} \ell</em>{f u s e}$ 为融合的损失函数和权重;对于每一个$l$使用的都是标准的BCE Loss：</p>
 <script type="math/tex; mode=display">
 \ell=-\sum_{(r, c)}^{(H, W)}\left[P_{G(r, c)} \log P_{S(r, c)}+\left(1-P_{G(r, c)}\right) \log \left(1-P_{S(r, c)}\right)\right]</script><h3 id="实验可视化"><a href="#实验可视化" class="headerlink" title="实验可视化"></a>实验可视化</h3><p>所提出的模型是使用DUTS-TR数据集进行训练，该数据集包含大约10000个样本图像，并使用标准数据增强技术进行扩充。研究人员在6个用于突出目标检测的基准数据集上评估了该模型：DUT-OMRON、DUTS-TE、HKU-IS、ECSSD、PASCAL-S和SOD。评价结果表明，在这6个基准点上，新模型与现有方法具有相当好的性能。</p>
 <p><img src="/img/image-20200918110749081.png" alt="image-20200918110749081"></p>
@@ -556,7 +556,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">111</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -578,7 +578,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

@@ -403,7 +403,7 @@
 <p><img src="/img/ps.png" alt="img"></p>
 <a id="more"></a>
 <p><strong>标记方法</strong></p>
-<p>全景分割的标记方法结合了语义分割和实例分割，给每个像素加上标签$\left(l_{i}, z_{i}\right)$,其中i表示第i个像素，l表示语义类别，z表示实例ID。语义类别由两部分组成，事物类别$L^{ST}$和$L^{TH}$分别为stuff和thing的简写）。当$l_{i} \in L^{S T}$，忽略$z_i$（事物类别）；</p>
+<p>全景分割的标记方法结合了语义分割和实例分割，给每个像素加上标签$\left(l<em>{i}, z</em>{i}\right)$,其中i表示第i个像素，l表示语义类别，z表示实例ID。语义类别由两部分组成，事物类别$L^{ST}$和$L^{TH}$分别为stuff和thing的简写）。当$l_{i} \in L^{S T}$，忽略$z_i$（事物类别）；</p>
 <p><strong>评估标准</strong></p>
 <p>首先是常规的IoU &gt; 0.5，然后结合TF、FN、FP搞出了一个PQ标准。（PQ是Panoptic Quality，即全景质量的简称。)</p>
 <p><img src="/img/metric.png" alt="img"></p>
@@ -433,7 +433,7 @@
 <p><img src="/img/mask2former.png" alt="img"></p>
 <p>因此，作者基于上述的问题和最初的motivation(一个模型取得三个不同分割任务STOA)，提出了几个改进，节省训练的时间(MaskFormer训练需要300epoch)和cost的同时能够提升性能。</p>
 <p><strong>第一个改进</strong>：Mask Attention加速收敛,相比于之前的cross attention，这个里面的attention affinity是一种稀疏的attention，其实就是将上一层预测的分割图使用阈值0.5转换成[0,1]mask图，将转换后的mask进一步转换成[-inf,0]，然后和原始att相加，过softmax得到att_mask，相当于不计算原始分割图中为0的区域att.</p>
-<p>standard cross-attention:  $\mathbf{X}_{l}=\operatorname{softmax}\left(\mathbf{Q}_{l} \mathbf{K}_{l}^{\mathrm{T}}\right) \mathbf{V}_{l}+\mathbf{X}_{l-1}$</p>
+<p>standard cross-attention:  $\mathbf{X}<em>{l}=\operatorname{softmax}\left(\mathbf{Q}</em>{l} \mathbf{K}<em>{l}^{\mathrm{T}}\right) \mathbf{V}</em>{l}+\mathbf{X}_{l-1}$</p>
 <p> masked cross-attention: </p>
 <script type="math/tex; mode=display">
 \mathbf{X}_{l}=\operatorname{softmax}\left(\mathcal{M}_{l-1}+\mathbf{Q}_{l} \mathbf{K}_{l}^{\mathrm{T}}\right) \mathbf{V}_{l}+\mathbf{X}_{l-1}</script><script type="math/tex; mode=display">
@@ -657,7 +657,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">111</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -679,7 +679,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

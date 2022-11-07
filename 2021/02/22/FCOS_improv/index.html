@@ -385,7 +385,7 @@
 <h3 id="改进点"><a href="#改进点" class="headerlink" title="改进点"></a>改进点</h3><p>对于原始fcos方法的原理介绍，可以参考<a href="https://nicehuster.github.io/2019/04/15/FCOS/" target="_blank" rel="noopener">这里</a> ，这里详细说一下改进的地方：</p>
 <h4 id="1-正负样本"><a href="#1-正负样本" class="headerlink" title="1.正负样本"></a>1.正负样本</h4><p>作者对正负样本的指定做了修改，在原始fcos中，对于目标被的所有特征点均指定为正样本，以及该特征点到目标边界的距离满足所处的FPN层的约束；而在FCOS_imprv中则要求指定只有在目标中心区域的特征点才为正样本；目标中心区域的大小为：</p>
 <script type="math/tex; mode=display">
-\left(c_{x}-r s, c_{y}-r s, c_{x}+r s, c_{y}+r s\right)</script><p>其中 $\left(c_{x}, c_{y}\right)$ 为目标中心，s为当前层的stride，r 为超参数，在论文中r设置为1.5。这个代码的实现可以看一下mmdetection中FCOS的实现：<a href="mmdet/models/dense_heads/fcos_head.py">fcos_head.py</a> 其中center_sample_radius参数默认设置为1.5.</p>
+\left(c_{x}-r s, c_{y}-r s, c_{x}+r s, c_{y}+r s\right)</script><p>其中 $\left(c<em>{x}, c</em>{y}\right)$ 为目标中心，s为当前层的stride，r 为超参数，在论文中r设置为1.5。这个代码的实现可以看一下mmdetection中FCOS的实现：<a href="mmdet/models/dense_heads/fcos_head.py">fcos_head.py</a> 其中center_sample_radius参数默认设置为1.5.</p>
 <h4 id="2-回归目标修改"><a href="#2-回归目标修改" class="headerlink" title="2.回归目标修改"></a>2.回归目标修改</h4><p>Fcos的回归目标直接是特征点到目标边界的距离，由于Head是共用的，所以在预测时为每个level预设一个可学习的scale因子，而fcos_imprv则加入stride，变得更适应FPN的尺寸，可学习的scale因子依然使用，具体形式如下：</p>
 <script type="math/tex; mode=display">
 \begin{array}{l}
@@ -534,7 +534,7 @@ G I o U=I o U-\frac{|C \backslash(A \cup B)|}{|C|}</script><p>GIoU 的实现方�
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">111</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -556,7 +556,7 @@ G I o U=I o U-\frac{|C \backslash(A \cup B)|}{|C|}</script><p>GIoU 的实现方�
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

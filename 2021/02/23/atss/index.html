@@ -394,7 +394,7 @@
 <p><img src="/img/image-20210224115350117.png" alt="image-20210224115350117"></p>
 <ul>
 <li><p><strong>Classification</strong></p>
-<p>在RetinaNet中，通过划分IOU阈值区间来区分正负样本，$\mathrm{IoU}&gt;\theta_{p}$ 置为正样本，$\mathrm{IoU}&lt;\theta_{n}$ 置为负样本，至于区间内所有样本忽略；在FCOS使用空间尺寸和尺寸限制来区分正负anchor point，正样本首先必须在GT box内，其次需要是GT尺寸对应的层，其余均为负样本；</p>
+<p>在RetinaNet中，通过划分IOU阈值区间来区分正负样本，$\mathrm{IoU}&gt;\theta<em>{p}$ 置为正样本，$\mathrm{IoU}&lt;\theta</em>{n}$ 置为负样本，至于区间内所有样本忽略；在FCOS使用空间尺寸和尺寸限制来区分正负anchor point，正样本首先必须在GT box内，其次需要是GT尺寸对应的层，其余均为负样本；</p>
 </li>
 </ul>
 <p><img src="/img/image-20210224115743063.png" alt="image-20210224115743063"></p>
@@ -408,7 +408,7 @@
 </li>
 </ul>
 <h3 id="2-自适应样本选取（Adaptive-Training-Sample-Selection）"><a href="#2-自适应样本选取（Adaptive-Training-Sample-Selection）" class="headerlink" title="2. 自适应样本选取（Adaptive Training Sample Selection）"></a>2. 自适应样本选取（Adaptive Training Sample Selection）</h3><p><img src="/img/image-20210224151209904.png" alt="image-20210224151209904"></p>
-<h4 id="1-算法流程"><a href="#1-算法流程" class="headerlink" title="1).算法流程"></a>1).算法流程</h4><p>论文提出基于统计特征自适应样本选取的方法具体流程如上图所示，具体来说，对于每个标注gt框g，首先针对每个FPN层级基于L2距离找到与目标中心点最近的k个anchor box，计算anchor box与gt box的IOU值，计算所有iou值的均值$m_{g}$和标准差$v_{g}$，基于均值和阈值的计算结果，得到IOU阈值 $t_{g}=m_{g}+v_{g}$ ，最后选择阈值大于等于$t_{g}$ 且中心点位于gt box内的box作为最后的输出。如果anchor box对应多个gt，则选择IoU最大的gt。</p>
+<h4 id="1-算法流程"><a href="#1-算法流程" class="headerlink" title="1).算法流程"></a>1).算法流程</h4><p>论文提出基于统计特征自适应样本选取的方法具体流程如上图所示，具体来说，对于每个标注gt框g，首先针对每个FPN层级基于L2距离找到与目标中心点最近的k个anchor box，计算anchor box与gt box的IOU值，计算所有iou值的均值$m<em>{g}$和标准差$v</em>{g}$，基于均值和阈值的计算结果，得到IOU阈值 $t<em>{g}=m</em>{g}+v<em>{g}$ ，最后选择阈值大于等于$t</em>{g}$ 且中心点位于gt box内的box作为最后的输出。如果anchor box对应多个gt，则选择IoU最大的gt。</p>
 <h4 id="2-算法思想"><a href="#2-算法思想" class="headerlink" title="2).算法思想"></a>2).算法思想</h4><p>从思想上来看，自适应样本选取的方法遵循如下几点：</p>
 <blockquote>
 <ul>
@@ -542,7 +542,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">111</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -564,7 +564,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

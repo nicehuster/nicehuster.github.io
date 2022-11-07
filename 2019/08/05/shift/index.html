@@ -394,7 +394,7 @@
 <h3 id="概率密度估计"><a href="#概率密度估计" class="headerlink" title="概率密度估计"></a>概率密度估计</h3><p>密度估计是指有给定样本集和求解随机变量的分布密度函数，解决这一问题的方法包括：参数估计和非参数估计。</p>
 <p><strong>参数估计</strong>：在我们已经知道观测数据符合某些模型的情况下，我们可以利用参数估计的方法来确定这些参数值，然后得出概率密度模型。前提是观测数据服从一个已知概率密度函数。</p>
 <p><strong>非参数估计</strong>：无需任何先验知识完全依靠特征空间中样本点计算其密度估计值.可以处理任意概率分布，不必假设服从已知分布；常用的无参数密度估计方法有：直方图法、最近邻域法和核密度估计法。<strong>MeanShift算法正属于核密度估计法</strong>。无需任何先验知识完全依靠特征空间中样本点计算其密度估计值。</p>
-<h4 id="核密度估计"><a href="#核密度估计" class="headerlink" title="核密度估计"></a>核密度估计</h4><p>mean shift算法使用核函数估计样本密度，假设对于大小为$n$,维度为$d$ 的数据集，$D=\left\{x_{1}, x_{2}, x_{3}, \ldots x_{n}\right\}, D \in R^{d}$ ，核函数K的带宽为h，则该函数的核密度估计为：</p>
+<h4 id="核密度估计"><a href="#核密度估计" class="headerlink" title="核密度估计"></a>核密度估计</h4><p>mean shift算法使用核函数估计样本密度，假设对于大小为$n$,维度为$d$ 的数据集，$D=\left{x<em>{1}, x</em>{2}, x<em>{3}, \ldots x</em>{n}\right}, D \in R^{d}$ ，核函数K的带宽为h，则该函数的核密度估计为：</p>
 <script type="math/tex; mode=display">
 f(x)=\frac{1}{n h^{d}} \sum_{i=1}^{n} K\left(\frac{x-x_{i}}{h}\right)</script><p>定义满足核函数条件为：</p>
 <script type="math/tex; mode=display">
@@ -408,7 +408,7 @@ N(x)=\frac{1}{\sqrt{2 \pi h}} e^{-\frac{x^{2}}{2 h^{2}}}</script><p>其中，h�
 <p>以高斯核估计一维数据集的密度为例，每个样本点都设置以该样本为中心的高斯分布，累加所有高斯分布，就得到该数据集的密度。</p>
 <p><img src="/img/image-20200918115326176.png" alt="image-20200918115326176"></p>
 <p>其中虚线表示每个样本点的高斯核，实现表示累加后所有样本高斯核后的数据集密度。</p>
-<h3 id="mean-shift-算法理论"><a href="#mean-shift-算法理论" class="headerlink" title="mean-shift 算法理论"></a>mean-shift 算法理论</h3><h4 id="朴素mean-shift向量形式"><a href="#朴素mean-shift向量形式" class="headerlink" title="朴素mean-shift向量形式"></a>朴素mean-shift向量形式</h4><p>对于给定的d维度空间中的n个样本点$\left\{x_{1}, x_{2}, x_{3}, \ldots x_{n}\right\}$ ，则对于x点，其mean-shift向量的基本形式为：</p>
+<h3 id="mean-shift-算法理论"><a href="#mean-shift-算法理论" class="headerlink" title="mean-shift 算法理论"></a>mean-shift 算法理论</h3><h4 id="朴素mean-shift向量形式"><a href="#朴素mean-shift向量形式" class="headerlink" title="朴素mean-shift向量形式"></a>朴素mean-shift向量形式</h4><p>对于给定的d维度空间中的n个样本点$\left{x<em>{1}, x</em>{2}, x<em>{3}, \ldots x</em>{n}\right}$ ，则对于x点，其mean-shift向量的基本形式为：</p>
 <script type="math/tex; mode=display">
 M_{h}(x)=\frac{1}{k} \sum_{x_{i} \in S_{h}}\left(x_{i}-x\right)</script><p><img src="/img/image-20200918115606176.png" alt="image-20200918115606176"></p>
 <p>其中$S_h$指的是一个半径为h的高维球区域，如上图中的圆形区域。$S_h$的定义为：</p>
@@ -434,7 +434,7 @@ m_{h}(x)=\frac{\sum_{i=1}^{n} x_{i} g\left(\mid \frac{x-x_{i}}{h} \|^{2}\right)}
 x=\frac{\sum_{i=1}^{n} x_{i} g\left(\left\|\frac{x-x_{i}}{h}\right\|^{2}\right)}{\sum_{i=1}^{n} g\left(\left\|\frac{x-x_{i}}{h}\right\|^{2}\right)}</script><p>因此，Mean Shift算法流程为：</p>
 <blockquote>
 <p>（1）计算每个样本的均值漂移向量 $m_{h}(\mathrm{x})$ ;</p>
-<p>（2）对每个样本点以 $m_{h}(\mathrm{x})$ 进行平移，即：$x=x+m_{h}(x)$ ；</p>
+<p>（2）对每个样本点以 $m<em>{h}(\mathrm{x})$ 进行平移，即：$x=x+m</em>{h}(x)$ ；</p>
 <p>（3）重复（1）（2），直到样本点收敛，即：$m_{h}(\mathrm{x})&lt;\varepsilon$ (人工设定)或者迭代次数小于设定值；</p>
 <p>（4）收敛到相同点的样本被认为是同一簇类的成员；</p>
 </blockquote>
@@ -575,7 +575,7 @@ x=\frac{\sum_{i=1}^{n} x_{i} g\left(\left\|\frac{x-x_{i}}{h}\right\|^{2}\right)}
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">111</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -597,7 +597,7 @@ x=\frac{\sum_{i=1}^{n} x_{i} g\left(\left\|\frac{x-x_{i}}{h}\right\|^{2}\right)}
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

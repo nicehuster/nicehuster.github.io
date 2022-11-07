@@ -393,7 +393,7 @@
 \sum_{b=1}^{\mu B}\left\|p_{\mathrm{m}}\left(y \mid \alpha\left(u_{b}\right)\right)-p_{\mathrm{m}}\left(y \mid \alpha\left(u_{b}\right)\right)\right\|_{2}^{2}</script><p>其中，$\alpha$ 表示随机的弱增强操作。</p>
 <h4 id="2-伪标签"><a href="#2-伪标签" class="headerlink" title="2. 伪标签"></a>2. 伪标签</h4><p>伪标签是利用模型本身为未标记数据获取人工标签的思想。通常是使用“hard”标签，也就是argmax获取的onehot标签，仅保留最大类概率超过阈值的标签。计算loss的时如下：</p>
 <script type="math/tex; mode=display">
-\frac{1}{\mu B} \sum_{b=1}^{\mu B} \mathbb{1}\left(\max \left(q_{b}\right) \geq \tau\right) \mathrm{H}\left(\hat{q}_{b}, q_{b}\right)</script><p>其中，$\hat{q}_{b}=\arg \max \left(q_{b}\right)$ , $\tau$ 是阈值。</p>
+\frac{1}{\mu B} \sum_{b=1}^{\mu B} \mathbb{1}\left(\max \left(q_{b}\right) \geq \tau\right) \mathrm{H}\left(\hat{q}_{b}, q_{b}\right)</script><p>其中，$\hat{q}<em>{b}=\arg \max \left(q</em>{b}\right)$ , $\tau$ 是阈值。</p>
 <h4 id="3-为什么work？"><a href="#3-为什么work？" class="headerlink" title="3.为什么work？"></a>3.为什么work？</h4><p>无监督训练过程实际上是一个孪生网络，可以提取到图片的有用特征。弱增强不至于图像失真，再加上输出伪标签阈值的设置，极大程度上降低了引入错误标签噪声的可能性。而仅仅使用弱增强可能会导致训练过拟合，无法提取到本质的特征，所以使用强增强。强增强带来图片的严重失真，但是依然是保留足够可以辨认类别的特征。有监督和无监督混合训练，逐步提高模型的表达能力。</p>
 <h3 id="算法流程"><a href="#算法流程" class="headerlink" title="算法流程"></a>算法流程</h3><p><img src="/img/fixmatch-algo.png" alt="img"></p>
 <blockquote>
@@ -533,7 +533,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">111</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -555,7 +555,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

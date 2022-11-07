@@ -396,14 +396,14 @@
 \begin{aligned}
 &L_{\text {seesaw }}(\mathbf{z})=-\sum_{i=1}^{C} y_{i} \log \left(\widehat{\sigma}_{i}\right) \\
 &\text { with } \widehat{\sigma}_{i}=\frac{e^{z_{i}}}{\sum_{j \neq i}^{C} \mathcal{S}_{i j} e^{z_{j}}+e^{z_{i}}}
-\end{aligned}</script><p>$y_{i} \in\{0,1\}$ 是one-hot label, $\mathbf{z}=\left[z_{1}, z_{2}, \ldots, z_{C}\right]$ ,是每一类预测的 logit。此时，对于一个第 i类的样本，它施加在第 j类上的负样本梯度为</p>
+\end{aligned}</script><p>$y<em>{i} \in{0,1}$ 是one-hot label, $\mathbf{z}=\left[z</em>{1}, z<em>{2}, \ldots, z</em>{C}\right]$ ,是每一类预测的 logit。此时，对于一个第 i类的样本，它施加在第 j类上的负样本梯度为</p>
 <script type="math/tex; mode=display">
-\frac{\partial L_{\text {seesaw }}(\mathbf{z})}{\partial z_{j}}=\mathcal{S}_{i j} \frac{e^{z_{j}}}{e^{z_{i}}} \widehat{\sigma}_{i}</script><p>这里我们可以发现 $S_{ij}$就像一个平衡系数，通过调节 $S_{ij}$，我们可以达到放大或者缩小第 i类施加在第 j 类上的负样本梯度的效果。这样，我们就可以通过选择合适 $S_{ij}$来达到平衡正负样本梯度的目的。</p>
+\frac{\partial L_{\text {seesaw }}(\mathbf{z})}{\partial z_{j}}=\mathcal{S}_{i j} \frac{e^{z_{j}}}{e^{z_{i}}} \widehat{\sigma}_{i}</script><p>这里我们可以发现 $S<em>{ij}$就像一个平衡系数，通过调节 $S</em>{ij}$，我们可以达到放大或者缩小第 i类施加在第 j 类上的负样本梯度的效果。这样，我们就可以通过选择合适 $S_{ij}$来达到平衡正负样本梯度的目的。</p>
 <p>在 Seesaw Loss 的设计中，我们考虑了两方面的因素，一方面我们需要考虑类别间样本分布的关系（class-wise），并据此减少头部类别对尾部类别的”惩罚” （负样本梯度）；另一方面，盲目减少对尾部类别的惩罚会增加错误分类的风险，因为部分误分类的样本受到的惩罚变小了，因此对于那些在训练过程中误分类的样本我们需要保证其受到足够的”惩罚”。据此， $S_{ij}$由两项相乘得到，</p>
 <script type="math/tex; mode=display">
-\mathcal{S}_{i j}=\mathcal{M}_{i j} \cdot \mathcal{C}_{i j}</script><p>$M_{ij}$ <strong>（Mitigation Factor）</strong>用来缓解尾部类别上过量的负样本梯度, $C_{ij}$ (<strong>Compensation Factor）</strong>用来补充那些错误分类样本上的”惩罚”。</p>
+\mathcal{S}_{i j}=\mathcal{M}_{i j} \cdot \mathcal{C}_{i j}</script><p>$M<em>{ij}$ <strong>（Mitigation Factor）</strong>用来缓解尾部类别上过量的负样本梯度, $C</em>{ij}$ (<strong>Compensation Factor）</strong>用来补充那些错误分类样本上的”惩罚”。</p>
 <h4 id="1-Mitigation-Factor"><a href="#1-Mitigation-Factor" class="headerlink" title="1. Mitigation Factor"></a>1. Mitigation Factor</h4><p><img src="/img/seesaw-mitigation.png" alt="img"></p>
-<p>既然正负样本梯度不平衡的问题来自于样本数量的不平衡，那么一种直接有效的办法就是根据不同类别之间样本数量的相对比例来进行调节。在训练过程中，Seesaw Loss在线地统计每一类的累计训练样本数量 $N_{ij}$ 并根据如下公式计算$M_{ij}$ ,</p>
+<p>既然正负样本梯度不平衡的问题来自于样本数量的不平衡，那么一种直接有效的办法就是根据不同类别之间样本数量的相对比例来进行调节。在训练过程中，Seesaw Loss在线地统计每一类的累计训练样本数量 $N<em>{ij}$ 并根据如下公式计算$M</em>{ij}$ ,</p>
 <script type="math/tex; mode=display">
 \mathcal{M}_{i j}=\left\{\begin{array}{cc}
 1, & \text { if } N_{i} \leq N_{j} \\
@@ -539,7 +539,7 @@ z=\tau \widetilde{\mathcal{W}}^{T} \tilde{x}+b \\
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">108</span>
+                <span class="site-state-item-count">111</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -561,7 +561,7 @@ z=\tau \widetilde{\mathcal{W}}^{T} \tilde{x}+b \\
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">52</span>
+                <span class="site-state-item-count">54</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

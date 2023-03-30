@@ -400,7 +400,7 @@
 <h4 id="字符级分词方法"><a href="#字符级分词方法" class="headerlink" title="字符级分词方法"></a>字符级分词方法</h4><p>这种方法称为 Character embedding，是一种更为极端的分词方法，直接把一个词分成一个一个的字母和特殊符号。虽然能解决 OOV 问题，也避免了大词汇量问题，但缺点也太明显了，粒度太细，训练花费的成本太高，但这种思想或许我们后面会用到。</p>
 <p><img src="https://img-blog.csdnimg.cn/img_convert/d4a136846907af983e6632ca17207033.png" alt="img"></p>
 <h4 id="基于子词的分词方法"><a href="#基于子词的分词方法" class="headerlink" title="基于子词的分词方法"></a>基于子词的分词方法</h4><p>基于子词的分词方法（Subword Tokenization），简称为 Subword 算法，意思就是把一个词切成更小的一块一块的子词。如果我们能使用将一个 token 分成多个 subtokens，上面的问题就能很好的解决。这种方法的目的是通过一个有限的词表*来解决所有单词的分词问题，同时尽可能将结果中 token 的数目降到最低。例如，可以用更小的词片段来组成更大的词，例如：</p>
-<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">“unfortunately ” = “un ” + “<span class="keyword">for</span> ” + “tun ” + “ate ” + “ly ”。</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">“unfortunately ” = “un ” + “<span class="keyword">for</span> ” + “tun ” + “ate ” + “ly ”。</span><br></pre></td></tr></table></figure>
 <p>可以看到，有点类似英语中的词根词缀拼词法，其中的这些小片段又可以用来构造其他词。可见这样做，既可以降低词表的大小，同时对相近词也能更好地处理。Subword 与传统分词方法的比较：</p>
 <blockquote>
 <ul>

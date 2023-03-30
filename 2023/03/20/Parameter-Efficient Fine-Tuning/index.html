@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="PEFT,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="在NLP任务中，在大模型上进行Fine-tuning是一种有效地迁移学习方法。尤其是，BERT、RoBERTa等模型的提出为NLP的下游任务的解决提供了极大的便利。但在大模型上对下游任务进行fine-tuning时，大模型参数动辄数十亿，存储和训练这种大模型是十分昂贵且耗时的。而且需要庞大计算资源。参数高效微调(Parameter-Efficient Fine-Tuning,PEFT) 方法旨在解">
+<meta name="keywords" content="PEFT">
+<meta property="og:type" content="article">
+<meta property="og:title" content="参数高效微调方法-Adapter">
+<meta property="og:url" content="https://blog.nicehuster.cn/2023/03/20/Parameter-Efficient Fine-Tuning/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="在NLP任务中，在大模型上进行Fine-tuning是一种有效地迁移学习方法。尤其是，BERT、RoBERTa等模型的提出为NLP的下游任务的解决提供了极大的便利。但在大模型上对下游任务进行fine-tuning时，大模型参数动辄数十亿，存储和训练这种大模型是十分昂贵且耗时的。而且需要庞大计算资源。参数高效微调(Parameter-Efficient Fine-Tuning,PEFT) 方法旨在解">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/adapter-acc-num-curve.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/adapter-arch.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/adapter-glue-res.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/adapter-acc-parm-curve.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/adapter-fusion-arch.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/dapterfusion-arch.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/dapterfusion-res.png">
+<meta property="og:updated_time" content="2023-03-30T07:20:59.945Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="参数高效微调方法-Adapter">
+<meta name="twitter:description" content="在NLP任务中，在大模型上进行Fine-tuning是一种有效地迁移学习方法。尤其是，BERT、RoBERTa等模型的提出为NLP的下游任务的解决提供了极大的便利。但在大模型上对下游任务进行fine-tuning时，大模型参数动辄数十亿，存储和训练这种大模型是十分昂贵且耗时的。而且需要庞大计算资源。参数高效微调(Parameter-Efficient Fine-Tuning,PEFT) 方法旨在解">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/adapter-acc-num-curve.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2023/03/20/Parameter-Efficient Fine-Tuning/">
+
+
+
+
+
+  <title>参数高效微调方法-Adapter | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2023/03/20/Parameter-Efficient Fine-Tuning/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">参数高效微调方法-Adapter</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-03-20T19:13:39+08:00">
+                2023-03-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在NLP任务中，在大模型上进行Fine-tuning是一种有效地迁移学习方法。尤其是，BERT、RoBERTa等模型的提出为NLP的下游任务的解决提供了极大的便利。但在大模型上对下游任务进行fine-tuning时，大模型参数动辄数十亿，存储和训练这种大模型是十分昂贵且耗时的。而且需要庞大计算资源。参数高效微调(Parameter-Efficient Fine-Tuning,PEFT) 方法旨在解决这两个问题，PEFT 方法仅微调少量 (额外) 模型参数，同时冻结预训练大模型 的大部分参数，从而大大降低了计算和存储成本。这也克服了灾难性遗忘 的问题， PEFT 方法在小数据集上也可以取得和全参数fine-tune一样的效果。下文详细介绍一下 参数高效微调方法中的Adapter以及Adapter Fusion。</p>
+<a id="more"></a>
+<h4 id="Adapter"><a href="#Adapter" class="headerlink" title="Adapter"></a>Adapter</h4><blockquote>
+<p>Title： <a href="https://arxiv.org/pdf/1902.00751.pdf" target="_blank" rel="noopener">Parameter-Efficient Transfer Learning for NLP</a></p>
+<p>Author： Neil Houlsby（Google Research）.etc</p>
+<p>Code：<a href="https://github.com/google-research/adapter-bert.git" target="_blank" rel="noopener">https://github.com/google-research/adapter-bert.git</a></p>
+</blockquote>
+<p>这篇论文是发表在ICML2019，改论文中提出了Adapter，通过在大模型中插入adapter module，训练时只需训练adapter module，相比于全参数fine-tuning，Adapter只需要训练较少参数即可取得全参数fine-tuning相当的结果。先直观感受一下，Adapter和fine-tune的指标比较，如下图所示：</p>
+<p><img src="/img/adapter-acc-num-curve.png" alt></p>
+<p>下图展示的是adapter module 结构以及插入transformer layer后的结构。</p>
+<p><img src="/img/adapter-arch.png" alt></p>
+<p>在在Adapter内部，它的输入h通过矩阵乘法Wdown，先将特征维度缩小，然后通过一个非线形层$f$，再通过矩阵乘法Wup将特征维度放大到跟adapter输入一样的尺寸，最后通过一个跨层连接，将adapter的输入跟上述结果加到一起作为最终adapter的输出，即下图形式。</p>
+<script type="math/tex; mode=display">
+\boldsymbol{h} \leftarrow \boldsymbol{h}+f\left(\boldsymbol{h} \boldsymbol{W}_{\text {down }}\right) \boldsymbol{W}_{\text {up }} .</script><p>至于adapter引进的模型参数，假设adapter的输入的特征维度是d，而中间的特征维度是m，那么新增的模型参数有：down-project的参数Wdown 为dxm+m,Wup的参数mxd+d，总共2md+m+d，由于m远小于d，所以真实情况下，一般新增的模型参数都只占语言模型全部参数量的0.5%～8%。同时要注意到，针对下游任务训练需要更新的参数除了adapter引入的模型参数外，还有adapter层后面紧随着的layer normalization层参数需要更新，每个layer normalization层只有均值跟方差需要更新，所以需要更新的参数是2d。（由于插入了具体任务的adapter模块，所以输入的均值跟方差发生了变化，就需要重新训练）</p>
+<p>通过实验，可以发现只训练少量参数的adapter方法的效果可以媲美finetune语言模型全部参数的传统做法。这也验证了adapter是一种高效的参数训练方法，可以快速将语言模型的能力迁移到下游任务中去。同时，可以看到不同数据集上adapter最佳的中间层特征维度m不尽相同。</p>
+<p><img src="/img/adapter-glue-res.png" alt></p>
+<p>为了进一步探究adapter的参数效率跟模型性能的关系，论文做了进一步的实验，同时比对了fine-tune的方式（只更新最后几层的参数或者只更新layer normalization的参数），从结果可以看出adapter是一种更加高效的参数更新方式，同时效果也非常可观，通过引入0.5%～5%的模型参数可以达到不落后先进模型1%的性能。</p>
+<p><img src="/img/adapter-acc-parm-curve.png" alt></p>
+<h4 id="Adapter-Fusion"><a href="#Adapter-Fusion" class="headerlink" title="Adapter Fusion"></a>Adapter Fusion</h4><blockquote>
+<p>Title： <a href="https://arxiv.org/pdf/2005.00247.pdf" target="_blank" rel="noopener">AdapterFusion: Non-Destructive Task Composition for Transfer Learning</a></p>
+<p>Author： Jonas Pfeiffer（UKP Lab）.etc</p>
+<p>Code：<a href="https://adapterhub.ml/" target="_blank" rel="noopener">https://adapterhub.ml/</a></p>
+</blockquote>
+<p>这是2020年5月份挂载arxiv上的一篇论文，被EACL 2021接收，这篇论文提出了一种adapter变种，Adapter Fusion，用于融合多任务信息。在了解Adapter Fusion之前，先看一下这个方法提出的任务背景。我们将C 定义为 N 个分类任务的集合，具有不同规模大小的标记数据和不同的损失函数：</p>
+<script type="math/tex; mode=display">
+C={(D_1,L_1),..,(D_N,L_N)}</script><p>其中，D表示标注数据，L表示损失函数。我们的目的是能够利用上述一组 N 个任务来改进目标任务m，$C_m=(D_m,L_m)$，如下所示，期望先从N个任务中学到一个模型参数（最右边参数），然后利用该参数来学习特定任务m下的一个模型参数（最左边参数）：</p>
+<script type="math/tex; mode=display">
+\Theta_m \leftarrow \underset{\Theta^{\prime}}{\operatorname{argmin}} L_m\left(D_m ; \Theta^{\prime}\right)</script><p>当前主流方法在处理上述问题时，通常有两种方法：</p>
+<blockquote>
+<p>（1）Sequential Fine-Tuning：顺序微调，在每个任务上顺序更新模型的所有权重，在每一步，模型都使用上一步学习的参数进行初始化；</p>
+<p>（2）Multi-Task Learning (MTL)：多任务学习，所有任务都是同时训练，学习一个共享表示，使模型能够更好地泛化每个任务；</p>
+</blockquote>
+<p>前者方法容易发生灾难性遗忘问题（catastrophic forgetting），后者需要同时访问所有任务数据，不同数据集大小和损失函数各不相同，如何平衡具有较大挑战。为了为了解决上述问题，Adapter Fusion提出一个两阶段的学习策略，其中第一阶段是knowledge extraction stage，在不同任务下引入各自的adapter模块，用于学习特定任务的信息，而第二阶段是knowledge composition step，用于学习聚合多个任务的adapter。</p>
+<p><img src="/img/adapter-fusion-arch.png" alt></p>
+<p>上图展示的是AdapterFusion在transformer中的结构，其中有多个Adapter模块，以及一个Adapter Fusion模块。后者用于融合前者信息。和上一篇论文提出的结构相比，这里去除了multi-head attn后面的Adapter模块。下面详细介绍Adapter Fusion提出的两阶段的学习策略。</p>
+<h5 id="（1）knowledge-extraction-stage"><a href="#（1）knowledge-extraction-stage" class="headerlink" title="（1）knowledge extraction stage"></a>（1）knowledge extraction stage</h5><p>对于该阶段有俩种训练方式，Single-Task Adapters (ST-A)，Multi-Task Adapters (MT-A)。</p>
+<p><strong>a. Single-Task Adapters (ST-A)</strong>：对于N个任务，模型都分别独立进行优化，各个任务之间互不干扰，互不影响。对于其中第n个任务而言，相应的目标函数如下所示：</p>
+<script type="math/tex; mode=display">
+\Phi_n \leftarrow \underset{\Phi}{\operatorname{argmin}} L_n\left(D_n ; \Theta_0, \Phi\right)</script><p>其中$\Phi$ 表示 adapter的权重参数，$\Theta_0$ 表示大模型的预训练参数。</p>
+<p><strong>b. Multi-Task Adapters (MT-A)</strong>：N个任务通过多任务学习的方式，进行联合优化，相应的目标函数如下：</p>
+<script type="math/tex; mode=display">
+\Theta \leftarrow \underset{\Theta, \Phi}{\operatorname{argmin}}\left(\sum_{n=1}^N L_n\left(D_n ; \Theta_0, \Phi_n\right)\right),  \boldsymbol{\Theta}=\Theta_{0 \rightarrow\{1, \ldots, N\}}, \Phi_1, \ldots, \Phi_N</script><h5 id="（2）knowledge-composition-step"><a href="#（2）knowledge-composition-step" class="headerlink" title="（2）knowledge composition step"></a>（2）knowledge composition step</h5><p>对于第二阶段，就是adapter fusion大展身手的时候了。为了避免通过引入特定任务参数而带来的灾难性遗忘问题，adapter fusion提出了一个共享多任务信息的结构。针对特定任务m，adapter fusion联合了第一阶段训练的到的N个adapter信息。固定模型的预训练参数跟N个adapter的参数，新引入adapter fusion的参数，目标函数也是学习针对特定任务m的adapter fusion的参数$\Psi_m$:</p>
+<script type="math/tex; mode=display">
+\Psi_m \leftarrow \underset{\Psi}{\operatorname{argmin}} L_m\left(D_m ; \Theta, \Phi_1, \ldots, \Phi_N, \Psi\right)</script><p>Adapter fusion的具体结构就是一个attention，它的参数包括query，key, value的矩阵参数，在transformer的每一层都存在，它的query是transformer每个子模块的输出结果，它的key跟value则是N个任务的adapter的输出。通过adapter fusion，模型可以为不同的任务对应的adapter分配不同的权重，聚合N个任务的信息，从而为特定任务输出更合适的结果。</p>
+<p><img src="/img/dapterfusion-arch.png" alt></p>
+<p>通过实验发现，第一阶段采用ST-A+第二阶段Adapter fusion是最有效的方法，在多个数据集上的平均效果达到了最佳。关于MT-A+adapter fusion没有取得最佳的效果，在于第一阶段其实已经联合了多个任务的信息了，所以adapter fusion的作用没有那么明显，同时MT-A这种多任务联合训练的方式需要投入较多的成本，并不算一种高效的参数更新方式。</p>
+<p><img src="/img/dapterfusion-res.png" alt></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/PEFT/" rel="tag"># PEFT</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2022/09/23/position encoding/" rel="next" title="让研究人员绞尽脑汁的Transformer位置编码[转载]">
+                <i class="fa fa-chevron-left"></i> 让研究人员绞尽脑汁的Transformer位置编码[转载]
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">112</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">55</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#Adapter"><span class="nav-number">1.</span> <span class="nav-text">Adapter</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Adapter-Fusion"><span class="nav-number">2.</span> <span class="nav-text">Adapter Fusion</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#（1）knowledge-extraction-stage"><span class="nav-number">2.1.</span> <span class="nav-text">（1）knowledge extraction stage</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#（2）knowledge-composition-step"><span class="nav-number">2.2.</span> <span class="nav-text">（2）knowledge composition step</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

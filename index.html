@@ -289,7 +289,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2022/11/02/tokenize/">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2023/03/20/Parameter-Efficient Fine-Tuning/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="nicehuster">
@@ -308,7 +308,7 @@
         
           <h1 class="post-title" itemprop="name headline">
                 
-                <a class="post-title-link" href="/2022/11/02/tokenize/" itemprop="url">文本分词详解</a></h1>
+                <a class="post-title-link" href="/2023/03/20/Parameter-Efficient Fine-Tuning/" itemprop="url">参数高效微调方法-Adapter</a></h1>
         
 
         <div class="post-meta">
@@ -320,8 +320,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-11-02T19:13:39+08:00">
-                2022-11-02
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-03-20T19:13:39+08:00">
+                2023-03-20
               </time>
             
 
@@ -381,12 +381,10 @@
 
       
         
-          <p>在对文本进行处理时，我们需要进行文本预处理 ，而最重要的一步就是分词（Tokenize） 。一个完整的分词流程如下：</p>
-<p><img src="https://img-blog.csdnimg.cn/img_convert/74651d420e612ceddb4bb29dcbac1ba5.png" alt="img"></p>
-<p>其中，执行分词的算法模型称为分词器（Tokenizer） ，划分好的一个个词称为 Token （为啥不直接叫 Word？接着往后看），这个过程称为 Tokenization 。我们将一个个的 token（可以理解为小片段）表示向量，我们分词的目的就是尽可能的让这些向量蕴含更多有用的信息，然后把这些向量输入到算法模型中。由于一篇文本的词往往太多了，为了方便算法模型训练，我们会选取出频率 （也可能是其它的权重）最高的若干个词组成一个词表（Vocabulary） 。</p>
+          <p>在NLP任务中，在大模型上进行Fine-tuning是一种有效地迁移学习方法。尤其是，BERT、RoBERTa等模型的提出为NLP的下游任务的解决提供了极大的便利。但在大模型上对下游任务进行fine-tuning时，大模型参数动辄数十亿，存储和训练这种大模型是十分昂贵且耗时的。而且需要庞大计算资源。参数高效微调(Parameter-Efficient Fine-Tuning,PEFT) 方法旨在解决这两个问题，PEFT 方法仅微调少量 (额外) 模型参数，同时冻结预训练大模型 的大部分参数，从而大大降低了计算和存储成本。这也克服了灾难性遗忘 的问题， PEFT 方法在小数据集上也可以取得和全参数fine-tune一样的效果。下文详细介绍一下 参数高效微调方法中的Adapter以及Adapter Fusion。</p>
           <!--noindex-->
           <div class="post-button text-center">
-            <a class="btn" href="/2022/11/02/tokenize/#more" rel="contents">
+            <a class="btn" href="/2023/03/20/Parameter-Efficient Fine-Tuning/#more" rel="contents">
               阅读全文 &raquo;
             </a>
           </div>
@@ -1463,6 +1461,154 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2022/08/02/tokenize/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2022/08/02/tokenize/" itemprop="url">文本分词详解</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-08-02T19:13:39+08:00">
+                2022-08-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p>在对文本进行处理时，我们需要进行文本预处理 ，而最重要的一步就是分词（Tokenize） 。一个完整的分词流程如下：</p>
+<p><img src="https://img-blog.csdnimg.cn/img_convert/74651d420e612ceddb4bb29dcbac1ba5.png" alt="img"></p>
+<p>其中，执行分词的算法模型称为分词器（Tokenizer） ，划分好的一个个词称为 Token （为啥不直接叫 Word？接着往后看），这个过程称为 Tokenization 。我们将一个个的 token（可以理解为小片段）表示向量，我们分词的目的就是尽可能的让这些向量蕴含更多有用的信息，然后把这些向量输入到算法模型中。由于一篇文本的词往往太多了，为了方便算法模型训练，我们会选取出频率 （也可能是其它的权重）最高的若干个词组成一个词表（Vocabulary） 。</p>
+          <!--noindex-->
+          <div class="post-button text-center">
+            <a class="btn" href="/2022/08/02/tokenize/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
+          <!--/noindex-->
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2022/07/26/Deformable DETR/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1602,152 +1748,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2022/07/24/DETR代码解读/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="nicehuster">
-      <meta itemprop="description" content>
-      <meta itemprop="image" content="/avatar/weichat.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一起打怪升级呀">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2022/07/24/DETR代码解读/" itemprop="url">DETR源码解读</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2022-07-24T19:13:39+08:00">
-                2022-07-24
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
-                    <span itemprop="name">paper reading</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>transformer由encoder和decoder俩部分组成。</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/2022/07/24/DETR代码解读/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1796,7 +1796,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">111</span>
+                <span class="site-state-item-count">112</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1818,7 +1818,7 @@
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">54</span>
+                <span class="site-state-item-count">55</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -1902,7 +1902,7 @@
         <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2022</span>
+  <span itemprop="copyrightYear">2023</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

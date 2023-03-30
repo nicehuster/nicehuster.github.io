@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://blog.nicehuster.cn/2022/11/02/tokenize/</loc>
-    <lastmod>2022-11-07</lastmod>
+    <loc>https://blog.nicehuster.cn/2023/03/20/Parameter-Efficient%20Fine-Tuning/</loc>
+    <lastmod>2023-03-30</lastmod>
+  </url>
+  <url>
+    <loc>https://blog.nicehuster.cn/2022/08/02/tokenize/</loc>
+    <lastmod>2023-03-29</lastmod>
   </url>
   <url>
     <loc>https://blog.nicehuster.cn/2022/09/23/position%20encoding/</loc>
@@ -425,6 +429,10 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
+    <loc>https://blog.nicehuster.cn/2018/07/29/tensorRT_customlayer/</loc>
+    <lastmod>2020-09-13</lastmod>
+  </url>
+  <url>
     <loc>https://blog.nicehuster.cn/2018/07/25/tensorRT_install/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
@@ -433,15 +441,11 @@
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://blog.nicehuster.cn/2019/05/16/zero-game/</loc>
-    <lastmod>2020-09-13</lastmod>
-  </url>
-  <url>
     <loc>https://blog.nicehuster.cn/2018/07/26/tensorRT_introduce/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/29/tensorRT_customlayer/</loc>
+    <loc>https://blog.nicehuster.cn/2019/05/16/zero-game/</loc>
     <lastmod>2020-09-13</lastmod>
   </url>
 </urlset> 

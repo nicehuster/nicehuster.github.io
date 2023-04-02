@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="prompt,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="近年来，在NLP领域热度最高的技术莫过于prompt engineering ，想了解一个方向最快速的方法就是看有关这个方向的survey的paper。本文的内容主要参考CMU刘鹏飞的这篇论文：Pre-train, Prompt, and Predict: A Systematic Survey of Prompting Methods in Natural Language Processing">
+<meta name="keywords" content="prompt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Prompt详解">
+<meta property="og:url" content="https://blog.nicehuster.cn/2023/03/27/prompt/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="近年来，在NLP领域热度最高的技术莫过于prompt engineering ，想了解一个方向最快速的方法就是看有关这个方向的survey的paper。本文的内容主要参考CMU刘鹏飞的这篇论文：Pre-train, Prompt, and Predict: A Systematic Survey of Prompting Methods in Natural Language Processing">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/prompt.jpg">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/four-paradigms-in-nlp.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/prompt-case-study.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/example-prompt-for-different-task.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/prompt-engineering.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/prompt-case-study.png">
+<meta property="og:updated_time" content="2023-04-02T08:20:04.845Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Prompt详解">
+<meta name="twitter:description" content="近年来，在NLP领域热度最高的技术莫过于prompt engineering ，想了解一个方向最快速的方法就是看有关这个方向的survey的paper。本文的内容主要参考CMU刘鹏飞的这篇论文：Pre-train, Prompt, and Predict: A Systematic Survey of Prompting Methods in Natural Language Processing">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/prompt.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2023/03/27/prompt/">
+
+
+
+
+
+  <title>Prompt详解 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2023/03/27/prompt/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Prompt详解</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-03-27T19:13:39+08:00">
+                2023-03-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>近年来，在NLP领域热度最高的技术莫过于prompt engineering ，想了解一个方向最快速的方法就是看有关这个方向的survey的paper。本文的内容主要参考CMU刘鹏飞的这篇论文：<a href="https://arxiv.org/pdf/2107.13586.pdf" target="_blank" rel="noopener">Pre-train, Prompt, and Predict: A Systematic Survey of Prompting Methods in Natural Language Processing</a>。这篇survey对于比较清晰的介绍了当前NLP中的范式发展，以及prompt的一些基础知识和prompt的设计方法。</p>
+<p><img src="/img/prompt.jpg" alt></p>
+<a id="more"></a>
+<h4 id="NLP的范式发展"><a href="#NLP的范式发展" class="headerlink" title="NLP的范式发展"></a>NLP的范式发展</h4><p>这篇论文总结总结了在NLP中的四次”范式“的“革命”：</p>
+<p><img src="/img/four-paradigms-in-nlp.png" alt></p>
+<blockquote>
+<ol>
+<li>第一个范式：feature engineering，从原始数据中提取显著特征，并提供具有适当归纳偏差的模型，以便从这个有限的数据中学习；</li>
+<li>第二个范式：architecture engineering，通过设计有利于学习这些特征的合适网络架构来提供归纳偏差</li>
+<li>第三个范式：objective engineering，在大量的原始文本数据上对大模型进行<strong>pretrain</strong>学习通用特征，然后在下游任务上进行<strong>fine-tune</strong>，在这个范式中重点在于设计合适的pretrain和fine-tune的objective function；</li>
+<li>第四个范式：prompt engineering，随着PLM体量不断增大，对其进行fine-tune对硬件、数据、耗时代价要求也在不断上涨。而prompt就是一个更小巧轻量、更普适高效的方法；</li>
+</ol>
+</blockquote>
+<h4 id="prompt是什么"><a href="#prompt是什么" class="headerlink" title="prompt是什么"></a>prompt是什么</h4><p>prompt 说简单也简单，其实就是构建一个语言模版。融入了prompt的新模式大致可以归纳成”pre-train, prompt, and predict“。在该模式中，下游任务被重新调整成类似预训练任务的形式。例如，通常的预训练任务有Masked Language Model， 在文本情感分类任务中，对于 “I love this movie.” 这句输入，可以在后面加上prompt “The movie is <em>_</em>“ 这样的形式，然后让PLM用表示情感的答案填空如 “great”、”fantastic” 等等，最后再将该答案转化成情感分类的标签，这样以来，通过选取合适的prompt，我们可以控制模型预测输出，从而一个完全无监督训练的PLM可以被用来解决各种各样的下游任务。</p>
+<p>下表格是人工设计的prompt模板，其中[x]和[y]可以看作是数据和标签。可以看到，prompt的微小差别，其性能差异可大到20-30点，合适的prompt对于模型的效果至关重要。</p>
+<p><img src="/img/prompt-case-study.png" alt></p>
+<h4 id="prompt数学描述"><a href="#prompt数学描述" class="headerlink" title="prompt数学描述"></a>prompt数学描述</h4><p>对于传统有监督学习任务而言，我们的目标是对x/y进行建模，得到模型$P(y|x,\theta)$，x/y为对应的数据和标签，然而在现实世界中构建大量人工标注的x/y数据，往往费时费力，而且质量也无法保证。而基于prompt的方法则是通过试图学习LM来规避这个问题。LM可表示为$P(X|,\theta)$，是对文本x的直接建模，通过它来直接预测/生成y。这在一定程度上对$P(y|x,\theta)$的直接建模进行了”解耦“，这样也就不再依赖人工标注数据x/y了。对于输入文本$x$，有函数$f_{prompt}(x)$ 将$x$转化为prompt形式$x^{’}$ ,</p>
+<script type="math/tex; mode=display">
+x^{’} =f_{prompt}(x)</script><p>该函数通常会进行两步操作：</p>
+<blockquote>
+<ol>
+<li>使用一个模板，模板通常为一段自然语言，并且包含有两个空位置：用于填输入x的位置[X]和用于生成答案文本z的位置[Z].</li>
+<li>把输入x填到[X]的位置。</li>
+</ol>
+</blockquote>
+<p>还用前文提到的例子。在文本情感分类的任务中，假设输入是</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">x</span> = <span class="string">" I love this movie."</span></span><br></pre></td></tr></table></figure>
+<p>使用的模板是</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">" <span class="selector-attr">[X]</span> <span class="selector-tag">Overall</span>, <span class="selector-tag">it</span> <span class="selector-tag">was</span> <span class="selector-tag">a</span> <span class="selector-attr">[Z]</span> <span class="selector-tag">movie</span>."</span><br></pre></td></tr></table></figure>
+<p>那么得到的x′就应该是 “I love this movie. Overall it was a [Z] movie.”</p>
+<p>在实际的研究中，prompts应该有空位置来填充答案，这个位置一般在句中或者句末。如果在句中，一般称这种prompt为<strong>cloze prompt</strong>；如果在句末，一般称这种prompt为<strong>prefix prompt</strong>。[X]和[Z]的位置以及数量都可能对结果造成影响，因此可以根据需要灵活调整。上面讲的都是简单的情感分类任务的 Prompt 设计，读者看到这里自然而然的会想到，其他 NLP 任务的 Prompt 如何设计呢？实际上刘鹏飞大神在他的<a href="https://arxiv.org/abs/2107.13586" target="_blank" rel="noopener">论文</a>中给我们提供了一些参考</p>
+<p><img src="/img/example-prompt-for-different-task.png" alt></p>
+<h4 id="prompt设计"><a href="#prompt设计" class="headerlink" title="prompt设计"></a>prompt设计</h4><p><img src="/img/prompt-engineering.png" alt></p>
+<p>如上图所示，prompt主要从俩方面进行设计：形状以及手工/自动设计。</p>
+<h5 id="prompt-shape"><a href="#prompt-shape" class="headerlink" title="prompt shape"></a>prompt shape</h5><p>prompt的形状主要有两种：cloze prompt，与 Maksed Language Model 的训练方式非常类似，因此对于 MLM 任务来说，Cloze Prompt 更合适；对于生成任务或者使用自回归 LM 解决的任务，Prefix Prompt 更合适；</p>
+<h5 id="Hand-crafted"><a href="#Hand-crafted" class="headerlink" title="Hand-crafted"></a>Hand-crafted</h5><p>Prompt 的模板最开始是人工设计的，人工设计一般基于人类的自然语言知识，力求得到语义流畅且高效的「模板」。人工设计模板的优点是直观，但缺点是需要很多实验、经验以及语言专业知识。下图是 <a href="https://arxiv.org/abs/2103.10385" target="_blank" rel="noopener">GPT Understands, Too</a> 论文中的一个实验结果。</p>
+<p><img src="/img/prompt-case-study.png" alt></p>
+<h5 id="Automated"><a href="#Automated" class="headerlink" title="Automated"></a>Automated</h5><p>为了解决人工设计模板的缺点，许多研究员开始探究如何自动学习到合适的模板。自动学习的模板又可以分为离散（Discrete Prompts）和连续（Continuous Prompts）两大类。离散的prompt是使用具体的words/tokens，而连续的prompt则是基于embeddings来表示prompts。这里主要介绍一下连续的prompt。连续型prompts去掉了两个约束条件：</p>
+<blockquote>
+<ol>
+<li>relax the constraint that the embeddings of template words be the embeddings of natural language words；</li>
+<li>Remove the restriction that the template is parameterized by the pre-trained LM’s parameters;</li>
+</ol>
+</blockquote>
+<p>连续prompts好处是模板中的embedding可以是整个词表的embedding，而不再是有限的一些embedding，此外，模板的参数也不再是直接取PLM的参数，而是由独立的参数，可通过下游任务的数据训练进行调整。目前的连续prompts方法大致可以分为下面几种：</p>
+<h6 id="Prefix-Tuning"><a href="#Prefix-Tuning" class="headerlink" title="Prefix Tuning"></a>Prefix Tuning</h6><p>prefix tuning 最开始由 Li 在<a href="https://arxiv.org/abs/2101.00190" target="_blank" rel="noopener">Prefix-Tuning: Optimizing Continuous Prompts for Generation</a> 这篇论文中提出来的，是一种在输入句子前添加一组连续型向量的方法，该方法保持 PLM 的参数不动，仅训练前缀（Prefix）向量。它的形式化定义是，在给定一个可训练的前缀矩阵$M_{\phi}$和一个固定的参数化为$\theta$的PLM的对数似然目标上进行优化，</p>
+<script type="math/tex; mode=display">
+maxφ log P (y|x; θ; φ) = maxφ∑yilog P (yi|h<i; θ; φ)</script><p>也是属于一种PEFT方法，我会在下一篇博客中详细介绍这个方法。</p>
+<h6 id="Tuning-Initialized-with-Discrete-Prompts"><a href="#Tuning-Initialized-with-Discrete-Prompts" class="headerlink" title="Tuning Initialized with Discrete Prompts"></a>Tuning Initialized with Discrete Prompts</h6><p>这类方法中连续prompts是用已有的prompts初始化的，已有的prompts可以是手工设计的，也可以是之前搜索发现的离散prompts。Zhong 等人先用一个离散prompt搜索方法定义了一个模板，然后基于该模板初始化虚拟的token，最后微调这些token的embedding以提高准确率。</p>
+<h6 id="Hard-Soft-Prompt-Hybrid-Tuning"><a href="#Hard-Soft-Prompt-Hybrid-Tuning" class="headerlink" title="Hard-Soft Prompt Hybrid Tuning"></a>Hard-Soft Prompt Hybrid Tuning</h6><p>这类方法可以说是手工设计和自动学习的结合，它通常不单纯使用可学习的prompt模板，而是在手工设计的模板中插入一些可学习的embedding。</p>
+<h4 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h4><p>本文只是简单地介绍了一下prompt原理，详细可看原文。此外，如何使用prompt预训练大模型可以参考b站上这个视频，讲解地比较通俗易懂，【2022-陈蕴侬-如何prompt预训练大模型】 <a href="https://www.bilibili.com/video/BV1sh41137Xd/?share_source=copy_web&amp;vd_source=b031a2a5b0a629cd338ab1f2c16ed732" target="_blank" rel="noopener">https://www.bilibili.com/video/BV1sh41137Xd/?share_source=copy_web&amp;vd_source=b031a2a5b0a629cd338ab1f2c16ed732</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/prompt/" rel="tag"># prompt</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/03/25/LoRA/" rel="next" title="参数高效微调方法-LoRA">
+                <i class="fa fa-chevron-left"></i> 参数高效微调方法-LoRA
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">114</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">56</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#NLP的范式发展"><span class="nav-number">1.</span> <span class="nav-text">NLP的范式发展</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#prompt是什么"><span class="nav-number">2.</span> <span class="nav-text">prompt是什么</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#prompt数学描述"><span class="nav-number">3.</span> <span class="nav-text">prompt数学描述</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#prompt设计"><span class="nav-number">4.</span> <span class="nav-text">prompt设计</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#prompt-shape"><span class="nav-number">4.1.</span> <span class="nav-text">prompt shape</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Hand-crafted"><span class="nav-number">4.2.</span> <span class="nav-text">Hand-crafted</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Automated"><span class="nav-number">4.3.</span> <span class="nav-text">Automated</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#Prefix-Tuning"><span class="nav-number">4.3.1.</span> <span class="nav-text">Prefix Tuning</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Tuning-Initialized-with-Discrete-Prompts"><span class="nav-number">4.3.2.</span> <span class="nav-text">Tuning Initialized with Discrete Prompts</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Hard-Soft-Prompt-Hybrid-Tuning"><span class="nav-number">4.3.3.</span> <span class="nav-text">Hard-Soft Prompt Hybrid Tuning</span></a></li></ol></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#最后"><span class="nav-number">5.</span> <span class="nav-text">最后</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2023</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

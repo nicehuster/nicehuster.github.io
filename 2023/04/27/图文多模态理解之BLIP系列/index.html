@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+  <meta name="google-site-verification" content="E3FpB-yqMjVKzHwdisKMpUn104x78HxTRcD4_v_URgc">
+
+
+
+
+
+
+
+  <meta name="baidu-site-verification" content="wgGFRLcCc9">
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="BLIP,">
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="一起打怪升级呀" type="application/atom+xml">
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="这篇文章介绍多模态预训练的一个系列-BLIP，以及针对BLIP改进和延续的一些相关工作。 BLIP这篇也是做的多模态预训练任务，之前的工作都是在于统一vision-language的理解任务，这篇工作同时支持理解和生成任务。这篇文章的作者和ALBEF的作者是同一人。">
+<meta name="keywords" content="BLIP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图文多模态理解-BLIP系列">
+<meta property="og:url" content="https://blog.nicehuster.cn/2023/04/27/图文多模态理解之BLIP系列/index.html">
+<meta property="og:site_name" content="一起打怪升级呀">
+<meta property="og:description" content="这篇文章介绍多模态预训练的一个系列-BLIP，以及针对BLIP改进和延续的一些相关工作。 BLIP这篇也是做的多模态预训练任务，之前的工作都是在于统一vision-language的理解任务，这篇工作同时支持理解和生成任务。这篇文章的作者和ALBEF的作者是同一人。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/blip.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/capFlit.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/CapFilt_exam.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/blip2.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/blip2-stage1.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/blip2-stage2.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/blip2-zero-shot-exp.png">
+<meta property="og:updated_time" content="2024-03-07T07:53:39.584Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="图文多模态理解-BLIP系列">
+<meta name="twitter:description" content="这篇文章介绍多模态预训练的一个系列-BLIP，以及针对BLIP改进和延续的一些相关工作。 BLIP这篇也是做的多模态预训练任务，之前的工作都是在于统一vision-language的理解任务，这篇工作同时支持理解和生成任务。这篇文章的作者和ALBEF的作者是同一人。">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/blip.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"always","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://blog.nicehuster.cn/2023/04/27/图文多模态理解之BLIP系列/">
+
+
+
+
+
+  <title>图文多模态理解-BLIP系列 | 一起打怪升级呀</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">一起打怪升级呀</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">别整太大鸭力,多鸡立自己qaq</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br>
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br>
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://blog.nicehuster.cn/2023/04/27/图文多模态理解之BLIP系列/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="nicehuster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/avatar/weichat.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一起打怪升级呀">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">图文多模态理解-BLIP系列</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2023-04-27T19:13:39+08:00">
+                2023-04-27
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper-reading/" itemprop="url" rel="index">
+                    <span itemprop="name">paper reading</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>  这篇文章介绍多模态预训练的一个系列-BLIP，以及针对BLIP改进和延续的一些相关工作。</p>
+<h3 id="BLIP"><a href="#BLIP" class="headerlink" title="BLIP"></a>BLIP</h3><p>这篇也是做的多模态预训练任务，之前的工作都是在于统一vision-language的理解任务，这篇工作同时支持理解和生成任务。这篇文章的作者和ALBEF的作者是同一人。</p>
+<a id="more"></a>
+<h4 id="motivation"><a href="#motivation" class="headerlink" title="motivation"></a>motivation</h4><blockquote>
+<p>模型角度：现有方法分为encoder-based model和encoder-decoder model, 都存在一些问题，前者无法支持下游的生成任务，例如CLIP不支持image-caption；后者比如SimVLM在image-text retreval上效果差。</p>
+<p>数据角度：使用互联网上爬取到的图像文本对，含有很多噪声；</p>
+</blockquote>
+<h4 id="BLIP-1"><a href="#BLIP-1" class="headerlink" title="BLIP"></a>BLIP</h4><p><img src="/img/blip.png" alt></p>
+<p>上图的模型结构中包含了四个部分image encoder, text encoder, image-grounded text encoder, image-grounded text decoder. image encoder, text encoder分别使用的是ViT和Bert提取图像特征和文本特征。image-grounded text encoder引入图像特征做cross attention，用来做图像文本匹配(ITM)任务。 image-grounded text decoder不同于前者，将self attention替换成causal self-attention用于语言模型任务。</p>
+<p>需要注意的是，与text相关的text encoder和Image-grounded Text encoder的共有结构特征是共享的，为了标记差异，在文本的开头分别用”[CLS]”和”[Encoder]”标记。而Image-grounded Text decoder中使用”[Decoder]”。</p>
+<h4 id="Pre-training-Objectives"><a href="#Pre-training-Objectives" class="headerlink" title="Pre-training Objectives"></a>Pre-training Objectives</h4><p>在预训练中有三个目标函数，两个是基于理解的预训练任务以及一个基于生成的预训练任务。计算量比较大的image encoder只需要运算一次。</p>
+<blockquote>
+<ul>
+<li><strong>Image-Text Contrastive Loss(ITC)</strong>：目的都是为了对齐视觉和文本模态的特征；</li>
+<li><strong>Image-Text Matching Loss (ITM)</strong>：判断图像和文本是否匹配，二分类任务；</li>
+<li><strong>Language Modeling Loss (LM)</strong>：不同于MLM任务，这里使用的是NTP；</li>
+</ul>
+</blockquote>
+<h4 id="CapFilt"><a href="#CapFilt" class="headerlink" title="CapFilt"></a>CapFilt</h4><p>在BLIP中为了提升预训练数据的质量，作者设计了CapFlit，在预训练任务中包含生成字幕的预训练任务也有判断图文是否匹配的预训练任务，因此可以让模型生成图片的描述(Captioner)，再通过Filter用于判断图像和文本是否匹配。如下图，原始的图文不匹配，在最终预训练时会被过滤掉，而Captioner生成的文本和图片匹配，则在最终预训练时会保留生成的数据。</p>
+<p><img src="/img/capFlit.png" alt></p>
+<p>文中也展示了一些对比的case，从case上看合成的caption比直接从web爬取的caption质量明显好很多。</p>
+<p><img src="/img/CapFilt_exam.png" alt></p>
+<h3 id="BLIP-2"><a href="#BLIP-2" class="headerlink" title="BLIP-2"></a>BLIP-2</h3><p>同样出自Junnan Li, BLIP2新增了一个Querying Transformer (Q-Former)，BLIP2训练需要two stage训练。第一个预训练阶段，我们执行vision-language representation learning，强制Q-Former学习与文本最相关的视觉表示。在第二个预训练阶段，我们通过将Q-Former的输出连接到冻结的LLM来执行视觉到语言的生成 学习，并训练Q-Former，使其输出视觉表示可以被LLM解释。如下图所示：</p>
+<p><img src="/img/blip2.png" alt></p>
+<h4 id="motivation-1"><a href="#motivation-1" class="headerlink" title="motivation"></a>motivation</h4><blockquote>
+<ul>
+<li>The cost of vision-and-language pre-training has become increasingly prohibitive due to end-to-end training of large-scale models；</li>
+<li>Pre-trained vision models offer high-quality visual representation.</li>
+<li>Pre-trained language models, in particular large language models (LLMs), offer strong language generation and zero-shot transfer abilities.</li>
+</ul>
+</blockquote>
+<p>一方面，现有的视觉-语言预训练模型越做越大，使得计算成本不断增加；另一方面，预训练的视觉模型/语言模型具有很强的能力，因此作者想到使用frozen的预训练的视觉/语言模型来做视觉-语言对齐的预训练任务。</p>
+<h4 id="method"><a href="#method" class="headerlink" title="method"></a>method</h4><p>训练Q-Former需要两步，分别是vision-language representation learning stage和vision-to-language generative learning stage。</p>
+<ul>
+<li><strong>vision-language representation learning stage</strong></li>
+</ul>
+<p><img src="/img/blip2-stage1.png" alt></p>
+<p>QFormer由Image Transformer和Text Transformer两个子模块构成，它们共享相同自注意力层。QFormer使用= BERTbase 的预训练权重初始化，而交叉注意力层是随机初始化。 Q-Former 总共包含 188M 参数。QFormer拥有 32个query，768维，是远小于ViT-L/14的 257x1024维度的。image encoder是冻结的。和BLIP类似，有三个优化函数：</p>
+<blockquote>
+<ul>
+<li><strong>Image-Text Contrastive Loss(ITC)</strong>：目的都是为了对齐image representation和text representation；这里的image representation是输出的query representation(32x768)，text representation是text transformer CLS token。计算互信息最大的那个query做梯度反传。为了防止信息泄露，query和text不能互相看见。</li>
+<li><strong>Image-Text Matching Loss (ITM)</strong>：同BLIP，query和text互相都可以看见，做了更细粒度的匹配。</li>
+<li><strong>Image-grounded Text Generation</strong>：训练Q-Former在给定图像情况下，生成文字。这里没有显式输入图像信息，而是与learnable query进行交互，text 可以看到query 和 当前和历史的text，query还是只能看到query。这里强迫了learnable query必须summary图像的抽象信息。</li>
+</ul>
+</blockquote>
+<ul>
+<li><strong>vision-to-language generative learning stage</strong></li>
+</ul>
+<p>在第一个阶段，已经训练得到了一个Q-Former，可以提取图像全局特征和重要的信息。第二个阶段，Q-Former被接入到LLM上，获取生成语言的能力。</p>
+<p><img src="/img/blip2-stage2.png" alt></p>
+<p>首先使用一个FC对齐Q-Former的维度和LLM text embedding维度。然后可以把图像浓缩信息传入到LLM中，因为第一个阶段有<strong>ITG</strong>来监督文本的generation，因此这个图像info天然的可以直接用于LLM，第一阶段已经做了微对齐。</p>
+<h4 id="experiments"><a href="#experiments" class="headerlink" title="experiments"></a>experiments</h4><p>微调带来了第一个好处就是机器成本下降，文中提到”For example, using a single 16-A100(40G) machine, our largest model with ViT-g and FlanT5-XXL requires less than 6 days for the first stage and less than 3 days for the second stage.”。 BLIP2 也展现了强大的zeroshot vision-language 任务。</p>
+<p><img src="/img/blip2-zero-shot-exp.png" alt></p>
+<h3 id="InstructBLIP"><a href="#InstructBLIP" class="headerlink" title="InstructBLIP"></a>InstructBLIP</h3>
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/BLIP/" rel="tag"># BLIP</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2023/03/27/prompt/" rel="next" title="Prompt详解">
+                <i class="fa fa-chevron-left"></i> Prompt详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2024/02/23/sora/" rel="prev" title="Sora涉及的核心技术">
+                Sora涉及的核心技术 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image" src="/avatar/weichat.jpg" alt="nicehuster">
+          <p class="site-author-name" itemprop="name">nicehuster</p>
+           
+              <p class="site-description motion-element" itemprop="description">欢迎来到小白(@nicehuster)的博客。</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives/">
+                <span class="site-state-item-count">117</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">58</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/nicehuster" target="_blank" title="Github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      Github
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://blog.csdn.net/auto1993" target="_blank" title="CSDN">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                    
+                      CSDN
+                    
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="https://weibo.com/u/3335530510" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                    
+                      Weibo
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#BLIP"><span class="nav-number">1.</span> <span class="nav-text">BLIP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#motivation"><span class="nav-number">1.1.</span> <span class="nav-text">motivation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BLIP-1"><span class="nav-number">1.2.</span> <span class="nav-text">BLIP</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Pre-training-Objectives"><span class="nav-number">1.3.</span> <span class="nav-text">Pre-training Objectives</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CapFilt"><span class="nav-number">1.4.</span> <span class="nav-text">CapFilt</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BLIP-2"><span class="nav-number">2.</span> <span class="nav-text">BLIP-2</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#motivation-1"><span class="nav-number">2.1.</span> <span class="nav-text">motivation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#method"><span class="nav-number">2.2.</span> <span class="nav-text">method</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#experiments"><span class="nav-number">2.3.</span> <span class="nav-text">experiments</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#InstructBLIP"><span class="nav-number">3.</span> <span class="nav-text">InstructBLIP</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">nicehuster</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+
+
+  
+
+  
+
+</body>
+</html>

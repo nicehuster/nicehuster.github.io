@@ -108,13 +108,13 @@
 <meta property="og:site_name" content="一起打怪升级呀">
 <meta property="og:description" content="扩散模型(Diffusion Model)是一种新的图像生成范式，有着与其他生成方法比如GAN、VAE以及Flow-based models不同而且有意思的特性。最近也有许多基于diffusion model的图像生成方法涌现出来，比如DALLE2、Imagen、GLIDE，    CogView1&amp;amp;2，本文主要依据Lil’Log 的博客进行翻译整理，方便学习记录。可以先看一下基于diff">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="https://lilianweng.github.io/posts/2021-07-11-diffusion-models/generative-overview.png">
-<meta property="og:image" content="https://lilianweng.github.io/posts/2021-07-11-diffusion-models/DDPM.png">
-<meta property="og:updated_time" content="2022-07-05T01:16:08.179Z">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/generative-overview.png">
+<meta property="og:image" content="https://blog.nicehuster.cn/img/DDPM.png">
+<meta property="og:updated_time" content="2023-10-29T08:10:25.282Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Diffusion Model详解">
 <meta name="twitter:description" content="扩散模型(Diffusion Model)是一种新的图像生成范式，有着与其他生成方法比如GAN、VAE以及Flow-based models不同而且有意思的特性。最近也有许多基于diffusion model的图像生成方法涌现出来，比如DALLE2、Imagen、GLIDE，    CogView1&amp;amp;2，本文主要依据Lil’Log 的博客进行翻译整理，方便学习记录。可以先看一下基于diff">
-<meta name="twitter:image" content="https://lilianweng.github.io/posts/2021-07-11-diffusion-models/generative-overview.png">
+<meta name="twitter:image" content="https://blog.nicehuster.cn/img/generative-overview.png">
 
 
 
@@ -383,11 +383,11 @@
       
         <p>扩散模型(Diffusion Model)是一种新的图像生成范式，有着与其他生成方法比如GAN、VAE以及Flow-based models不同而且有意思的特性。最近也有许多基于diffusion model的图像生成方法涌现出来，比如DALLE2、Imagen、GLIDE，    CogView1&amp;2，本文主要依据<a href="https://lilianweng.github.io/" target="_blank" rel="noopener">Lil’Log</a> 的博客进行翻译整理，方便学习记录。可以先看一下基于diffusion model的一些下游方法基于text-to-image图像生成结果。<br><a id="more"></a></p>
 <h3 id="图像生成-text2image"><a href="#图像生成-text2image" class="headerlink" title="图像生成(text2image)"></a>图像生成(text2image)</h3><p>上面各类基于diffusion模型生成的图片都非常真实，而且有些生成出来的风格画很有意境。接下来就开始介绍diffusion model，在介绍diffusion model之前首先看一下各类生成模型的对比：</p>
-<p><img src="https://lilianweng.github.io/posts/2021-07-11-diffusion-models/generative-overview.png" alt></p>
+<p><img src="/img/generative-overview.png" alt></p>
 <p>上图对比了GAN，VAE、以及基于Flow的模型，它们在生成高质量样本方面显示出巨大的成功，但每一种都有其自身的一些局限性。GAN模型由于其对抗性训练的性质，以潜在的不稳定的训练和较少的生成多样性而闻名。VAE依赖于代用损失。基于Flow的模型必须使用专门的架构来构建可逆变换。</p>
-<h3 id="什么是Diffusion-Models"><a href="#什么是Diffusion-Models" class="headerlink" title="什么是Diffusion Models?"></a>什么是Diffusion Models?</h3><p><img src="https://lilianweng.github.io/posts/2021-07-11-diffusion-models/DDPM.png" alt></p>
-<p>如图所示，diffusion model通常包含俩个过程，从信号到噪声的正向过程/扩散过程(forward/diffusion process)以及从噪声逐步到信号的逆向/重建过程(reverse process)，这里主要介绍Google 的DDPM(Denoising Diffusion Probabilistic Model)，近些面出来的基于diffusion model的方法大都是基于DDPM的框架所设计。</p>
-<h4 id="正向-扩散过程"><a href="#正向-扩散过程" class="headerlink" title="正向/扩散过程"></a>正向/扩散过程</h4><p>正向过程采用的是一个固定的Markov chain形式(每个时刻$t$只与$t-1$时刻有关)，即逐步地向图片中添加高斯噪声的过程：</p>
+<h3 id="什么是Diffusion-Models"><a href="#什么是Diffusion-Models" class="headerlink" title="什么是Diffusion Models?"></a>什么是Diffusion Models?</h3><p><img src="/img/DDPM.png" alt></p>
+<p>如图所示，diffusion model通常包含俩个过程，从信号到噪声的正向过程/扩散过程(forward/diffusion process)以及从噪声逐步到信号的逆向/重建过程(reverse process)，这里主要介绍Google 的DDPM(Denoising Diffusion Probabilistic Model)，近些年出来的基于diffusion model的方法大都是基于DDPM的框架所设计。</p>
+<h4 id="正向过程"><a href="#正向过程" class="headerlink" title="正向过程"></a>正向过程</h4><p>正向过程采用的是一个固定的Markov chain形式(每个时刻$t$只与$t-1$时刻有关)，即逐步地向图片中添加高斯噪声的过程：</p>
 <script type="math/tex; mode=display">
 q\left(x_{t} \mid x_{t-1}\right)=\mathcal{N}\left(x_{t} ; \sqrt{1-\beta_{t}} x_{t-1}, \beta_{t} \mathbf{I}\right), q\left(x_{1: T} \mid x_{0}\right)=\prod_{t=1}^{T} q\left(x_{t} \mid x_{t-1}\right)</script><p>上面公式表示的是，$x<em>t$ 采样自 $x</em>{t-1}$并服从高斯分布$N(\sqrt{1-\beta<em>{t}},\beta</em>{t})$，在这个过程中随着$t$的增大，$x<em>t$ 越来越接近纯噪声，当$T \rightarrow \infty$ ，$x_T$ 是完全的高斯噪声(isotropic Gaussian distribution)。在实际应用中$\beta</em>{t}$是随着t增大而递增的，在DDPM中，$\beta_{t}$是预先设置的常量参数。在介绍diffusion的实现和推导过程中需要了解俩个重要特性：</p>
 <blockquote>
@@ -398,6 +398,7 @@ q\left(x_{t} \mid x_{t-1}\right)=\mathcal{N}\left(x_{t} ; \sqrt{1-\beta_{t}} x_{
 <p>将$\alpha<em>{t}=1-\beta</em>{t}$以及$\bar{\alpha}<em>{t}=\prod</em>{t=1}^{T} \alpha<em>{t}$ ，则可以得到：$q\left(x</em>{t} \mid x<em>{0}\right):=\mathcal{N}\left(x</em>{t} ; \sqrt{\bar{\alpha}<em>{t}} x</em>{0},\left(1-\bar{\alpha}_{t}\right) \boldsymbol{I}\right)$</p>
 <p>该公式意味着我们可以直接获得任意程度的加噪图片，方便后续的训练。</p>
 </blockquote>
+<h4 id="反向过程"><a href="#反向过程" class="headerlink" title="反向过程"></a>反向过程</h4><p>反向过程是一个去噪的过程， </p>
 <p>扩散过程有一个重要的特性是，可以直接采样任意时刻t下的加噪结果$x_t$。</p>
 <p><a href="https://zhuanlan.zhihu.com/p/525106459" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/525106459</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/449284962" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/449284962</a></p>
@@ -518,7 +519,7 @@ q\left(x_{t} \mid x_{t-1}\right)=\mathcal{N}\left(x_{t} ; \sqrt{1-\beta_{t}} x_{
           
             <div class="site-state-item site-state-posts">
               <a href="/archives/">
-                <span class="site-state-item-count">114</span>
+                <span class="site-state-item-count">117</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -540,7 +541,7 @@ q\left(x_{t} \mid x_{t-1}\right)=\mathcal{N}\left(x_{t} ; \sqrt{1-\beta_{t}} x_{
             
             <div class="site-state-item site-state-tags">
               <a href="/tags/index.html">
-                <span class="site-state-item-count">56</span>
+                <span class="site-state-item-count">58</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
@@ -617,7 +618,7 @@ q\left(x_{t} \mid x_{t-1}\right)=\mathcal{N}\left(x_{t} ; \sqrt{1-\beta_{t}} x_{
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#图像生成-text2image"><span class="nav-number">1.</span> <span class="nav-text">图像生成(text2image)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是Diffusion-Models"><span class="nav-number">2.</span> <span class="nav-text">什么是Diffusion Models?</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#正向-扩散过程"><span class="nav-number">2.1.</span> <span class="nav-text">正向/扩散过程</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#图像生成-text2image"><span class="nav-number">1.</span> <span class="nav-text">图像生成(text2image)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是Diffusion-Models"><span class="nav-number">2.</span> <span class="nav-text">什么是Diffusion Models?</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#正向过程"><span class="nav-number">2.1.</span> <span class="nav-text">正向过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#反向过程"><span class="nav-number">2.2.</span> <span class="nav-text">反向过程</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -640,7 +641,7 @@ q\left(x_{t} \mid x_{t-1}\right)=\mathcal{N}\left(x_{t} ; \sqrt{1-\beta_{t}} x_{
         <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>

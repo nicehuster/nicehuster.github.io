@@ -765,21 +765,7 @@
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/2018/03/09/dl_environ/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://blog.nicehuster.cn/2019/05/15/HRNet/</loc>
-    
-    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://blog.nicehuster.cn/2019/04/02/docker/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -793,6 +779,20 @@
   </url>
   
   <url>
+    <loc>https://blog.nicehuster.cn/2018/03/09/dl_environ/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://blog.nicehuster.cn/2019/04/02/docker/</loc>
+    
+    <lastmod>2020-09-13T06:54:12.000Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://blog.nicehuster.cn/2018/07/08/caffe/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
@@ -800,7 +800,7 @@
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/29/tensorRT_customlayer/</loc>
+    <loc>https://blog.nicehuster.cn/2018/07/25/tensorRT_install/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
@@ -814,7 +814,7 @@
   </url>
   
   <url>
-    <loc>https://blog.nicehuster.cn/2018/07/25/tensorRT_install/</loc>
+    <loc>https://blog.nicehuster.cn/2018/07/29/tensorRT_customlayer/</loc>
     
     <lastmod>2020-09-13T06:54:12.000Z</lastmod>
     
